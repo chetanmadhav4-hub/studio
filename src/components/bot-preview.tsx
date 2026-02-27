@@ -37,6 +37,7 @@ export function BotPreview() {
     try {
       const res = await fetch("/api/whatsapp/webhook", {
         method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           entry: [
             {
@@ -79,23 +80,28 @@ export function BotPreview() {
       const matches = line.match(urlRegex);
       
       if (matches) {
-        // Find any URL that looks like an image or is our known placeholder
+        // Find any URL that looks like an image
         const imageUrl = matches.find(url => 
-          url.includes("api.qrserver.com") || 
+          url.includes("placehold.co") || 
           url.includes("picsum.photos") ||
-          url.match(/\.(jpeg|jpg|gif|png|webp)/i)
+          url.includes("qrserver.com") ||
+          url.match(/\.(jpeg|jpg|gif|png|webp|svg)/i)
         );
 
         if (imageUrl) {
-          const textWithoutUrl = line.replace(imageUrl, "").trim();
           return (
-            <div key={idx} className="my-2">
-              {textWithoutUrl && <div className="mb-1">{textWithoutUrl}</div>}
-              <div className="text-center py-2">
+            <div key={idx} className="my-3 flex flex-col items-center">
+              <div className="bg-white p-2 rounded-xl border-2 border-primary/10 shadow-sm max-w-[220px]">
                 <img 
                   src={imageUrl} 
                   alt="QR Code" 
-                  className="rounded-lg max-w-[200px] h-auto border-2 border-white shadow-md bg-white p-2 mx-auto inline-block"
+                  className="rounded-lg w-full h-auto object-contain block"
+                  onLoad={() => console.log("Image loaded:", imageUrl)}
+                  onError={(e) => {
+                    console.error("Image load failed:", imageUrl);
+                    // Fallback visual
+                    (e.target as any).style.display = 'none';
+                  }}
                 />
               </div>
             </div>
@@ -103,7 +109,18 @@ export function BotPreview() {
         }
       }
 
-      return <div key={idx} className={line.trim() === "" ? "h-2" : "min-h-[1.25rem]"}>{line}</div>;
+      // Handle standard text lines
+      if (line.trim() === "") return <div key={idx} className="h-2" />;
+      
+      // Basic formatting for WhatsApp bold text
+      const formattedLine = line.split(/(\*.*?\*)/g).map((part, i) => {
+        if (part.startsWith('*') && part.endsWith('*')) {
+          return <strong key={i}>{part.slice(1, -1)}</strong>;
+        }
+        return part;
+      });
+
+      return <div key={idx} className="min-h-[1.25rem]">{formattedLine}</div>;
     });
   };
 
@@ -130,20 +147,23 @@ export function BotPreview() {
             }`}
           >
             <div
-              className={`max-w-[85%] rounded-lg px-3 py-2 text-sm shadow-sm whitespace-pre-wrap ${
+              className={`max-w-[85%] rounded-lg px-3 py-2 text-sm shadow-sm whitespace-pre-wrap transition-all duration-300 ${
                 msg.role === "user"
                   ? "bg-[#DCF8C6] text-foreground rounded-tr-none"
                   : "bg-white text-foreground rounded-tl-none"
               }`}
             >
               {renderMessageContent(msg.text)}
+              <div className="text-[10px] text-muted-foreground text-right mt-1 opacity-70">
+                {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+              </div>
             </div>
           </div>
         ))}
         {loading && (
           <div className="flex justify-start">
             <div className="bg-white rounded-lg px-4 py-2 text-sm animate-pulse">
-              ...
+              typing...
             </div>
           </div>
         )}
@@ -154,7 +174,7 @@ export function BotPreview() {
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && handleSend()}
           placeholder="Type a message..."
-          className="bg-white border-none rounded-full h-10 px-4 focus-visible:ring-0"
+          className="bg-white border-none rounded-full h-10 px-4 focus-visible:ring-0 shadow-sm"
         />
         <Button 
           onClick={handleSend}
@@ -162,7 +182,7 @@ export function BotPreview() {
           size="icon" 
           className="rounded-full bg-[#00A884] hover:bg-[#008F6F] h-10 w-10 shrink-0"
         >
-          <Send className="w-5 h-5" />
+          <Send className="w-5 h-5 text-white" />
         </Button>
       </div>
     </Card>

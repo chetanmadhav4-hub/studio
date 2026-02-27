@@ -88,8 +88,9 @@ export async function processBotMessage(
           paymentLink: `upi://pay?pa=${upiId}&pn=${encodeURIComponent(accountHolder)}&am=${price}&cu=INR`,
         });
 
+        // Ensure the QR URL is on its own line for the preview detector
         return {
-          reply: `${instructions.message}\n\n👤 *Account:* ${accountHolder}\n🆔 *UPI ID:* ${upiId}\n📸 *Scan this QR to pay:* \n${STATIC_QR_URL}\n\n✅ Payment karne ke baad, apna *Instagram Profile Link* yahan bheje order start karne ke liye.`,
+          reply: `${instructions.message}\n\n👤 *Account:* ${accountHolder}\n🆔 *UPI ID:* ${upiId}\n📸 *Scan this QR to pay:*\n\n${STATIC_QR_URL}\n\n✅ Payment karne ke baad, apna *Instagram Profile Link* yahan bheje order start karne ke liye.`,
           nextState: {
             state: 'AWAITING_PROFILE_LINK',
             data: { ...session.data },
