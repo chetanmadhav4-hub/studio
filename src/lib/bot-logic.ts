@@ -33,10 +33,10 @@ export async function processBotMessage(
   // Global commands
   if (normalizedMsg === 'hi' || normalizedMsg === 'start' || normalizedMsg === 'menu') {
     let menu = "👋 *Welcome to InstaFlow Bot!*\n\nAsli automation ka maza lein. 🚀\n\nNiche di gayi list mein se koi bhi service select karein:\n\n";
-    Object.entries(SERVICES_CONFIG).forEach(([key, service]) => {
-      menu += `${key}️⃣ *${service.name}*\n`;
+    Object.entries(SERVICES_CONFIG).forEach(([_, service]) => {
+      // Send as "OPTION: Name" which our preview will turn into a button
+      menu += `OPTION: ${service.name}\n`;
     });
-    menu += "\nKripya service ka *Number* bhejein ya *Naam* likhein.";
     
     return {
       reply: menu,
@@ -51,16 +51,16 @@ export async function processBotMessage(
     case 'AWAITING_SERVICE_SELECTION': {
       let selectedKey = '';
       
-      // Match by number or partial name
+      // Match by exact name from the button
       Object.entries(SERVICES_CONFIG).forEach(([key, service]) => {
-        if (normalizedMsg === key || normalizedMsg.includes(service.name.toLowerCase())) {
+        if (normalizedMsg === service.name.toLowerCase() || normalizedMsg.includes(service.name.toLowerCase())) {
           selectedKey = key;
         }
       });
 
       if (!selectedKey) {
         return {
-          reply: "⚠️ Kripya sahi service select karein. List mein se koi Number ya Naam bhejein (e.g., 1 ya Followers).",
+          reply: "⚠️ Kripya niche diye gaye buttons mein se ek select karein.",
           nextState: { state: 'AWAITING_SERVICE_SELECTION' },
         };
       }
@@ -94,7 +94,7 @@ export async function processBotMessage(
 
       const price = calculatePrice(quantity, service.pricePer1000);
       return {
-        reply: `✅ Aapne *${quantity} ${service.name}* select kiye hain.\n💰 Total price: *₹${price}*\n\nPayment QR code dekhne ke liye *YES* reply karein.`,
+        reply: `✅ Aapne *${quantity} ${service.name}* select kiye hain.\n💰 Total price: *₹${price}*\n\nOPTION: YES\nOPTION: MENU`,
         nextState: {
           state: 'AWAITING_PAYMENT_CONFIRMATION',
           data: { ...session.data, quantity, price },
@@ -111,7 +111,7 @@ export async function processBotMessage(
         const upiId = 'smmxpressbot@slc';
         const accountName = 'CHETAN KUMAR MEGHWAL';
         
-        // UPI Payload for QR Generation
+        // UPI Payload for QR Generation - Exact amount dynamic QR
         const upiPayload = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(accountName)}&am=${price}&cu=INR`;
         const qrImageUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(upiPayload)}`;
 
@@ -123,15 +123,18 @@ export async function processBotMessage(
         });
 
         return {
-          reply: `${instructions.message}\n\n👤 *Account:* ${accountName}\n🆔 *UPI ID:* ${upiId}\n\n📸 *SCAN TO PAY ₹${price} FOR ${serviceName}:*\n${qrImageUrl}\n\n✅ Payment ke baad, apna *Instagram Link* bhejein (Profile ya Post link) order start karne ke liye.`,
+          reply: `${instructions.message}\n\n👤 *Account:* ${accountName}\n🆔 *UPI ID:* ${upiId}\n💰 *Amount:* ₹${price}\n\n📸 *SCAN TO PAY ₹${price} FOR ${serviceName}:*\n${qrImageUrl}\n\n✅ Payment ke baad, apna *Instagram Link* bhejein order start karne ke liye.`,
           nextState: {
             state: 'AWAITING_LINK',
             data: { ...session.data },
           },
         };
       }
+      if (normalizedMsg === 'menu') {
+        return processBotMessage(session, 'menu');
+      }
       return {
-        reply: "⚠️ Aage badhne ke liye kripya *YES* reply karein ya *MENU* se restart karein.",
+        reply: "⚠️ Aage badhne ke liye kripya niche diye gaye buttons ka istemal karein.\n\nOPTION: YES\nOPTION: MENU",
         nextState: { state: 'AWAITING_PAYMENT_CONFIRMATION' },
       };
     }
@@ -162,7 +165,7 @@ export async function processBotMessage(
       });
 
       return {
-        reply: confirmation.message + "\n\nNaya order lagane ke liye *MENU* likhein.",
+        reply: confirmation.message + "\n\nNaya order lagane ke liye *MENU* likhein.\n\nOPTION: MENU",
         nextState: {
           state: 'ORDER_PLACED',
           data: { ...session.data, targetLink, orderId },
@@ -172,7 +175,7 @@ export async function processBotMessage(
 
     default:
       return {
-        reply: "👋 Welcome back! Menu dekhne ke liye *HI* bhejein.",
+        reply: "👋 Welcome back! Menu dekhne ke liye *HI* bhejein.\n\nOPTION: MENU",
         nextState: { state: 'START', data: {} },
       };
   }

@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Send, Bot } from "lucide-react";
+import { Send, Bot, MousePointer2 } from "lucide-react";
 
 interface ChatMessage {
   role: "user" | "bot";
@@ -25,12 +25,12 @@ export function BotPreview() {
     }
   }, [messages]);
 
-  const handleSend = async () => {
-    if (!input.trim() || loading) return;
+  const handleSend = async (customInput?: string) => {
+    const messageToSend = customInput || input;
+    if (!messageToSend.trim() || loading) return;
 
-    const userMsg = input;
     setInput("");
-    setMessages((prev) => [...prev, { role: "user", text: userMsg }]);
+    setMessages((prev) => [...prev, { role: "user", text: messageToSend }]);
     setLoading(true);
 
     try {
@@ -46,7 +46,7 @@ export function BotPreview() {
                     messages: [
                       {
                         from: "demo_user",
-                        text: { body: userMsg },
+                        text: { body: messageToSend },
                       },
                     ],
                   },
@@ -74,13 +74,14 @@ export function BotPreview() {
   const renderMessageContent = (text: string) => {
     const urlRegex = /(https?:\/\/[^\s]+)/g;
     const lines = text.split("\n");
+    const optionLines = lines.filter(line => line.startsWith("OPTION: "));
+    const otherLines = lines.filter(line => !line.startsWith("OPTION: "));
 
-    return lines.map((line, idx) => {
+    const content = otherLines.map((line, idx) => {
       const matches = line.match(urlRegex);
       
       if (matches) {
         const imageUrl = matches[0];
-        // Specifically look for QR generator or common image patterns
         const isImageUrl = 
           imageUrl.includes("qrserver.com") || 
           imageUrl.includes("api.qrserver.com") ||
@@ -91,15 +92,15 @@ export function BotPreview() {
         if (isImageUrl) {
           const textBeforeUrl = line.replace(imageUrl, "").trim();
           return (
-            <div key={idx} className="my-2 flex flex-col gap-2">
-              {textBeforeUrl && <div className="leading-relaxed">{textBeforeUrl}</div>}
-              <div className="bg-white p-3 rounded-xl border-2 border-[#075E54]/10 shadow-md max-w-[220px] mx-auto overflow-hidden">
+            <div key={idx} className="my-3 flex flex-col gap-2">
+              {textBeforeUrl && <div className="leading-relaxed font-medium">{textBeforeUrl}</div>}
+              <div className="bg-white p-3 rounded-xl border-2 border-[#075E54]/10 shadow-lg max-w-[240px] mx-auto overflow-hidden">
                 <img 
                   src={imageUrl} 
                   alt="QR Code" 
                   className="rounded-lg w-full h-auto block"
                 />
-                <div className="text-[10px] text-center mt-2 text-[#075E54] font-bold tracking-wider uppercase">
+                <div className="text-[10px] text-center mt-3 text-[#075E54] font-bold tracking-widest uppercase bg-[#E7F3F1] py-1 rounded">
                   Scan to Pay Now
                 </div>
               </div>
@@ -108,7 +109,7 @@ export function BotPreview() {
         }
       }
 
-      if (line.trim() === "") return <div key={idx} className="h-2" />;
+      if (line.trim() === "") return <div key={idx} className="h-1" />;
       
       const formattedLine = line.split(/(\*.*?\*)/g).map((part, i) => {
         if (part.startsWith('*') && part.endsWith('*')) {
@@ -117,14 +118,37 @@ export function BotPreview() {
         return part;
       });
 
-      return <div key={idx} className="leading-relaxed mb-1">{formattedLine}</div>;
+      return <div key={idx} className="leading-relaxed mb-1.5">{formattedLine}</div>;
     });
+
+    return (
+      <div className="flex flex-col gap-1">
+        <div>{content}</div>
+        {optionLines.length > 0 && (
+          <div className="mt-3 grid gap-2">
+            {optionLines.map((optLine, i) => {
+              const optionText = optLine.replace("OPTION: ", "").trim();
+              return (
+                <button
+                  key={i}
+                  onClick={() => handleSend(optionText)}
+                  className="w-full py-2.5 px-4 bg-white hover:bg-[#F0F2F5] text-[#00A884] font-semibold text-sm rounded-lg border border-[#00A884]/20 transition-all active:scale-[0.98] flex items-center justify-center gap-2 shadow-sm"
+                >
+                  <MousePointer2 className="w-4 h-4" />
+                  {optionText}
+                </button>
+              );
+            })}
+          </div>
+        )}
+      </div>
+    );
   };
 
   return (
-    <Card className="max-w-md mx-auto h-[650px] flex flex-col bg-[#E5DDD5] shadow-2xl rounded-2xl overflow-hidden border-none ring-1 ring-black/5">
+    <Card className="max-w-md mx-auto h-[680px] flex flex-col bg-[#E5DDD5] shadow-2xl rounded-2xl overflow-hidden border-none ring-1 ring-black/5">
       <CardHeader className="bg-[#075E54] text-white py-4 px-5 flex flex-row items-center gap-3 shrink-0 shadow-md relative z-10">
-        <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center border border-white/10">
+        <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center border border-white/10 overflow-hidden">
           <Bot className="w-6 h-6 text-white" />
         </div>
         <div>
@@ -177,7 +201,7 @@ export function BotPreview() {
           className="bg-white border-none rounded-full h-11 px-5 focus-visible:ring-2 focus-visible:ring-[#075E54]/20 shadow-sm"
         />
         <Button 
-          onClick={handleSend}
+          onClick={() => handleSend()}
           disabled={loading}
           size="icon" 
           className="rounded-full bg-[#00A884] hover:bg-[#008F6F] h-11 w-11 shrink-0 shadow-md transition-transform active:scale-95"
