@@ -20,6 +20,7 @@ const AiGeneratedPaymentInstructionsAndConfirmationInputSchema = z.object({
   quantity: z.number().optional().describe('The number of followers for the order.'),
   price: z.number().optional().describe('The calculated total price for the order.'),
   paymentLink: z.string().url().optional().describe('The dynamic payment link for the user.'),
+  qrCodeUrl: z.string().url().optional().describe('The URL of the generated QR code image.'),
   orderId: z.string().optional().describe('The SMM panel order ID.'),
   startTimeText: z.string().optional().describe('Text indicating the estimated start time for the order (e.g., "0-30 minutes").'),
 });
@@ -40,7 +41,30 @@ const prompt = ai.definePrompt({
   name: 'generatePaymentConfirmationPrompt',
   input: {schema: AiGeneratedPaymentInstructionsAndConfirmationInputSchema},
   output: {schema: AiGeneratedPaymentInstructionsAndConfirmationOutputSchema},
-  prompt: `You are an AI assistant for the InstaFlow Bot. You help users with SMM services via WhatsApp.\n\n{{#if (eq type "payment_instructions")}}\nGenerate clear and easy-to-understand payment instructions for the user.\nThey have selected {{quantity}} followers.\nThe total price is ₹{{price}}.\nHere is your payment link: {{paymentLink}}\nPlease complete the payment using this link. We will automatically detect your payment and then ask for your Instagram profile link to proceed with the order.\nKeep it concise, friendly, and use WhatsApp appropriate emojis.\n{{else if (eq type "order_confirmation")}}\nGenerate a concise and celebratory order confirmation message.\nThe order for {{quantity}} followers has been placed successfully.\nYour Order ID is: {{orderId}}.\nThe estimated start time is: {{startTimeText}}.\nCongratulate the user and reassure them the order is being processed.\nUse WhatsApp appropriate emojis to make it engaging and positive.\n{{/if}}`,
+  prompt: `You are an AI assistant for the InstaFlow Bot. You help users with SMM services via WhatsApp.
+
+{{#if (eq type "payment_instructions")}}
+Generate clear and easy-to-understand payment instructions for the user.
+They have selected {{quantity}} followers.
+The total price is ₹{{price}}.
+Here is your payment link: {{paymentLink}}
+
+IMPORTANT: Also mention that they can scan the QR code sent below to pay quickly.
+Instructions:
+1. Open any UPI app (PhonePe, Google Pay, Paytm).
+2. Scan the QR code or click the link.
+3. Complete the ₹{{price}} payment.
+4. We will automatically detect your payment.
+
+Keep it concise, friendly, and use WhatsApp appropriate emojis.
+{{else if (eq type "order_confirmation")}}
+Generate a concise and celebratory order confirmation message.
+The order for {{quantity}} followers has been placed successfully.
+Your Order ID is: {{orderId}}.
+The estimated start time is: {{startTimeText}}.
+Congratulate the user and reassure them the order is being processed.
+Use WhatsApp appropriate emojis to make it engaging and positive.
+{{/if}}`,
 });
 
 const aiGeneratedPaymentInstructionsAndConfirmationFlow = ai.defineFlow(

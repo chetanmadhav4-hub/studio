@@ -60,7 +60,7 @@ export async function processBotMessage(
 
       const price = calculatePrice(quantity);
       return {
-        reply: `✅ You selected ${quantity} followers.\n💰 Total price: ₹${price}\n\nReply *YES* to generate your payment link.`,
+        reply: `✅ You selected ${quantity} followers.\n💰 Total price: ₹${price}\n\nReply *YES* to generate your payment link and QR code.`,
         nextState: {
           state: 'AWAITING_PAYMENT_CONFIRMATION',
           data: { ...session.data, quantity, price },
@@ -76,15 +76,19 @@ export async function processBotMessage(
         // In a real app, generate a dynamic link from Razorpay/Cashfree
         const mockPaymentLink = `https://pay.instaflow.bot/checkout/${session.phoneNumber}_${Date.now()}`;
         
+        // Generate a QR code URL for the payment link
+        const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(mockPaymentLink)}`;
+        
         const instructions = await aiGeneratedPaymentInstructionsAndConfirmation({
           type: 'payment_instructions' as any,
           quantity,
           price,
           paymentLink: mockPaymentLink,
+          qrCodeUrl,
         });
 
         return {
-          reply: instructions.message,
+          reply: `${instructions.message}\n\n📸 *Scan this QR code to pay:*\n${qrCodeUrl}`,
           nextState: {
             state: 'AWAITING_PROFILE_LINK', // In a real flow, this would wait for a webhook first
             data: { ...session.data, paymentLinkId: 'MOCK_ID' },
