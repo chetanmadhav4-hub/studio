@@ -64,7 +64,7 @@ export function BotPreview() {
     } catch (error) {
       setMessages((prev) => [
         ...prev,
-        { role: "bot", text: "⚠️ Error processing your request." },
+        { role: "bot", text: "⚠️ Error processing your request. Server may be starting up." },
       ]);
     } finally {
       setLoading(false);
@@ -80,8 +80,10 @@ export function BotPreview() {
       
       if (matches) {
         const imageUrl = matches[0];
+        // Specifically look for QR generator or common image patterns
         const isImageUrl = 
           imageUrl.includes("qrserver.com") || 
+          imageUrl.includes("api.qrserver.com") ||
           imageUrl.includes("placehold.co") || 
           imageUrl.includes("picsum.photos") ||
           imageUrl.match(/\.(jpeg|jpg|gif|png|webp|svg)/i);
@@ -90,15 +92,15 @@ export function BotPreview() {
           const textBeforeUrl = line.replace(imageUrl, "").trim();
           return (
             <div key={idx} className="my-2 flex flex-col gap-2">
-              {textBeforeUrl && <div>{textBeforeUrl}</div>}
-              <div className="bg-white p-2 rounded-lg border shadow-sm max-w-[200px] mx-auto overflow-hidden">
+              {textBeforeUrl && <div className="leading-relaxed">{textBeforeUrl}</div>}
+              <div className="bg-white p-3 rounded-xl border-2 border-[#075E54]/10 shadow-md max-w-[220px] mx-auto overflow-hidden">
                 <img 
                   src={imageUrl} 
                   alt="QR Code" 
-                  className="rounded w-full h-auto block"
+                  className="rounded-lg w-full h-auto block"
                 />
-                <div className="text-[9px] text-center mt-1 text-muted-foreground font-bold">
-                  SCAN TO PAY
+                <div className="text-[10px] text-center mt-2 text-[#075E54] font-bold tracking-wider uppercase">
+                  Scan to Pay Now
                 </div>
               </div>
             </div>
@@ -106,33 +108,36 @@ export function BotPreview() {
         }
       }
 
-      if (line.trim() === "") return <div key={idx} className="h-1" />;
+      if (line.trim() === "") return <div key={idx} className="h-2" />;
       
       const formattedLine = line.split(/(\*.*?\*)/g).map((part, i) => {
         if (part.startsWith('*') && part.endsWith('*')) {
-          return <strong key={i}>{part.slice(1, -1)}</strong>;
+          return <strong key={i} className="font-bold">{part.slice(1, -1)}</strong>;
         }
         return part;
       });
 
-      return <div key={idx} className="leading-relaxed mb-0.5">{formattedLine}</div>;
+      return <div key={idx} className="leading-relaxed mb-1">{formattedLine}</div>;
     });
   };
 
   return (
-    <Card className="max-w-md mx-auto h-[600px] flex flex-col bg-[#E5DDD5] shadow-2xl rounded-xl overflow-hidden border-none">
-      <CardHeader className="bg-[#075E54] text-white py-3 px-4 flex flex-row items-center gap-3 shrink-0">
-        <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
-          <Bot className="w-6 h-6" />
+    <Card className="max-w-md mx-auto h-[650px] flex flex-col bg-[#E5DDD5] shadow-2xl rounded-2xl overflow-hidden border-none ring-1 ring-black/5">
+      <CardHeader className="bg-[#075E54] text-white py-4 px-5 flex flex-row items-center gap-3 shrink-0 shadow-md relative z-10">
+        <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center border border-white/10">
+          <Bot className="w-6 h-6 text-white" />
         </div>
         <div>
-          <CardTitle className="text-base font-semibold">InstaFlow Bot</CardTitle>
-          <p className="text-xs opacity-70">Online</p>
+          <CardTitle className="text-base font-bold tracking-tight">InstaFlow Bot</CardTitle>
+          <div className="flex items-center gap-1.5">
+            <span className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" />
+            <p className="text-[11px] font-medium text-emerald-100">Online & active</p>
+          </div>
         </div>
       </CardHeader>
       <CardContent 
         ref={scrollRef}
-        className="flex-1 overflow-y-auto p-4 space-y-4 scroll-smooth"
+        className="flex-1 overflow-y-auto p-5 space-y-4 scroll-smooth bg-[url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png')] bg-repeat"
       >
         {messages.map((msg, i) => (
           <div
@@ -142,14 +147,14 @@ export function BotPreview() {
             }`}
           >
             <div
-              className={`max-w-[85%] rounded-lg px-3 py-2 text-sm shadow-sm transition-all duration-300 ${
+              className={`max-w-[88%] rounded-2xl px-3.5 py-2.5 text-sm shadow-sm relative transition-all duration-300 ${
                 msg.role === "user"
                   ? "bg-[#DCF8C6] text-foreground rounded-tr-none"
                   : "bg-white text-foreground rounded-tl-none"
               }`}
             >
               {renderMessageContent(msg.text)}
-              <div className="text-[10px] text-muted-foreground text-right mt-1 opacity-70">
+              <div className="text-[9px] text-muted-foreground/60 text-right mt-1.5 font-medium">
                 {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
               </div>
             </div>
@@ -157,25 +162,25 @@ export function BotPreview() {
         ))}
         {loading && (
           <div className="flex justify-start">
-            <div className="bg-white rounded-lg px-4 py-2 text-sm animate-pulse">
-              typing...
+            <div className="bg-white rounded-2xl px-5 py-2.5 text-sm animate-pulse shadow-sm text-muted-foreground font-medium">
+              Bot is thinking...
             </div>
           </div>
         )}
       </CardContent>
-      <div className="p-3 bg-[#F0F2F5] flex gap-2 shrink-0">
+      <div className="p-4 bg-[#F0F2F5] flex gap-3 shrink-0 border-t border-black/5">
         <Input
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && handleSend()}
           placeholder="Type a message..."
-          className="bg-white border-none rounded-full h-10 px-4 focus-visible:ring-0 shadow-sm"
+          className="bg-white border-none rounded-full h-11 px-5 focus-visible:ring-2 focus-visible:ring-[#075E54]/20 shadow-sm"
         />
         <Button 
           onClick={handleSend}
           disabled={loading}
           size="icon" 
-          className="rounded-full bg-[#00A884] hover:bg-[#008F6F] h-10 w-10 shrink-0"
+          className="rounded-full bg-[#00A884] hover:bg-[#008F6F] h-11 w-11 shrink-0 shadow-md transition-transform active:scale-95"
         >
           <Send className="w-5 h-5 text-white" />
         </Button>

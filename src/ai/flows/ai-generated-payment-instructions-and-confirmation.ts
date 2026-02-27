@@ -35,7 +35,7 @@ const prompt = ai.definePrompt({
   name: 'generatePaymentConfirmationPrompt',
   input: {schema: AiGeneratedPaymentInstructionsAndConfirmationInputSchema},
   output: {schema: AiGeneratedPaymentInstructionsAndConfirmationOutputSchema},
-  prompt: `You are an AI assistant for the InstaFlow Bot. You help users with SMM services via WhatsApp.
+  prompt: `You are an AI assistant for the InstaFlow Bot, helping users with SMM services.
 
 Context:
 - Message Type: {{{type}}}
@@ -45,10 +45,10 @@ Context:
 - Start Time: {{{startTimeText}}}
 
 Instructions:
-1. If type is 'payment_instructions': Generate clear instructions to pay ₹{{{price}}} for {{{quantity}}} followers. Mention that they can use the UPI link or scan the QR code provided below the message. Tell them to pay to CHETAN KUMAR MEGHWAL (smmxpressbot@slc).
-2. If type is 'order_confirmation': Generate a celebratory message for Order ID {{{orderId}}}. Reassure them it will start in {{{startTimeText}}}.
+1. If type is 'payment_instructions': Create a clear message telling the user to pay ₹{{{price}}} for {{{quantity}}} followers. Mention they can use the UPI link or QR code below. Mention the account name CHETAN KUMAR MEGHWAL.
+2. If type is 'order_confirmation': Create a happy message for Order ID {{{orderId}}}. Reassure them it starts in {{{startTimeText}}}.
 
-Keep it friendly, professional, and use WhatsApp emojis. Do NOT include any URLs in your message as they are provided separately.`,
+Keep it friendly, using Hindi/English mix (Hinglish) as common in Indian WhatsApp chats. Use emojis. Do NOT include URLs directly in the message text.`,
 });
 
 const aiGeneratedPaymentInstructionsAndConfirmationFlow = ai.defineFlow(

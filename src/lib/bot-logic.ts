@@ -24,10 +24,10 @@ export async function processBotMessage(
 ): Promise<{ reply: string; nextState: Partial<UserSession> }> {
   const normalizedMsg = messageText.trim().toLowerCase();
 
-  // Reset if user says Hi or Start
+  // Global commands
   if (normalizedMsg === 'hi' || normalizedMsg === 'start' || normalizedMsg === 'menu') {
     return {
-      reply: "👋 Welcome to InstaFlow Bot!\n\nChoose your service:\n1️⃣ Instagram Followers",
+      reply: "👋 *Welcome to InstaFlow Bot!*\n\nAsli automation ka maza lein. 🚀\n\nChoose your service:\n1️⃣ *Instagram Followers*",
       nextState: {
         state: 'AWAITING_QUANTITY',
         data: {},
@@ -39,7 +39,7 @@ export async function processBotMessage(
     case 'AWAITING_QUANTITY': {
       if (normalizedMsg === '1' || normalizedMsg === 'instagram followers') {
         return {
-          reply: "📊 How many followers do you want? (Minimum 100)",
+          reply: "📊 Aapko kitne followers chahiye? (Minimum 100)",
           nextState: { state: 'AWAITING_QUANTITY' },
         };
       }
@@ -59,7 +59,7 @@ export async function processBotMessage(
 
       const price = calculatePrice(quantity);
       return {
-        reply: `✅ You selected ${quantity} followers.\n💰 Total price: ₹${price}\n\nReply *YES* to see the payment QR code for ₹${price}.`,
+        reply: `✅ Aapne *${quantity} followers* select kiye hain.\n💰 Total price: *₹${price}*\n\nPayment QR code dekhne ke liye *YES* reply karein.`,
         nextState: {
           state: 'AWAITING_PAYMENT_CONFIRMATION',
           data: { ...session.data, quantity, price },
@@ -72,11 +72,11 @@ export async function processBotMessage(
         const quantity = session.data.quantity || 0;
         const price = session.data.price || 0;
         
-        const accountHolder = 'CHETAN KUMAR MEGHWAL';
         const upiId = 'smmxpressbot@slc';
+        const accountName = 'CHETAN KUMAR MEGHWAL';
         
         // UPI Payload for QR Generation
-        const upiPayload = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(accountHolder)}&am=${price}&cu=INR`;
+        const upiPayload = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(accountName)}&am=${price}&cu=INR`;
         const qrImageUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(upiPayload)}`;
 
         const instructions = await aiGeneratedPaymentInstructionsAndConfirmation({
@@ -87,7 +87,7 @@ export async function processBotMessage(
         });
 
         return {
-          reply: `${instructions.message}\n\n👤 *Account:* ${accountHolder}\n🆔 *UPI ID:* ${upiId}\n\n📸 *SCAN THIS QR TO PAY ₹${price}:*\n${qrImageUrl}\n\n✅ Payment karne ke baad, apna *Instagram Profile Link* yahan bheje order start karne ke liye.`,
+          reply: `${instructions.message}\n\n👤 *Account:* ${accountName}\n🆔 *UPI ID:* ${upiId}\n\n📸 *SCAN THIS QR TO PAY ₹${price}:*\n${qrImageUrl}\n\n✅ Payment karne ke baad, apna *Instagram Profile Link* yahan bhejein order start karne ke liye.`,
           nextState: {
             state: 'AWAITING_PROFILE_LINK',
             data: { ...session.data },
@@ -95,7 +95,7 @@ export async function processBotMessage(
         };
       }
       return {
-        reply: "⚠️ Please reply *YES* to proceed to payment or *MENU* to start over.",
+        reply: "⚠️ Aage badhne ke liye kripya *YES* reply karein ya *MENU* se start over karein.",
         nextState: { state: 'AWAITING_PAYMENT_CONFIRMATION' },
       };
     }
@@ -108,7 +108,7 @@ export async function processBotMessage(
           currentState: 'Providing profile link after payment',
         });
         return {
-          reply: error.errorMessage + "\n\nKripya sahi Instagram profile link bheje.",
+          reply: error.errorMessage + "\n\nKripya sahi Instagram profile link bhejein (e.g., https://instagram.com/username)",
           nextState: { state: 'AWAITING_PROFILE_LINK' },
         };
       }
@@ -136,7 +136,7 @@ export async function processBotMessage(
 
     default:
       return {
-        reply: "👋 Welcome back! Send *HI* to see the menu.",
+        reply: "👋 Welcome back! Menu dekhne ke liye *HI* bhejein.",
         nextState: { state: 'START', data: {} },
       };
   }
