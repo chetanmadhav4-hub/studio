@@ -1,10 +1,15 @@
+
 import { BotState, UserSession } from './bot-types';
 import { aiGeneratedOrderConfirmation } from '@/ai/flows/ai-generated-order-confirmation';
 import { generateContextualErrorMessage } from '@/ai/flows/ai-generated-contextual-error-messages';
 import { aiGeneratedPaymentInstructionsAndConfirmation } from '@/ai/flows/ai-generated-payment-instructions-and-confirmation';
+import placeholderData from './placeholder-images.json';
 
 export const PRICE_PER_1000 = 120;
 export const MINIMUM_QUANTITY = 100;
+
+// Get static QR code from placeholder images
+const STATIC_QR_URL = placeholderData.placeholderImages.find(img => img.id === 'static-qr-code')?.imageUrl || '';
 
 export function calculatePrice(quantity: number): number {
   return Math.ceil((quantity / 1000) * PRICE_PER_1000);
@@ -60,7 +65,7 @@ export async function processBotMessage(
 
       const price = calculatePrice(quantity);
       return {
-        reply: `✅ You selected ${quantity} followers.\n💰 Total price: ₹${price}\n\nReply *YES* to generate your payment QR code for ₹${price}.`,
+        reply: `✅ You selected ${quantity} followers.\n💰 Total price: ₹${price}\n\nReply *YES* to see the payment QR code for ₹${price}.`,
         nextState: {
           state: 'AWAITING_PAYMENT_CONFIRMATION',
           data: { ...session.data, quantity, price },
@@ -73,29 +78,20 @@ export async function processBotMessage(
         const quantity = session.data.quantity || 0;
         const price = session.data.price || 0;
         
-        // Exact details from user image
-        const upiId = 'smmxpressbot@slc';
         const accountHolder = 'CHETAN KUMAR MEGHWAL';
-        
-        // UPI Link with EXACT amount and Account Holder Name
-        const upiLink = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(accountHolder)}&am=${price}&cu=INR&tn=Order_${quantity}_Followers`;
-        
-        // Generate QR code URL
-        const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(upiLink)}`;
         
         const instructions = await aiGeneratedPaymentInstructionsAndConfirmation({
           type: 'payment_instructions' as any,
           quantity,
           price,
-          paymentLink: upiLink,
-          qrCodeUrl,
+          paymentLink: 'UPI_DIRECT',
         });
 
         return {
-          reply: `${instructions.message}\n\n👤 *Account:* ${accountHolder}\n📸 *Scan to pay ₹${price}:*\n${qrCodeUrl}\n\n✅ Payment karne ke baad, apna *Instagram Profile Link* yahan bheje order start karne ke liye.`,
+          reply: `${instructions.message}\n\n👤 *Account:* ${accountHolder}\n📸 *Scan this QR to pay ₹${price}:*\n${STATIC_QR_URL}\n\n✅ Payment karne ke baad, apna *Instagram Profile Link* yahan bheje order start karne ke liye.`,
           nextState: {
             state: 'AWAITING_PROFILE_LINK',
-            data: { ...session.data, paymentLinkId: 'UPI_DIRECT' },
+            data: { ...session.data },
           },
         };
       }
