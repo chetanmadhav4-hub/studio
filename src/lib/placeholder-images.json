@@ -3,8 +3,8 @@
     {
       "id": "static-qr-code",
       "description": "Slice UPI QR code for CHETAN KUMAR MEGHWAL",
-      "imageUrl": "https://placehold.co/400x500/075E54/white?text=SCAN+TO+PAY%0ACHETAN+KUMAR%0A₹4563",
-      "imageHint": "slice upi qr code chetan kumar meghwal"
+      "imageUrl": "https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=upi://pay?pa=smmxpressbot@slc%26pn=CHETAN%20KUMAR%20MEGHWAL%26cu=INR",
+      "imageHint": "upi qr code payment"
     }
   ]
 }

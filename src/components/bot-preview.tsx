@@ -80,29 +80,32 @@ export function BotPreview() {
       const matches = line.match(urlRegex);
       
       if (matches) {
-        // Find any URL that looks like an image
-        const imageUrl = matches.find(url => 
-          url.includes("placehold.co") || 
-          url.includes("picsum.photos") ||
-          url.includes("qrserver.com") ||
-          url.match(/\.(jpeg|jpg|gif|png|webp|svg)/i)
-        );
+        // Find any URL that should be an image
+        const imageUrl = matches[0];
+        const isImageUrl = 
+          imageUrl.includes("qrserver.com") || 
+          imageUrl.includes("placehold.co") || 
+          imageUrl.includes("picsum.photos") ||
+          imageUrl.match(/\.(jpeg|jpg|gif|png|webp|svg)/i);
 
-        if (imageUrl) {
+        if (isImageUrl) {
+          // Replace the URL line with an image component
+          const textBeforeUrl = line.replace(imageUrl, "").trim();
           return (
-            <div key={idx} className="my-3 flex flex-col items-center">
-              <div className="bg-white p-2 rounded-xl border-2 border-primary/10 shadow-sm max-w-[220px]">
+            <div key={idx} className="my-2 flex flex-col gap-2">
+              {textBeforeUrl && <div>{textBeforeUrl}</div>}
+              <div className="bg-white p-3 rounded-lg border shadow-sm max-w-[240px] mx-auto">
                 <img 
                   src={imageUrl} 
                   alt="QR Code" 
-                  className="rounded-lg w-full h-auto object-contain block"
-                  onLoad={() => console.log("Image loaded:", imageUrl)}
+                  className="rounded h-auto w-full object-contain"
                   onError={(e) => {
-                    console.error("Image load failed:", imageUrl);
-                    // Fallback visual
-                    (e.target as any).style.display = 'none';
+                    (e.target as HTMLImageElement).style.display = 'none';
                   }}
                 />
+                <div className="text-[10px] text-center mt-2 text-muted-foreground font-medium">
+                  Scan to Pay ₹4563
+                </div>
               </div>
             </div>
           );
@@ -112,7 +115,6 @@ export function BotPreview() {
       // Handle standard text lines
       if (line.trim() === "") return <div key={idx} className="h-2" />;
       
-      // Basic formatting for WhatsApp bold text
       const formattedLine = line.split(/(\*.*?\*)/g).map((part, i) => {
         if (part.startsWith('*') && part.endsWith('*')) {
           return <strong key={i}>{part.slice(1, -1)}</strong>;
@@ -120,7 +122,7 @@ export function BotPreview() {
         return part;
       });
 
-      return <div key={idx} className="min-h-[1.25rem]">{formattedLine}</div>;
+      return <div key={idx} className="leading-relaxed">{formattedLine}</div>;
     });
   };
 
@@ -147,7 +149,7 @@ export function BotPreview() {
             }`}
           >
             <div
-              className={`max-w-[85%] rounded-lg px-3 py-2 text-sm shadow-sm whitespace-pre-wrap transition-all duration-300 ${
+              className={`max-w-[85%] rounded-lg px-3 py-2 text-sm shadow-sm transition-all duration-300 ${
                 msg.role === "user"
                   ? "bg-[#DCF8C6] text-foreground rounded-tr-none"
                   : "bg-white text-foreground rounded-tl-none"

@@ -3,13 +3,9 @@ import { BotState, UserSession } from './bot-types';
 import { aiGeneratedOrderConfirmation } from '@/ai/flows/ai-generated-order-confirmation';
 import { generateContextualErrorMessage } from '@/ai/flows/ai-generated-contextual-error-messages';
 import { aiGeneratedPaymentInstructionsAndConfirmation } from '@/ai/flows/ai-generated-payment-instructions-and-confirmation';
-import placeholderData from './placeholder-images.json';
 
 export const PRICE_PER_1000 = 120;
 export const MINIMUM_QUANTITY = 100;
-
-// Get static QR code from placeholder images
-const STATIC_QR_URL = placeholderData.placeholderImages.find(img => img.id === 'static-qr-code')?.imageUrl || '';
 
 export function calculatePrice(quantity: number): number {
   return Math.ceil((quantity / 1000) * PRICE_PER_1000);
@@ -22,7 +18,6 @@ export function isValidInstagramUrl(url: string): boolean {
 
 /**
  * Handles the state machine logic for the bot.
- * Returns the message to be sent back to the user and the next state data.
  */
 export async function processBotMessage(
   session: UserSession,
@@ -81,16 +76,19 @@ export async function processBotMessage(
         const accountHolder = 'CHETAN KUMAR MEGHWAL';
         const upiId = 'smmxpressbot@slc';
         
+        // Dynamic QR code generation for the specific amount using a reliable QR API
+        const upiPayload = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(accountHolder)}&am=${price}&cu=INR`;
+        const qrImageUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(upiPayload)}`;
+
         const instructions = await aiGeneratedPaymentInstructionsAndConfirmation({
           type: 'payment_instructions' as any,
           quantity,
           price,
-          paymentLink: `upi://pay?pa=${upiId}&pn=${encodeURIComponent(accountHolder)}&am=${price}&cu=INR`,
+          paymentLink: upiPayload,
         });
 
-        // Ensure the QR URL is on its own line for the preview detector
         return {
-          reply: `${instructions.message}\n\n👤 *Account:* ${accountHolder}\n🆔 *UPI ID:* ${upiId}\n📸 *Scan this QR to pay:*\n\n${STATIC_QR_URL}\n\n✅ Payment karne ke baad, apna *Instagram Profile Link* yahan bheje order start karne ke liye.`,
+          reply: `${instructions.message}\n\n👤 *Account:* ${accountHolder}\n🆔 *UPI ID:* ${upiId}\n\n📸 *SCAN THIS QR TO PAY ₹${price}:*\n${qrImageUrl}\n\n✅ Payment karne ke baad, apna *Instagram Profile Link* yahan bheje order start karne ke liye.`,
           nextState: {
             state: 'AWAITING_PROFILE_LINK',
             data: { ...session.data },
