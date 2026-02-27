@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Send, Bot, Image as ImageIcon } from "lucide-react";
+import { Send, Bot } from "lucide-react";
 
 interface ChatMessage {
   role: "user" | "bot";
@@ -70,29 +70,42 @@ export function BotPreview() {
     }
   };
 
-  // Helper to render message with image detection
   const renderMessageContent = (text: string) => {
+    // Regex to find a URL in a string
+    const urlRegex = /(https?:\/\/[^\s]+)/g;
     const lines = text.split("\n");
+
     return lines.map((line, idx) => {
-      // Basic image URL detection (e.g. from qrserver)
-      if (line.includes("https://api.qrserver.com") || line.match(/\.(jpeg|jpg|gif|png|webp)$/i)) {
-        return (
-          <div key={idx} className="my-2">
-            <img 
-              src={line.trim()} 
-              alt="QR Code or Image" 
-              className="rounded-lg max-w-full h-auto border shadow-sm bg-white p-2 mx-auto"
-            />
-          </div>
+      const matches = line.match(urlRegex);
+      
+      // Check if any URL in the line is an image or from qrserver
+      if (matches) {
+        const imageUrl = matches.find(url => 
+          url.includes("api.qrserver.com") || 
+          url.match(/\.(jpeg|jpg|gif|png|webp)$/i)
         );
+
+        if (imageUrl) {
+          return (
+            <div key={idx} className="my-3 text-center">
+              <div className="text-xs text-muted-foreground mb-1">QR Code:</div>
+              <img 
+                src={imageUrl} 
+                alt="QR Code" 
+                className="rounded-lg max-w-full h-auto border-2 border-white shadow-md bg-white p-2 mx-auto inline-block"
+              />
+            </div>
+          );
+        }
       }
-      return <div key={idx} className={line.trim() === "" ? "h-2" : ""}>{line}</div>;
+
+      return <div key={idx} className={line.trim() === "" ? "h-2" : "min-h-[1.25rem]"}>{line}</div>;
     });
   };
 
   return (
     <Card className="max-w-md mx-auto h-[600px] flex flex-col bg-[#E5DDD5] shadow-2xl rounded-xl overflow-hidden border-none">
-      <CardHeader className="bg-[#075E54] text-white py-3 px-4 flex flex-row items-center gap-3">
+      <CardHeader className="bg-[#075E54] text-white py-3 px-4 flex flex-row items-center gap-3 shrink-0">
         <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
           <Bot className="w-6 h-6" />
         </div>
@@ -131,7 +144,7 @@ export function BotPreview() {
           </div>
         )}
       </CardContent>
-      <div className="p-3 bg-[#F0F2F5] flex gap-2">
+      <div className="p-3 bg-[#F0F2F5] flex gap-2 shrink-0">
         <Input
           value={input}
           onChange={(e) => setInput(e.target.value)}
