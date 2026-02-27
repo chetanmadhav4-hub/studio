@@ -73,13 +73,14 @@ export async function processBotMessage(
         const quantity = session.data.quantity || 0;
         const price = session.data.price || 0;
         
-        // Target UPI ID as requested
+        // Exact details from user image
         const upiId = 'smmxpressbot@slc';
+        const accountHolder = 'CHETAN KUMAR MEGHWAL';
         
-        // UPI Link with EXACT amount
-        const upiLink = `upi://pay?pa=${upiId}&pn=InstaFlow&am=${price}&cu=INR&tn=Order_${quantity}_Followers`;
+        // UPI Link with EXACT amount and Account Holder Name
+        const upiLink = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(accountHolder)}&am=${price}&cu=INR&tn=Order_${quantity}_Followers`;
         
-        // Generate QR code URL (using encodeURIComponent for the entire UPI link)
+        // Generate QR code URL
         const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(upiLink)}`;
         
         const instructions = await aiGeneratedPaymentInstructionsAndConfirmation({
@@ -90,9 +91,8 @@ export async function processBotMessage(
           qrCodeUrl,
         });
 
-        // Send the QR code URL on its own line for the preview to catch it
         return {
-          reply: `${instructions.message}\n\n📸 *Scan to pay ₹${price}:*\n${qrCodeUrl}\n\n✅ Payment karne ke baad, apna *Instagram Profile Link* yahan bheje order start karne ke liye.`,
+          reply: `${instructions.message}\n\n👤 *Account:* ${accountHolder}\n📸 *Scan to pay ₹${price}:*\n${qrCodeUrl}\n\n✅ Payment karne ke baad, apna *Instagram Profile Link* yahan bheje order start karne ke liye.`,
           nextState: {
             state: 'AWAITING_PROFILE_LINK',
             data: { ...session.data, paymentLinkId: 'UPI_DIRECT' },

@@ -71,14 +71,12 @@ export function BotPreview() {
   };
 
   const renderMessageContent = (text: string) => {
-    // Regex to find a URL in a string
     const urlRegex = /(https?:\/\/[^\s]+)/g;
     const lines = text.split("\n");
 
     return lines.map((line, idx) => {
       const matches = line.match(urlRegex);
       
-      // Check if any URL in the line is an image or from qrserver
       if (matches) {
         const imageUrl = matches.find(url => 
           url.includes("api.qrserver.com") || 
@@ -86,14 +84,18 @@ export function BotPreview() {
         );
 
         if (imageUrl) {
+          // Keep the text on the line if there is any, but render the image below it
+          const textWithoutUrl = line.replace(imageUrl, "").trim();
           return (
-            <div key={idx} className="my-3 text-center">
-              <div className="text-xs text-muted-foreground mb-1">QR Code:</div>
-              <img 
-                src={imageUrl} 
-                alt="QR Code" 
-                className="rounded-lg max-w-full h-auto border-2 border-white shadow-md bg-white p-2 mx-auto inline-block"
-              />
+            <div key={idx} className="my-2">
+              {textWithoutUrl && <div className="mb-2">{textWithoutUrl}</div>}
+              <div className="text-center">
+                <img 
+                  src={imageUrl} 
+                  alt="QR Code" 
+                  className="rounded-lg max-w-full h-auto border-2 border-white shadow-md bg-white p-2 mx-auto inline-block"
+                />
+              </div>
             </div>
           );
         }
