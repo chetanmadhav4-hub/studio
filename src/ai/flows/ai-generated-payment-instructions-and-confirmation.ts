@@ -12,7 +12,7 @@ import {z} from 'genkit';
 
 const AiGeneratedPaymentInstructionsAndConfirmationInputSchema = z.object({
   type: z.enum(['payment_instructions', 'order_confirmation']).describe('The type of message to generate.'),
-  quantity: z.number().optional().describe('The number of followers for the order.'),
+  quantity: z.number().optional().describe('The number of followers/likes for the order.'),
   price: z.number().optional().describe('The calculated total price for the order.'),
   paymentLink: z.string().optional().describe('The dynamic payment link for the user.'),
   orderId: z.string().optional().describe('The SMM panel order ID.'),
@@ -45,10 +45,10 @@ Context:
 - Start Time: {{{startTimeText}}}
 
 Instructions:
-1. If type is 'payment_instructions': Create a clear message telling the user to pay ₹{{{price}}} for {{{quantity}}} followers. Mention they can use the UPI link or QR code below. Mention the account name CHETAN KUMAR MEGHWAL.
+1. If type is 'payment_instructions': Create a clear message telling the user to pay ₹{{{price}}} for their order of {{{quantity}}} items. Mention they can scan the QR code below. Mention the account name CHETAN KUMAR MEGHWAL.
 2. If type is 'order_confirmation': Create a happy message for Order ID {{{orderId}}}. Reassure them it starts in {{{startTimeText}}}.
 
-Keep it friendly, using Hindi/English mix (Hinglish) as common in Indian WhatsApp chats. Use emojis. Do NOT include URLs directly in the message text.`,
+Keep it friendly, using Hindi/English mix (Hinglish). Use emojis. Do NOT include URLs directly in the message text.`,
 });
 
 const aiGeneratedPaymentInstructionsAndConfirmationFlow = ai.defineFlow(

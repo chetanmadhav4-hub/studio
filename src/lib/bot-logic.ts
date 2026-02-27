@@ -3,15 +3,21 @@ import { aiGeneratedOrderConfirmation } from '@/ai/flows/ai-generated-order-conf
 import { generateContextualErrorMessage } from '@/ai/flows/ai-generated-contextual-error-messages';
 import { aiGeneratedPaymentInstructionsAndConfirmation } from '@/ai/flows/ai-generated-payment-instructions-and-confirmation';
 
-export const PRICE_PER_1000 = 120;
-export const MINIMUM_QUANTITY = 100;
+export const SERVICES_CONFIG: Record<string, { name: string; pricePer1000: number; min: number }> = {
+  '1': { name: 'Instagram Followers', pricePer1000: 120, min: 100 },
+  '2': { name: 'Instagram Likes', pricePer1000: 60, min: 100 },
+  '3': { name: 'Instagram Views', pricePer1000: 30, min: 100 },
+  '4': { name: 'Instagram Shares', pricePer1000: 80, min: 100 },
+  '5': { name: 'Instagram Comments', pricePer1000: 250, min: 10 },
+  '6': { name: 'Instagram Story Views', pricePer1000: 50, min: 100 },
+};
 
-export function calculatePrice(quantity: number): number {
-  return Math.ceil((quantity / 1000) * PRICE_PER_1000);
+export function calculatePrice(quantity: number, pricePer1000: number): number {
+  return Math.max(1, Math.ceil((quantity / 1000) * pricePer1000));
 }
 
 export function isValidInstagramUrl(url: string): boolean {
-  const regex = /^(https?:\/\/)?(www\.)?instagram\.com\/[a-zA-Z0-9_.]+\/?/;
+  const regex = /^(https?:\/\/)?(www\.)?instagram\.com\/[a-zA-Z0-9_.]+/;
   return regex.test(url);
 }
 
@@ -26,30 +32,59 @@ export async function processBotMessage(
 
   // Global commands
   if (normalizedMsg === 'hi' || normalizedMsg === 'start' || normalizedMsg === 'menu') {
+    let menu = "👋 *Welcome to InstaFlow Bot!*\n\nAsli automation ka maza lein. 🚀\n\nNiche di gayi list mein se koi bhi service select karein:\n\n";
+    Object.entries(SERVICES_CONFIG).forEach(([key, service]) => {
+      menu += `${key}️⃣ *${service.name}*\n`;
+    });
+    menu += "\nKripya service ka *Number* bhejein ya *Naam* likhein.";
+    
     return {
-      reply: "👋 *Welcome to InstaFlow Bot!*\n\nAsli automation ka maza lein. 🚀\n\nChoose your service:\n1️⃣ *Instagram Followers*",
+      reply: menu,
       nextState: {
-        state: 'AWAITING_QUANTITY',
+        state: 'AWAITING_SERVICE_SELECTION',
         data: {},
       },
     };
   }
 
   switch (session.state) {
-    case 'AWAITING_QUANTITY': {
-      if (normalizedMsg === '1' || normalizedMsg === 'instagram followers') {
+    case 'AWAITING_SERVICE_SELECTION': {
+      let selectedKey = '';
+      
+      // Match by number or partial name
+      Object.entries(SERVICES_CONFIG).forEach(([key, service]) => {
+        if (normalizedMsg === key || normalizedMsg.includes(service.name.toLowerCase())) {
+          selectedKey = key;
+        }
+      });
+
+      if (!selectedKey) {
         return {
-          reply: "📊 Aapko kitne followers chahiye? (Minimum 100)",
-          nextState: { state: 'AWAITING_QUANTITY' },
+          reply: "⚠️ Kripya sahi service select karein. List mein se koi Number ya Naam bhejein (e.g., 1 ya Followers).",
+          nextState: { state: 'AWAITING_SERVICE_SELECTION' },
         };
       }
 
+      const selectedService = SERVICES_CONFIG[selectedKey];
+      return {
+        reply: `📊 Aapne *${selectedService.name}* select kiya hai.\n\nKitni quantity chahiye? (Minimum ${selectedService.min})`,
+        nextState: { 
+          state: 'AWAITING_QUANTITY',
+          data: { ...session.data, serviceId: selectedKey, serviceName: selectedService.name }
+        },
+      };
+    }
+
+    case 'AWAITING_QUANTITY': {
       const quantity = parseInt(normalizedMsg);
-      if (isNaN(quantity) || quantity < MINIMUM_QUANTITY) {
+      const serviceId = session.data.serviceId || '1';
+      const service = SERVICES_CONFIG[serviceId];
+
+      if (isNaN(quantity) || quantity < service.min) {
         const error = await generateContextualErrorMessage({
           errorType: 'INVALID_QUANTITY',
-          details: `User input: ${messageText}. Minimum required is ${MINIMUM_QUANTITY}.`,
-          currentState: 'Selecting quantity for Instagram Followers',
+          details: `User input: ${messageText}. Minimum for ${service.name} is ${service.min}.`,
+          currentState: `Selecting quantity for ${service.name}`,
         });
         return {
           reply: error.errorMessage,
@@ -57,9 +92,9 @@ export async function processBotMessage(
         };
       }
 
-      const price = calculatePrice(quantity);
+      const price = calculatePrice(quantity, service.pricePer1000);
       return {
-        reply: `✅ Aapne *${quantity} followers* select kiye hain.\n💰 Total price: *₹${price}*\n\nPayment QR code dekhne ke liye *YES* reply karein.`,
+        reply: `✅ Aapne *${quantity} ${service.name}* select kiye hain.\n💰 Total price: *₹${price}*\n\nPayment QR code dekhne ke liye *YES* reply karein.`,
         nextState: {
           state: 'AWAITING_PAYMENT_CONFIRMATION',
           data: { ...session.data, quantity, price },
@@ -71,6 +106,7 @@ export async function processBotMessage(
       if (normalizedMsg === 'yes') {
         const quantity = session.data.quantity || 0;
         const price = session.data.price || 0;
+        const serviceName = session.data.serviceName || 'Service';
         
         const upiId = 'smmxpressbot@slc';
         const accountName = 'CHETAN KUMAR MEGHWAL';
@@ -87,49 +123,49 @@ export async function processBotMessage(
         });
 
         return {
-          reply: `${instructions.message}\n\n👤 *Account:* ${accountName}\n🆔 *UPI ID:* ${upiId}\n\n📸 *SCAN THIS QR TO PAY ₹${price}:*\n${qrImageUrl}\n\n✅ Payment karne ke baad, apna *Instagram Profile Link* yahan bhejein order start karne ke liye.`,
+          reply: `${instructions.message}\n\n👤 *Account:* ${accountName}\n🆔 *UPI ID:* ${upiId}\n\n📸 *SCAN TO PAY ₹${price} FOR ${serviceName}:*\n${qrImageUrl}\n\n✅ Payment ke baad, apna *Instagram Link* bhejein (Profile ya Post link) order start karne ke liye.`,
           nextState: {
-            state: 'AWAITING_PROFILE_LINK',
+            state: 'AWAITING_LINK',
             data: { ...session.data },
           },
         };
       }
       return {
-        reply: "⚠️ Aage badhne ke liye kripya *YES* reply karein ya *MENU* se start over karein.",
+        reply: "⚠️ Aage badhne ke liye kripya *YES* reply karein ya *MENU* se restart karein.",
         nextState: { state: 'AWAITING_PAYMENT_CONFIRMATION' },
       };
     }
 
-    case 'AWAITING_PROFILE_LINK': {
+    case 'AWAITING_LINK': {
       if (!isValidInstagramUrl(messageText)) {
         const error = await generateContextualErrorMessage({
           errorType: 'INVALID_URL',
-          details: `User provided: ${messageText}. Needs to be a valid Instagram profile link.`,
-          currentState: 'Providing profile link after payment',
+          details: `User provided: ${messageText}. Needs to be a valid Instagram link.`,
+          currentState: 'Providing link after payment',
         });
         return {
-          reply: error.errorMessage + "\n\nKripya sahi Instagram profile link bhejein (e.g., https://instagram.com/username)",
-          nextState: { state: 'AWAITING_PROFILE_LINK' },
+          reply: error.errorMessage + "\n\nKripya sahi Instagram link bhejein (e.g., https://instagram.com/username)",
+          nextState: { state: 'AWAITING_LINK' },
         };
       }
 
-      const profileLink = messageText;
+      const targetLink = messageText;
       const orderId = `INSTA-${Math.floor(100000 + Math.random() * 900000)}`;
       
       const confirmation = await aiGeneratedOrderConfirmation({
         orderId,
         quantity: session.data.quantity || 0,
-        serviceName: 'Instagram Followers',
-        instagramProfileLink: profileLink,
+        serviceName: session.data.serviceName || 'Instagram Service',
+        instagramProfileLink: targetLink,
         price: session.data.price || 0,
         startTime: '0-30 minutes',
       });
 
       return {
-        reply: confirmation.message,
+        reply: confirmation.message + "\n\nNaya order lagane ke liye *MENU* likhein.",
         nextState: {
           state: 'ORDER_PLACED',
-          data: { ...session.data, profileLink, orderId },
+          data: { ...session.data, targetLink, orderId },
         },
       };
     }

@@ -1,8 +1,9 @@
 export type BotState = 
   | 'START' 
+  | 'AWAITING_SERVICE_SELECTION'
   | 'AWAITING_QUANTITY' 
   | 'AWAITING_PAYMENT_CONFIRMATION' 
-  | 'AWAITING_PROFILE_LINK' 
+  | 'AWAITING_LINK' 
   | 'ORDER_PLACED' 
   | 'ERROR';
 
@@ -11,10 +12,12 @@ export interface UserSession {
   state: BotState;
   lastMessage: string;
   data: {
+    serviceId?: string;
+    serviceName?: string;
     quantity?: number;
     price?: number;
     paymentLinkId?: string;
-    profileLink?: string;
+    targetLink?: string;
     orderId?: string;
     smmOrderId?: string;
   };
@@ -28,7 +31,7 @@ export interface OrderRecord {
   quantity: number;
   price: number;
   status: 'PENDING_PAYMENT' | 'PAID' | 'PLACED' | 'FAILED';
-  profileLink?: string;
+  targetLink?: string;
   smmOrderId?: string;
   createdAt: number;
 }
