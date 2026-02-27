@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect, useRef } from "react";
@@ -78,22 +79,23 @@ export function BotPreview() {
       const matches = line.match(urlRegex);
       
       if (matches) {
+        // Find any URL that looks like an image or is our known placeholder
         const imageUrl = matches.find(url => 
           url.includes("api.qrserver.com") || 
-          url.match(/\.(jpeg|jpg|gif|png|webp)$/i)
+          url.includes("picsum.photos") ||
+          url.match(/\.(jpeg|jpg|gif|png|webp)/i)
         );
 
         if (imageUrl) {
-          // Keep the text on the line if there is any, but render the image below it
           const textWithoutUrl = line.replace(imageUrl, "").trim();
           return (
             <div key={idx} className="my-2">
-              {textWithoutUrl && <div className="mb-2">{textWithoutUrl}</div>}
-              <div className="text-center">
+              {textWithoutUrl && <div className="mb-1">{textWithoutUrl}</div>}
+              <div className="text-center py-2">
                 <img 
                   src={imageUrl} 
                   alt="QR Code" 
-                  className="rounded-lg max-w-full h-auto border-2 border-white shadow-md bg-white p-2 mx-auto inline-block"
+                  className="rounded-lg max-w-[200px] h-auto border-2 border-white shadow-md bg-white p-2 mx-auto inline-block"
                 />
               </div>
             </div>
