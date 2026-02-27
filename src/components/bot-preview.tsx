@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Send, User, Bot } from "lucide-react";
+import { Send, Bot, Image as ImageIcon } from "lucide-react";
 
 interface ChatMessage {
   role: "user" | "bot";
@@ -70,6 +70,26 @@ export function BotPreview() {
     }
   };
 
+  // Helper to render message with image detection
+  const renderMessageContent = (text: string) => {
+    const lines = text.split("\n");
+    return lines.map((line, idx) => {
+      // Basic image URL detection (e.g. from qrserver)
+      if (line.includes("https://api.qrserver.com") || line.match(/\.(jpeg|jpg|gif|png|webp)$/i)) {
+        return (
+          <div key={idx} className="my-2">
+            <img 
+              src={line.trim()} 
+              alt="QR Code or Image" 
+              className="rounded-lg max-w-full h-auto border shadow-sm bg-white p-2 mx-auto"
+            />
+          </div>
+        );
+      }
+      return <div key={idx} className={line.trim() === "" ? "h-2" : ""}>{line}</div>;
+    });
+  };
+
   return (
     <Card className="max-w-md mx-auto h-[600px] flex flex-col bg-[#E5DDD5] shadow-2xl rounded-xl overflow-hidden border-none">
       <CardHeader className="bg-[#075E54] text-white py-3 px-4 flex flex-row items-center gap-3">
@@ -99,7 +119,7 @@ export function BotPreview() {
                   : "bg-white text-foreground rounded-tl-none"
               }`}
             >
-              {msg.text}
+              {renderMessageContent(msg.text)}
             </div>
           </div>
         ))}
