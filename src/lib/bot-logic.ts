@@ -79,16 +79,17 @@ export async function processBotMessage(
         const price = session.data.price || 0;
         
         const accountHolder = 'CHETAN KUMAR MEGHWAL';
+        const upiId = 'smmxpressbot@slc';
         
         const instructions = await aiGeneratedPaymentInstructionsAndConfirmation({
           type: 'payment_instructions' as any,
           quantity,
           price,
-          paymentLink: 'UPI_DIRECT',
+          paymentLink: `upi://pay?pa=${upiId}&pn=${encodeURIComponent(accountHolder)}&am=${price}&cu=INR`,
         });
 
         return {
-          reply: `${instructions.message}\n\n👤 *Account:* ${accountHolder}\n📸 *Scan this QR to pay ₹${price}:*\n${STATIC_QR_URL}\n\n✅ Payment karne ke baad, apna *Instagram Profile Link* yahan bheje order start karne ke liye.`,
+          reply: `${instructions.message}\n\n👤 *Account:* ${accountHolder}\n🆔 *UPI ID:* ${upiId}\n📸 *Scan this QR to pay:* \n${STATIC_QR_URL}\n\n✅ Payment karne ke baad, apna *Instagram Profile Link* yahan bheje order start karne ke liye.`,
           nextState: {
             state: 'AWAITING_PROFILE_LINK',
             data: { ...session.data },
