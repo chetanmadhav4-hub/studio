@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useEffect, useRef } from "react";
@@ -80,7 +79,6 @@ export function BotPreview() {
       const matches = line.match(urlRegex);
       
       if (matches) {
-        // Find any URL that should be an image
         const imageUrl = matches[0];
         const isImageUrl = 
           imageUrl.includes("qrserver.com") || 
@@ -89,22 +87,18 @@ export function BotPreview() {
           imageUrl.match(/\.(jpeg|jpg|gif|png|webp|svg)/i);
 
         if (isImageUrl) {
-          // Replace the URL line with an image component
           const textBeforeUrl = line.replace(imageUrl, "").trim();
           return (
             <div key={idx} className="my-2 flex flex-col gap-2">
               {textBeforeUrl && <div>{textBeforeUrl}</div>}
-              <div className="bg-white p-3 rounded-lg border shadow-sm max-w-[240px] mx-auto">
+              <div className="bg-white p-2 rounded-lg border shadow-sm max-w-[200px] mx-auto overflow-hidden">
                 <img 
                   src={imageUrl} 
                   alt="QR Code" 
-                  className="rounded h-auto w-full object-contain"
-                  onError={(e) => {
-                    (e.target as HTMLImageElement).style.display = 'none';
-                  }}
+                  className="rounded w-full h-auto block"
                 />
-                <div className="text-[10px] text-center mt-2 text-muted-foreground font-medium">
-                  Scan to Pay ₹4563
+                <div className="text-[9px] text-center mt-1 text-muted-foreground font-bold">
+                  SCAN TO PAY
                 </div>
               </div>
             </div>
@@ -112,8 +106,7 @@ export function BotPreview() {
         }
       }
 
-      // Handle standard text lines
-      if (line.trim() === "") return <div key={idx} className="h-2" />;
+      if (line.trim() === "") return <div key={idx} className="h-1" />;
       
       const formattedLine = line.split(/(\*.*?\*)/g).map((part, i) => {
         if (part.startsWith('*') && part.endsWith('*')) {
@@ -122,7 +115,7 @@ export function BotPreview() {
         return part;
       });
 
-      return <div key={idx} className="leading-relaxed">{formattedLine}</div>;
+      return <div key={idx} className="leading-relaxed mb-0.5">{formattedLine}</div>;
     });
   };
 

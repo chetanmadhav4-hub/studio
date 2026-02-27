@@ -1,4 +1,3 @@
-
 import { BotState, UserSession } from './bot-types';
 import { aiGeneratedOrderConfirmation } from '@/ai/flows/ai-generated-order-confirmation';
 import { generateContextualErrorMessage } from '@/ai/flows/ai-generated-contextual-error-messages';
@@ -76,12 +75,12 @@ export async function processBotMessage(
         const accountHolder = 'CHETAN KUMAR MEGHWAL';
         const upiId = 'smmxpressbot@slc';
         
-        // Dynamic QR code generation for the specific amount using a reliable QR API
+        // UPI Payload for QR Generation
         const upiPayload = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(accountHolder)}&am=${price}&cu=INR`;
         const qrImageUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(upiPayload)}`;
 
         const instructions = await aiGeneratedPaymentInstructionsAndConfirmation({
-          type: 'payment_instructions' as any,
+          type: 'payment_instructions',
           quantity,
           price,
           paymentLink: upiPayload,

@@ -10,19 +10,13 @@
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 
-enum MessageType {
-  PAYMENT_INSTRUCTIONS = 'payment_instructions',
-  ORDER_CONFIRMATION = 'order_confirmation',
-}
-
 const AiGeneratedPaymentInstructionsAndConfirmationInputSchema = z.object({
-  type: z.nativeEnum(MessageType).describe('The type of message to generate (payment_instructions or order_confirmation).'),
+  type: z.enum(['payment_instructions', 'order_confirmation']).describe('The type of message to generate.'),
   quantity: z.number().optional().describe('The number of followers for the order.'),
   price: z.number().optional().describe('The calculated total price for the order.'),
-  paymentLink: z.string().url().optional().describe('The dynamic payment link for the user.'),
-  qrCodeUrl: z.string().url().optional().describe('The URL of the generated QR code image.'),
+  paymentLink: z.string().optional().describe('The dynamic payment link for the user.'),
   orderId: z.string().optional().describe('The SMM panel order ID.'),
-  startTimeText: z.string().optional().describe('Text indicating the estimated start time for the order (e.g., "0-30 minutes").'),
+  startTimeText: z.string().optional().describe('Text indicating the estimated start time for the order.'),
 });
 export type AiGeneratedPaymentInstructionsAndConfirmationInput = z.infer<typeof AiGeneratedPaymentInstructionsAndConfirmationInputSchema>;
 
@@ -43,28 +37,18 @@ const prompt = ai.definePrompt({
   output: {schema: AiGeneratedPaymentInstructionsAndConfirmationOutputSchema},
   prompt: `You are an AI assistant for the InstaFlow Bot. You help users with SMM services via WhatsApp.
 
-{{#if (eq type "payment_instructions")}}
-Generate clear and easy-to-understand payment instructions for the user.
-They have selected {{quantity}} followers.
-The total price is ₹{{price}}.
-Here is your payment link: {{paymentLink}}
+Context:
+- Message Type: {{{type}}}
+- Quantity: {{{quantity}}}
+- Price: ₹{{{price}}}
+- Order ID: {{{orderId}}}
+- Start Time: {{{startTimeText}}}
 
-IMPORTANT: Also mention that they can scan the QR code sent below to pay quickly.
 Instructions:
-1. Open any UPI app (PhonePe, Google Pay, Paytm).
-2. Scan the QR code or click the link.
-3. Complete the ₹{{price}} payment.
-4. We will automatically detect your payment.
+1. If type is 'payment_instructions': Generate clear instructions to pay ₹{{{price}}} for {{{quantity}}} followers. Mention that they can use the UPI link or scan the QR code provided below the message. Tell them to pay to CHETAN KUMAR MEGHWAL (smmxpressbot@slc).
+2. If type is 'order_confirmation': Generate a celebratory message for Order ID {{{orderId}}}. Reassure them it will start in {{{startTimeText}}}.
 
-Keep it concise, friendly, and use WhatsApp appropriate emojis.
-{{else if (eq type "order_confirmation")}}
-Generate a concise and celebratory order confirmation message.
-The order for {{quantity}} followers has been placed successfully.
-Your Order ID is: {{orderId}}.
-The estimated start time is: {{startTimeText}}.
-Congratulate the user and reassure them the order is being processed.
-Use WhatsApp appropriate emojis to make it engaging and positive.
-{{/if}}`,
+Keep it friendly, professional, and use WhatsApp emojis. Do NOT include any URLs in your message as they are provided separately.`,
 });
 
 const aiGeneratedPaymentInstructionsAndConfirmationFlow = ai.defineFlow(
