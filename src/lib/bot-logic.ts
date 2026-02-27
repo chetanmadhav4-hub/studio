@@ -60,7 +60,7 @@ export async function processBotMessage(
 
       const price = calculatePrice(quantity);
       return {
-        reply: `✅ You selected ${quantity} followers.\n💰 Total price: ₹${price}\n\nReply *YES* to generate your payment link and QR code.`,
+        reply: `✅ You selected ${quantity} followers.\n💰 Total price: ₹${price}\n\nReply *YES* to generate your payment QR code for ₹${price}.`,
         nextState: {
           state: 'AWAITING_PAYMENT_CONFIRMATION',
           data: { ...session.data, quantity, price },
@@ -73,25 +73,26 @@ export async function processBotMessage(
         const quantity = session.data.quantity || 0;
         const price = session.data.price || 0;
         
-        // In a real app, generate a dynamic link from Razorpay/Cashfree
-        const mockPaymentLink = `https://pay.instaflow.bot/checkout/${session.phoneNumber}_${Date.now()}`;
+        // UPI ID and Construction of UPI Link for exact amount
+        const upiId = 'smmxpressbot@slc';
+        const upiLink = `upi://pay?pa=${upiId}&pn=InstaFlow&am=${price}&cu=INR&tn=InstaFlow_Order_${quantity}`;
         
-        // Generate a QR code URL for the payment link
-        const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(mockPaymentLink)}`;
+        // Generate a QR code URL for the UPI link using a public API
+        const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(upiLink)}`;
         
         const instructions = await aiGeneratedPaymentInstructionsAndConfirmation({
           type: 'payment_instructions' as any,
           quantity,
           price,
-          paymentLink: mockPaymentLink,
+          paymentLink: upiLink,
           qrCodeUrl,
         });
 
         return {
-          reply: `${instructions.message}\n\n📸 *Scan this QR code to pay:*\n${qrCodeUrl}`,
+          reply: `${instructions.message}\n\n📸 *Scan this QR code to pay ₹${price}:*\n${qrCodeUrl}\n\n✅ Payment karne ke baad, apna *Instagram Profile Link* yahan bheje order start karne ke liye.`,
           nextState: {
-            state: 'AWAITING_PROFILE_LINK', // In a real flow, this would wait for a webhook first
-            data: { ...session.data, paymentLinkId: 'MOCK_ID' },
+            state: 'AWAITING_PROFILE_LINK',
+            data: { ...session.data, paymentLinkId: 'UPI_DIRECT' },
           },
         };
       }
@@ -102,7 +103,6 @@ export async function processBotMessage(
     }
 
     case 'AWAITING_PROFILE_LINK': {
-      // Assuming payment is verified or we are manually testing
       if (!isValidInstagramUrl(messageText)) {
         const error = await generateContextualErrorMessage({
           errorType: 'INVALID_URL',
@@ -110,7 +110,7 @@ export async function processBotMessage(
           currentState: 'Providing profile link after payment',
         });
         return {
-          reply: error.errorMessage,
+          reply: error.errorMessage + "\n\nKripya sahi Instagram profile link bheje.",
           nextState: { state: 'AWAITING_PROFILE_LINK' },
         };
       }
