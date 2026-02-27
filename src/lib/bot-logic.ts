@@ -30,11 +30,10 @@ export async function processBotMessage(
 ): Promise<{ reply: string; nextState: Partial<UserSession> }> {
   const normalizedMsg = messageText.trim().toLowerCase();
 
-  // Global commands
+  // 1. GLOBAL COMMANDS: Reset to Menu
   if (normalizedMsg === 'hi' || normalizedMsg === 'start' || normalizedMsg === 'menu') {
     let menu = "👋 *Welcome to InstaFlow Bot!*\n\nAsli automation ka maza lein. 🚀\n\nNiche di gayi list mein se koi bhi service select karein:\n\n";
     Object.entries(SERVICES_CONFIG).forEach(([_, service]) => {
-      // Send as "OPTION: Name" which our preview will turn into a button
       menu += `OPTION: ${service.name}\n`;
     });
     
@@ -47,31 +46,32 @@ export async function processBotMessage(
     };
   }
 
+  // 2. GLOBAL SERVICE INTERRUPTION: If user clicks a service button at ANY time
+  let interceptedServiceKey = '';
+  Object.entries(SERVICES_CONFIG).forEach(([key, service]) => {
+    if (normalizedMsg === service.name.toLowerCase()) {
+      interceptedServiceKey = key;
+    }
+  });
+
+  if (interceptedServiceKey) {
+    const selectedService = SERVICES_CONFIG[interceptedServiceKey];
+    return {
+      reply: `📊 Aapne *${selectedService.name}* select kiya hai.\n\nKitni quantity chahiye? (Minimum ${selectedService.min})`,
+      nextState: { 
+        state: 'AWAITING_QUANTITY',
+        data: { serviceId: interceptedServiceKey, serviceName: selectedService.name }
+      },
+    };
+  }
+
+  // 3. STATE-BASED LOGIC
   switch (session.state) {
     case 'AWAITING_SERVICE_SELECTION': {
-      let selectedKey = '';
-      
-      // Match by exact name from the button
-      Object.entries(SERVICES_CONFIG).forEach(([key, service]) => {
-        if (normalizedMsg === service.name.toLowerCase() || normalizedMsg.includes(service.name.toLowerCase())) {
-          selectedKey = key;
-        }
-      });
-
-      if (!selectedKey) {
-        return {
-          reply: "⚠️ Kripya niche diye gaye buttons mein se ek select karein.",
-          nextState: { state: 'AWAITING_SERVICE_SELECTION' },
-        };
-      }
-
-      const selectedService = SERVICES_CONFIG[selectedKey];
+      // This is now handled by the global interception logic above
       return {
-        reply: `📊 Aapne *${selectedService.name}* select kiya hai.\n\nKitni quantity chahiye? (Minimum ${selectedService.min})`,
-        nextState: { 
-          state: 'AWAITING_QUANTITY',
-          data: { ...session.data, serviceId: selectedKey, serviceName: selectedService.name }
-        },
+        reply: "⚠️ Kripya niche diye gaye buttons mein se ek select karein.",
+        nextState: { state: 'AWAITING_SERVICE_SELECTION' },
       };
     }
 
@@ -94,7 +94,7 @@ export async function processBotMessage(
 
       const price = calculatePrice(quantity, service.pricePer1000);
       return {
-        reply: `✅ Aapne *${quantity} ${service.name}* select kiye hain.\n💰 Total price: *₹${price}*\n\nOPTION: YES\nOPTION: MENU`,
+        reply: `✅ Aapne *${quantity} ${service.name}* select kiye hain.\n💰 Total price: *₹${price}*\n\nOPTION: YES, PAY NOW\nOPTION: MENU`,
         nextState: {
           state: 'AWAITING_PAYMENT_CONFIRMATION',
           data: { ...session.data, quantity, price },
@@ -103,7 +103,7 @@ export async function processBotMessage(
     }
 
     case 'AWAITING_PAYMENT_CONFIRMATION': {
-      if (normalizedMsg === 'yes') {
+      if (normalizedMsg.includes('yes') || normalizedMsg.includes('pay')) {
         const quantity = session.data.quantity || 0;
         const price = session.data.price || 0;
         const serviceName = session.data.serviceName || 'Service';
@@ -111,7 +111,7 @@ export async function processBotMessage(
         const upiId = 'smmxpressbot@slc';
         const accountName = 'CHETAN KUMAR MEGHWAL';
         
-        // UPI Payload for QR Generation - Exact amount dynamic QR
+        // Use the goqr.me API to generate a real scanable QR for the exact amount
         const upiPayload = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(accountName)}&am=${price}&cu=INR`;
         const qrImageUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(upiPayload)}`;
 
@@ -123,53 +123,58 @@ export async function processBotMessage(
         });
 
         return {
-          reply: `${instructions.message}\n\n👤 *Account:* ${accountName}\n🆔 *UPI ID:* ${upiId}\n💰 *Amount:* ₹${price}\n\n📸 *SCAN TO PAY ₹${price} FOR ${serviceName}:*\n${qrImageUrl}\n\n✅ Payment ke baad, apna *Instagram Link* bhejein order start karne ke liye.`,
+          reply: `${instructions.message}\n\n👤 *Account:* ${accountName}\n🆔 *UPI ID:* ${upiId}\n💰 *Amount:* ₹${price}\n\n📸 *SCAN TO PAY ₹${price} FOR ${serviceName}:*\n${qrImageUrl}\n\n✅ Payment ke baad, apna *Instagram Link* bhejein order start karne ke liye.\n\nOPTION: MENU`,
           nextState: {
             state: 'AWAITING_LINK',
             data: { ...session.data },
           },
         };
       }
-      if (normalizedMsg === 'menu') {
-        return processBotMessage(session, 'menu');
-      }
       return {
-        reply: "⚠️ Aage badhne ke liye kripya niche diye gaye buttons ka istemal karein.\n\nOPTION: YES\nOPTION: MENU",
+        reply: "⚠️ Aage badhne ke liye kripya niche diye gaye buttons ka istemal karein.\n\nOPTION: YES, PAY NOW\nOPTION: MENU",
         nextState: { state: 'AWAITING_PAYMENT_CONFIRMATION' },
       };
     }
 
     case 'AWAITING_LINK': {
-      if (!isValidInstagramUrl(messageText)) {
-        const error = await generateContextualErrorMessage({
-          errorType: 'INVALID_URL',
-          details: `User provided: ${messageText}. Needs to be a valid Instagram link.`,
-          currentState: 'Providing link after payment',
+      // If it's not a service button (checked globally) and it is a valid link:
+      if (isValidInstagramUrl(messageText)) {
+        const targetLink = messageText;
+        const orderId = `INSTA-${Math.floor(100000 + Math.random() * 900000)}`;
+        
+        const confirmation = await aiGeneratedOrderConfirmation({
+          orderId,
+          quantity: session.data.quantity || 0,
+          serviceName: session.data.serviceName || 'Instagram Service',
+          instagramProfileLink: targetLink,
+          price: session.data.price || 0,
+          startTime: '0-30 minutes',
         });
+
         return {
-          reply: error.errorMessage + "\n\nKripya sahi Instagram link bhejein (e.g., https://instagram.com/username)",
-          nextState: { state: 'AWAITING_LINK' },
+          reply: confirmation.message + "\n\nNaya order lagane ke liye *MENU* likhein.\n\nOPTION: MENU",
+          nextState: {
+            state: 'ORDER_PLACED',
+            data: { ...session.data, targetLink, orderId },
+          },
         };
       }
 
-      const targetLink = messageText;
-      const orderId = `INSTA-${Math.floor(100000 + Math.random() * 900000)}`;
+      // If it's not a link and not a service (already checked), show error
+      const error = await generateContextualErrorMessage({
+        errorType: 'INVALID_URL',
+        details: `User provided: ${messageText}. Needs to be a valid Instagram link.`,
+        currentState: 'Providing link after payment',
+      });
       
-      const confirmation = await aiGeneratedOrderConfirmation({
-        orderId,
-        quantity: session.data.quantity || 0,
-        serviceName: session.data.serviceName || 'Instagram Service',
-        instagramProfileLink: targetLink,
-        price: session.data.price || 0,
-        startTime: '0-30 minutes',
+      let replyWithMenu = error.errorMessage + "\n\nKripya sahi Instagram link bhejein (e.g., https://instagram.com/username)\n\nYa koi nayi service select karein:\n";
+      Object.entries(SERVICES_CONFIG).forEach(([_, service]) => {
+        replyWithMenu += `OPTION: ${service.name}\n`;
       });
 
       return {
-        reply: confirmation.message + "\n\nNaya order lagane ke liye *MENU* likhein.\n\nOPTION: MENU",
-        nextState: {
-          state: 'ORDER_PLACED',
-          data: { ...session.data, targetLink, orderId },
-        },
+        reply: replyWithMenu,
+        nextState: { state: 'AWAITING_LINK' },
       };
     }
 
