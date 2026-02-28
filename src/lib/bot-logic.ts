@@ -51,28 +51,48 @@ export async function processBotMessage(
     }
 
     const orderId = `INSTA-${Math.floor(100000 + Math.random() * 900000)}`;
+    const serviceName = session.data.serviceName || 'Instagram Service';
+    const quantity = session.data.quantity || 0;
+    const price = session.data.price || 0;
+    const targetLink = link.trim();
+
     try {
       const confirmation = await aiGeneratedOrderConfirmation({
         orderId,
-        quantity: session.data.quantity || 0,
-        serviceName: session.data.serviceName || 'Instagram Service',
-        instagramProfileLink: link.trim(),
-        price: session.data.price || 0,
+        quantity,
+        serviceName,
+        instagramProfileLink: targetLink,
+        price,
         startTime: '0-30 minutes',
       });
+      
       return {
         reply: confirmation.message + "\n\nNaya order lagane ke liye MENU likhein.\n\nOPTION: MENU",
         nextState: { 
           state: 'ORDER_PLACED', 
-          data: { ...session.data, orderId, targetLink: link.trim(), utrId: utr.trim() } 
+          data: { ...session.data, orderId, targetLink, utrId: utr.trim() } 
         }
       };
     } catch (e) {
+      // Robust Fallback message matching the user's required structured format
+      const fallbackMsg = `🎉 *Woohoo! Your InstaFlow order successfully created!*
+
+- *Order ID:* ${orderId}
+- *Service:* ${serviceName}
+- *Quantity:* ${quantity}
+- *Amount:* ₹${price}
+- *Start Time:* 0-30 minutes
+- *Target Link:* ${targetLink}
+
+Naya order lagane ke liye MENU likhein.
+
+OPTION: MENU`;
+
       return {
-        reply: `🎉 *Order Created!* ID: ${orderId}\n\nNaya order lagane ke liye MENU likhein.\n\nOPTION: MENU`,
+        reply: fallbackMsg,
         nextState: { 
           state: 'ORDER_PLACED', 
-          data: { ...session.data, orderId, targetLink: link.trim(), utrId: utr.trim() } 
+          data: { ...session.data, orderId, targetLink, utrId: utr.trim() } 
         }
       };
     }
@@ -178,7 +198,6 @@ export async function processBotMessage(
     }
 
     case 'AWAITING_PAYMENT_DETAILS': {
-      // If user types something else while form is shown, remind them to use the form
       return {
         reply: "⚠️ Kripya QR code ke niche diye gaye box mein details bhar kar Submit karein.\n\n[PAYMENT_FORM]",
         nextState: { state: 'AWAITING_PAYMENT_DETAILS' },
