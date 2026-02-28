@@ -154,7 +154,7 @@ export function BotPreview() {
           return (
             <div key={idx} className="my-3 flex flex-col gap-2">
               {textBeforeUrl && <div className="leading-relaxed font-medium">{textBeforeUrl}</div>}
-              <div className="bg-white p-3 rounded-xl border-2 border-[#075E54]/10 shadow-lg max-w-[220px] mx-auto overflow-hidden text-center">
+              <div className="bg-white dark:bg-zinc-800 p-3 rounded-xl border-2 border-[#075E54]/10 dark:border-white/10 shadow-lg max-w-[220px] mx-auto overflow-hidden text-center">
                 <img 
                   src={imageUrl} 
                   alt="QR Code" 
@@ -169,7 +169,7 @@ export function BotPreview() {
                     Pay via UPI App
                   </a>
                 ) : (
-                  <div className="text-[10px] text-center mt-3 text-[#075E54] font-bold tracking-widest uppercase bg-[#E7F3F1] py-1.5 rounded">
+                  <div className="text-[10px] text-center mt-3 text-[#075E54] dark:text-[#00A884] font-bold tracking-widest uppercase bg-[#E7F3F1] dark:bg-zinc-900 py-1.5 rounded">
                     Scan to Pay Now
                   </div>
                 )}
@@ -202,7 +202,7 @@ export function BotPreview() {
                 <button
                   key={i}
                   onClick={() => handleSend(optionText)}
-                  className="w-full py-2 px-4 bg-white hover:bg-[#F0F2F5] text-[#00A884] font-semibold text-xs md:text-sm rounded-lg border border-[#00A884]/20 transition-all active:scale-[0.98] flex items-center justify-center gap-2 shadow-sm"
+                  className="w-full py-2 px-4 bg-white dark:bg-zinc-900 hover:bg-[#F0F2F5] dark:hover:bg-zinc-800 text-[#00A884] font-semibold text-xs md:text-sm rounded-lg border border-[#00A884]/20 transition-all active:scale-[0.98] flex items-center justify-center gap-2 shadow-sm"
                 >
                   <MousePointer2 className="w-4 h-4" />
                   {optionText}
@@ -225,7 +225,7 @@ export function BotPreview() {
     <div className="relative w-full">
       {!user && mounted && (
         <div className="absolute inset-0 z-50 bg-black/50 backdrop-blur-[2px] rounded-2xl flex items-center justify-center p-4 text-center">
-          <Card className="bg-white border-none shadow-2xl w-full max-w-[280px]">
+          <Card className="bg-white dark:bg-card border-none shadow-2xl w-full max-w-[280px]">
             <CardHeader className="pb-2">
               <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-1">
                 <LogIn className="w-5 h-5 text-primary" />
@@ -249,8 +249,8 @@ export function BotPreview() {
         </div>
       )}
       
-      <Card className={`w-full h-[580px] md:h-[680px] flex flex-col bg-[#E5DDD5] shadow-xl rounded-2xl overflow-hidden border-none ring-1 ring-black/5 transition-all ${!user ? 'opacity-40 grayscale-[20%]' : ''}`}>
-        <CardHeader className="bg-[#075E54] text-white py-3 px-4 flex flex-row items-center gap-3 shrink-0 shadow-md relative z-10">
+      <Card className={`w-full h-[580px] md:h-[680px] flex flex-col bg-[#E5DDD5] dark:bg-zinc-950 shadow-xl rounded-2xl overflow-hidden border-none ring-1 ring-black/5 transition-all ${!user ? 'opacity-40 grayscale-[20%]' : ''}`}>
+        <CardHeader className="bg-[#075E54] dark:bg-zinc-900 text-white py-3 px-4 flex flex-row items-center gap-3 shrink-0 shadow-md relative z-10">
           <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-white/20 flex items-center justify-center border border-white/10 overflow-hidden">
             <Bot className="w-5 h-5 md:w-6 md:h-6 text-white" />
           </div>
@@ -264,7 +264,7 @@ export function BotPreview() {
         </CardHeader>
         <CardContent 
           ref={scrollRef}
-          className="flex-1 overflow-y-auto p-4 space-y-4 scroll-smooth bg-[url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png')] bg-repeat"
+          className="flex-1 overflow-y-auto p-4 space-y-4 scroll-smooth bg-[url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png')] dark:bg-none bg-repeat"
         >
           {messages.map((msg, i) => (
             <div
@@ -276,12 +276,12 @@ export function BotPreview() {
               <div
                 className={`max-w-[85%] rounded-2xl px-3 py-2 text-sm shadow-sm relative ${
                   msg.role === "user"
-                    ? "bg-[#DCF8C6] text-foreground rounded-tr-none"
-                    : "bg-white text-foreground rounded-tl-none"
+                    ? "bg-[#DCF8C6] dark:bg-emerald-900 text-foreground dark:text-emerald-50 rounded-tr-none"
+                    : "bg-white dark:bg-zinc-800 text-foreground dark:text-zinc-100 rounded-tl-none"
                 }`}
               >
                 {renderMessageContent(msg.text)}
-                <div className="text-[9px] text-muted-foreground/60 text-right mt-1 font-medium">
+                <div className="text-[9px] text-muted-foreground/60 dark:text-zinc-400 text-right mt-1 font-medium">
                   {currentTime}
                 </div>
               </div>
@@ -289,20 +289,20 @@ export function BotPreview() {
           ))}
           {loading && (
             <div className="flex justify-start">
-              <div className="bg-white rounded-2xl px-4 py-2 text-[13px] animate-pulse shadow-sm text-muted-foreground">
+              <div className="bg-white dark:bg-zinc-800 rounded-2xl px-4 py-2 text-[13px] animate-pulse shadow-sm text-muted-foreground dark:text-zinc-400">
                 Bot is typing...
               </div>
             </div>
           )}
         </CardContent>
-        <div className="p-3 bg-[#F0F2F5] flex gap-2 shrink-0 border-t border-black/5">
+        <div className="p-3 bg-[#F0F2F5] dark:bg-zinc-900 flex gap-2 shrink-0 border-t border-black/5 dark:border-white/5">
           <Input
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleSend()}
             placeholder={user ? "Type a message..." : "Login to chat"}
             disabled={!user}
-            className="bg-white border-none rounded-full h-10 px-4 text-sm focus-visible:ring-1 focus-visible:ring-[#075E54]/20 shadow-sm"
+            className="bg-white dark:bg-zinc-800 border-none dark:text-white rounded-full h-10 px-4 text-sm focus-visible:ring-1 focus-visible:ring-[#075E54]/20 shadow-sm"
           />
           <Button 
             onClick={() => handleSend()}
