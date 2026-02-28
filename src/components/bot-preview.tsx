@@ -94,7 +94,7 @@ export function BotPreview() {
     }
   };
 
-  const renderMessageContent = (text: string, role: string) => {
+  const renderMessageContent = (text: string) => {
     const urlRegex = /(https?:\/\/[^\s]+)/g;
     const upiRegex = /upi:\/\/pay\S+/;
     const formTag = "[PAYMENT_FORM]";
@@ -117,7 +117,7 @@ export function BotPreview() {
           const textBeforeUrl = line.replace(imageUrl, "").trim();
           return (
             <div key={idx} className="my-3 flex flex-col gap-2">
-              {textBeforeUrl && <div className="leading-relaxed font-medium text-foreground">{textBeforeUrl}</div>}
+              {textBeforeUrl && <div className="leading-relaxed font-medium text-foreground dark:text-zinc-100">{textBeforeUrl}</div>}
               <div className="bg-white dark:bg-zinc-800 p-3 rounded-xl border shadow-lg max-w-[220px] mx-auto text-center">
                 <img src={imageUrl} alt="QR Code" className="rounded-lg w-full h-auto bg-white" />
                 {upiLink && (
@@ -131,7 +131,7 @@ export function BotPreview() {
         }
       }
       if (line.trim() === "") return <div key={idx} className="h-1" />;
-      return <div key={idx} className="leading-relaxed mb-1.5 text-foreground">{line.replace(/\*/g, '')}</div>;
+      return <div key={idx} className="leading-relaxed mb-1.5 text-foreground dark:text-zinc-100">{line.replace(/\*/g, '')}</div>;
     });
 
     return (
@@ -180,7 +180,7 @@ export function BotPreview() {
                 ? "bg-[#DCF8C6] dark:bg-emerald-900 text-slate-800 dark:text-emerald-50 rounded-tr-none" 
                 : "bg-white dark:bg-zinc-800 text-slate-800 dark:text-zinc-100 rounded-tl-none"
             }`}>
-              {renderMessageContent(msg.text, msg.role)}
+              {renderMessageContent(msg.text)}
             </div>
           </div>
         ))}

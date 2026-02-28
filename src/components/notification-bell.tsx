@@ -6,7 +6,6 @@ import { useUser, useFirestore, useDoc, useMemoFirebase } from "@/firebase";
 import { doc, updateDoc, deleteField } from "firebase/firestore";
 import { 
   Bell, 
-  X,
   CheckCircle2,
   AlertCircle,
   Trash2
@@ -59,9 +58,7 @@ export function NotificationBell() {
         <Button variant="ghost" size="sm" className="relative h-9 w-9 p-0 rounded-full hover:bg-accent transition-colors">
           <Bell className="w-5 h-5 text-foreground" />
           {hasNewNotification && (
-            <>
-              <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-background animate-pulse" />
-            </>
+            <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-background animate-pulse" />
           )}
         </Button>
       </PopoverTrigger>
