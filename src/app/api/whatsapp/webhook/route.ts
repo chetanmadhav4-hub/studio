@@ -15,13 +15,16 @@ export async function POST(req: Request) {
     const value = changes?.value;
     const message = value?.messages?.[0];
 
+    // If it's just a status update or empty change, ignore
     if (!message) {
       return NextResponse.json({ success: true });
     }
 
     const phoneNumber = message.from;
     const messageText = message.text?.body || '';
-    const adminNumber = '9116053238'; // Admin phone number
+    
+    // ADMIN NUMBER: User requested 9116053238. For Meta API, we use country code (91) + number.
+    const adminNumber = '919116053238'; 
 
     // Log user message to Firestore for history
     await addDoc(collection(firestore, 'chatSessions', phoneNumber, 'messages'), {
@@ -67,7 +70,7 @@ export async function POST(req: Request) {
     const phoneNumberId = process.env.WHATSAPP_PHONE_NUMBER_ID;
 
     if (accessToken && phoneNumberId) {
-      // 1. Send reply back to user
+      // 1. Send reply back to user (if not a demo/preview call)
       if (phoneNumber !== 'demo_user') {
         await fetch(`https://graph.facebook.com/v17.0/${phoneNumberId}/messages`, {
           method: 'POST',
@@ -85,10 +88,22 @@ export async function POST(req: Request) {
       }
 
       // 2. Notify ADMIN if order is placed
-      if (updatedSession.state === 'ORDER_PLACED' && updatedSession.data) {
-        const { orderId, utrId, targetLink } = updatedSession.data;
-        const adminMsg = `🚀 *Naya Order Aaya Hai!*\n\n📦 *Order ID:* ${orderId}\n🆔 *UTR ID:* ${utrId}\n🔗 *Link:* ${targetLink}\n\nKripya panel check karein.`;
+      // We check if the state JUST transitioned to ORDER_PLACED
+      if (updatedSession.state === 'ORDER_PLACED' && updatedSession.data && updatedSession.data.orderId) {
+        const { orderId, utrId, targetLink, serviceName, quantity, price } = updatedSession.data;
+        
+        const adminMsg = `🚀 *Naya Order Aaya Hai!*
 
+📦 *Order ID:* ${orderId}
+🆔 *UTR ID:* ${utrId}
+🔗 *Link:* ${targetLink}
+🛠️ *Service:* ${serviceName}
+📊 *Qty:* ${quantity}
+💰 *Amount:* ₹${price}
+
+*Kripya payment aur link check karke panel me process karein.*`;
+
+        // Send to Admin
         await fetch(`https://graph.facebook.com/v17.0/${phoneNumberId}/messages`, {
           method: 'POST',
           headers: {

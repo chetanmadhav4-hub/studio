@@ -74,7 +74,7 @@ export async function processBotMessage(
         }
       };
     } catch (e) {
-      // Robust Fallback message matching the user's required structured format
+      // Robust Fallback message
       const fallbackMsg = `🎉 *Woohoo! Your InstaFlow order successfully created!*
 
 - *Order ID:* ${orderId}
