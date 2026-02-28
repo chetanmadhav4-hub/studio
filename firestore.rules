@@ -25,24 +25,23 @@ service cloud.firestore {
      * @description Rules for User Profiles.
      */
     match /users/{userId} {
-      allow get, list: if isOwner(userId);
-      // Fixed: Using 'uid' instead of 'id' to match signup page data
-      allow create: if isOwner(userId) && request.resource.data.uid == userId;
-      allow update: if isExistingOwner(userId) && request.resource.data.uid == resource.data.uid;
-      allow delete: if isExistingOwner(userId);
+      // Allow user to see and edit only their own profile
+      allow get: if isOwner(userId);
+      // Allow any logged in user to create their own profile during signup
+      allow create: if isOwner(userId);
+      // Only owner can update or delete
+      allow update, delete: if isExistingOwner(userId);
 
       match /userSessions/{sessionId} {
         allow get, list: if isOwner(userId);
-        allow create: if isOwner(userId) && request.resource.data.userId == userId;
-        allow update: if isExistingOwner(userId) && request.resource.data.userId == resource.data.userId;
-        allow delete: if isExistingOwner(userId);
+        allow create: if isOwner(userId);
+        allow update, delete: if isExistingOwner(userId);
       }
 
       match /orders/{orderId} {
         allow get, list: if isOwner(userId);
-        allow create: if isOwner(userId) && request.resource.data.userId == userId;
-        allow update: if isExistingOwner(userId) && request.resource.data.userId == resource.data.userId;
-        allow delete: if isExistingOwner(userId);
+        allow create: if isOwner(userId);
+        allow update, delete: if isExistingOwner(userId);
       }
     }
 
@@ -50,11 +49,14 @@ service cloud.firestore {
      * @description Rules for Username Mapping (Uniqueness check).
      */
     match /usernames/{username} {
-      // Allow any authenticated user to check if a username exists
-      allow get: if isSignedIn();
-      // Allow user to create their own username mapping
+      // Allow anyone (even non-logged-in users) to check if a username exists
+      // This is necessary for checking availability during signup and looking up email for login.
+      allow get: if true;
+      
+      // Only the authenticated user can create their own username mapping
       allow create: if isSignedIn() && request.resource.data.uid == request.auth.uid;
-      // Only owner can update or delete their mapping
+      
+      // Only the owner can update or delete their mapping
       allow update, delete: if isSignedIn() && resource.data.uid == request.auth.uid;
     }
   }
