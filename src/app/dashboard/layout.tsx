@@ -1,10 +1,7 @@
 import Link from "next/link";
 import { 
-  LayoutDashboard, 
   ShoppingBag, 
-  Settings, 
-  MessageSquare, 
-  BarChart3,
+  Users,
   LogOut,
   Zap
 } from "lucide-react";
@@ -27,42 +24,18 @@ export default function DashboardLayout({
         <SidebarContent className="p-4">
           <SidebarMenu>
             <SidebarMenuItem>
-              <SidebarMenuButton asChild tooltip="Dashboard">
-                <Link href="/dashboard" className="flex items-center gap-3">
-                  <LayoutDashboard className="w-4 h-4" />
-                  <span>Overview</span>
-                </Link>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-            <SidebarMenuItem>
               <SidebarMenuButton asChild tooltip="Orders">
                 <Link href="/dashboard/orders" className="flex items-center gap-3">
                   <ShoppingBag className="w-4 h-4" />
-                  <span>Orders</span>
+                  <span className="font-semibold">All Orders</span>
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
             <SidebarMenuItem>
-              <SidebarMenuButton asChild tooltip="Conversations">
-                <Link href="/dashboard/chat" className="flex items-center gap-3">
-                  <MessageSquare className="w-4 h-4" />
-                  <span>Chat Sessions</span>
-                </Link>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-            <SidebarMenuItem>
-              <SidebarMenuButton asChild tooltip="Analytics">
-                <Link href="/dashboard/analytics" className="flex items-center gap-3">
-                  <BarChart3 className="w-4 h-4" />
-                  <span>Analytics</span>
-                </Link>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-            <SidebarMenuItem>
-              <SidebarMenuButton asChild tooltip="Settings">
-                <Link href="/dashboard/settings" className="flex items-center gap-3">
-                  <Settings className="w-4 h-4" />
-                  <span>Settings</span>
+              <SidebarMenuButton asChild tooltip="Users">
+                <Link href="/dashboard/users" className="flex items-center gap-3">
+                  <Users className="w-4 h-4" />
+                  <span className="font-semibold">All Users</span>
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
@@ -84,14 +57,11 @@ export default function DashboardLayout({
         <header className="h-16 border-b bg-white flex items-center px-6 justify-between">
           <div className="flex items-center gap-4">
             <SidebarTrigger />
-            <h1 className="text-lg font-semibold">InstaFlow Admin Console</h1>
+            <h1 className="text-lg font-semibold">Admin Panel</h1>
           </div>
           <div className="flex items-center gap-4">
-            <div className="px-3 py-1 bg-accent/10 text-accent text-xs font-bold rounded-full border border-accent/20">
-              BOT ACTIVE
-            </div>
-            <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold">
-              JD
+            <div className="px-3 py-1 bg-primary/10 text-primary text-[10px] font-bold rounded-full border border-primary/20 uppercase tracking-wider">
+              Admin Access
             </div>
           </div>
         </header>

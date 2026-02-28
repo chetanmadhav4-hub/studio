@@ -2,27 +2,20 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // --- COLLECTION GROUP RULES (MUST BE TOP LEVEL) ---
+    // --- COLLECTION GROUP RULES ---
     // These allow the Admin Dashboard to list documents across ALL users
     
     match /{path=**}/orders/{orderId} {
       allow read: if request.auth != null;
-      allow write: if request.auth != null && (request.auth.uid == resource.data.uid || request.auth.uid == userIdFromPath(path));
-    }
-    
-    match /{path=**}/messages/{messageId} {
-      allow read, write: if true; 
-    }
-
-    // Helper to extract userId from path if possible
-    function userIdFromPath(p) {
-      return p[1]; // Assumes path starts with /users/{userId}/...
     }
 
     // --- SPECIFIC PATH RULES ---
 
     match /users/{userId} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
+      // Allow any logged in user to read (for the admin user list)
+      allow read: if request.auth != null;
+      // Users can only write their own profile
+      allow write: if request.auth != null && request.auth.uid == userId;
 
       match /orders/{orderId} {
         allow read, write: if request.auth != null && request.auth.uid == userId;
