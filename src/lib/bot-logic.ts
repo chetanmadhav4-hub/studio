@@ -122,7 +122,7 @@ export async function processBotMessage(
         });
 
         return {
-          reply: `${instructions.message}\n\n👤 *Account:* ${accountName}\n🆔 *UPI ID:* ${upiId}\n💰 *Amount:* ₹${price}\n\n📸 *SCAN TO PAY ₹${price} FOR ${serviceName}:*\n${qrImageUrl}\n\n${upiPayload}\n\n✅ Payment ke baad, apna *Instagram Link and payment ka screenshot* bhejein order start karne ke liye.`,
+          reply: `${instructions.message}\n\n👤 *Account:* ${accountName}\n🆔 *UPI ID:* ${upiId}\n💰 *Amount:* ₹${price}\n\n📸 *SCAN TO PAY ₹${price} FOR ${serviceName}:*\n${qrImageUrl}\n\n${upiPayload}\n\n✅ Payment ke baad, apna *Instagram Link* bhejein order start karne ke liye.`,
           nextState: {
             state: 'AWAITING_LINK',
             data: { ...session.data },
@@ -151,7 +151,7 @@ export async function processBotMessage(
         });
 
         return {
-          reply: confirmation.message + "\n\nNaya order lagane ke liye *MENU* likhein.\n\nOPTION: MENU",
+          reply: confirmation.message + "\n\nNaya order lagane ke liye niche select karein:\n\nOPTION: MENU\nOPTION: SUPPORT",
           nextState: {
             state: 'ORDER_PLACED',
             data: { ...session.data, targetLink, orderId },

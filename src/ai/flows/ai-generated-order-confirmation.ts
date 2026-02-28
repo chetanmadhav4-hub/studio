@@ -47,28 +47,20 @@ const orderConfirmationPrompt = ai.definePrompt({
   output: {schema: AiGeneratedOrderConfirmationOutputSchema},
   prompt: `You are a helpful assistant for the InstaFlow Bot.
 
-Generate a structured order confirmation message. 
+Generate a clean and structured order confirmation message.
 
-The message MUST start with exactly this header:
+CRITICAL: The message MUST start with exactly this header:
 🎉 *Woohoo! Your InstaFlow order successfully created!*
 
-Then, list the key details in a clean format like this:
+Then, list the following details in this exact format with bullet points:
 - *Order ID:* {{{orderId}}}
 - *Service:* {{{serviceName}}}
 - *Quantity:* {{{quantity}}}
-- *Amount Paid:* ₹{{{price}}}
+- *Amount:* ₹{{{price}}}
 - *Start Time:* {{{startTime}}}
-- *Link:* {{{instagramProfileLink}}}
+- *Target Link:* {{{instagramProfileLink}}}
 
-Keep the message short and easy to read on a mobile screen. Use emojis only in the header or to highlight key points. Do NOT write a long paragraph.
-
-Now, generate the message for:
-Order ID: {{{orderId}}}
-Service: {{{serviceName}}}
-Quantity: {{{quantity}}}
-Instagram Profile: {{{instagramProfileLink}}}
-Total Price: ₹{{{price}}}
-Estimated Start Time: {{{startTime}}}`,
+Keep it professional yet friendly. Use Hindi/English mix (Hinglish) if you like, but keep the points in English as shown. Do not write any long paragraphs after the points.`,
 });
 
 const aiGeneratedOrderConfirmationFlow = ai.defineFlow(
