@@ -34,7 +34,7 @@ export async function processBotMessage(
   // 1. GLOBAL SERVICE INTERRUPTION (Allows switching service anytime)
   let interceptedServiceKey = '';
   Object.entries(SERVICES_CONFIG).forEach(([key, service]) => {
-    if (normalizedMsg.includes(service.name.toLowerCase()) || normalizedMsg === key) {
+    if (normalizedMsg.includes(service.name.toLowerCase()) || (normalizedMsg.length < 3 && normalizedMsg === key)) {
       interceptedServiceKey = key;
     }
   });
@@ -45,7 +45,7 @@ export async function processBotMessage(
       reply: `📊 Aapne *${selectedService.name}* select kiya hai.\n\nKitni quantity chahiye? (Minimum ${selectedService.min})`,
       nextState: { 
         state: 'AWAITING_QUANTITY',
-        data: { serviceId: interceptedServiceKey, serviceName: selectedService.name }
+        data: { ...session.data, serviceId: interceptedServiceKey, serviceName: selectedService.name }
       },
     };
   }
@@ -70,24 +70,34 @@ export async function processBotMessage(
   switch (session.state) {
     case 'AWAITING_SERVICE_SELECTION': {
       return {
-        reply: "⚠️ Kripya niche diye gaye buttons mein se ek select karein.",
+        reply: "⚠️ Kripya niche diye gaye buttons mein se ek select karein.\n\nType 'MENU' to see all services.",
         nextState: { state: 'AWAITING_SERVICE_SELECTION' },
       };
     }
 
     case 'AWAITING_QUANTITY': {
-      const quantity = parseInt(normalizedMsg);
+      // Try to extract only numbers from the message
+      const numberMatch = normalizedMsg.match(/\d+/);
+      const quantity = numberMatch ? parseInt(numberMatch[0]) : NaN;
+      
       const serviceId = session.data.serviceId || '1';
       const service = SERVICES_CONFIG[serviceId];
 
       if (isNaN(quantity) || quantity < service.min) {
-        const error = await generateContextualErrorMessage({
-          errorType: 'INVALID_QUANTITY',
-          details: `User input: ${messageText}. Minimum for ${service.name} is ${service.min}.`,
-          currentState: `Selecting quantity for ${service.name}`,
-        });
+        let errorMessage = `⚠️ Kripya sahi quantity enter karein. *${service.name}* ke liye minimum *${service.min}* chahiye.`;
+        try {
+          const errorRes = await generateContextualErrorMessage({
+            errorType: 'INVALID_QUANTITY',
+            details: `User input: ${messageText}. Minimum for ${service.name} is ${service.min}.`,
+            currentState: `Selecting quantity for ${service.name}`,
+          });
+          errorMessage = errorRes.errorMessage;
+        } catch (e) {
+          console.error("AI Error:", e);
+        }
+        
         return {
-          reply: error.errorMessage,
+          reply: errorMessage,
           nextState: { state: 'AWAITING_QUANTITY' },
         };
       }
@@ -114,15 +124,21 @@ export async function processBotMessage(
         const upiPayload = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(accountName)}&am=${price}&cu=INR`;
         const qrImageUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(upiPayload)}`;
 
-        const instructions = await aiGeneratedPaymentInstructionsAndConfirmation({
-          type: 'payment_instructions',
-          quantity,
-          price,
-          paymentLink: upiPayload,
-        });
+        let instructionsText = `Dost, aapko *${quantity}* followers ke liye *₹${price}* pay karne honge. QR code scan karein ya UPI ID use karein. Payment hone ke baad link bhejein.`;
+        try {
+          const instructions = await aiGeneratedPaymentInstructionsAndConfirmation({
+            type: 'payment_instructions',
+            quantity,
+            price,
+            paymentLink: upiPayload,
+          });
+          instructionsText = instructions.message;
+        } catch (e) {
+          console.error("AI Error:", e);
+        }
 
         return {
-          reply: `${instructions.message}\n\n👤 *Account:* ${accountName}\n🆔 *UPI ID:* ${upiId}\n💰 *Amount:* ₹${price}\n\n📸 *SCAN TO PAY ₹${price} FOR ${serviceName}:*\n${qrImageUrl}\n\n${upiPayload}\n\n✅ Payment ke baad, apna *Instagram Link* bhejein order start karne ke liye.`,
+          reply: `${instructionsText}\n\n👤 *Account:* ${accountName}\n🆔 *UPI ID:* ${upiId}\n💰 *Amount:* ₹${price}\n\n📸 *SCAN TO PAY ₹${price} FOR ${serviceName}:*\n${qrImageUrl}\n\n${upiPayload}\n\n✅ Payment ke baad, apna *Instagram Link* bhejein order start karne ke liye.`,
           nextState: {
             state: 'AWAITING_LINK',
             data: { ...session.data },
@@ -141,17 +157,24 @@ export async function processBotMessage(
         const targetLink = messageText;
         const orderId = `INSTA-${Math.floor(100000 + Math.random() * 900000)}`;
         
-        const confirmation = await aiGeneratedOrderConfirmation({
-          orderId,
-          quantity: session.data.quantity || 0,
-          serviceName: session.data.serviceName || 'Instagram Service',
-          instagramProfileLink: targetLink,
-          price: session.data.price || 0,
-          startTime: '0-30 minutes',
-        });
+        let confirmationText = `🎉 *Woohoo! Your InstaFlow order successfully created!*\n\n- *Order ID:* ${orderId}\n- *Service:* ${session.data.serviceName}\n- *Quantity:* ${session.data.quantity}\n- *Amount:* ₹${session.data.price}\n- *Start Time:* 0-30 minutes\n- *Target Link:* ${targetLink}`;
+        
+        try {
+          const confirmation = await aiGeneratedOrderConfirmation({
+            orderId,
+            quantity: session.data.quantity || 0,
+            serviceName: session.data.serviceName || 'Instagram Service',
+            instagramProfileLink: targetLink,
+            price: session.data.price || 0,
+            startTime: '0-30 minutes',
+          });
+          confirmationText = confirmation.message;
+        } catch (e) {
+          console.error("AI Error:", e);
+        }
 
         return {
-          reply: confirmation.message + "\n\nNaya order lagane ke liye niche select karein:\n\nOPTION: MENU\nOPTION: SUPPORT",
+          reply: confirmationText + "\n\nNaya order lagane ke liye niche select karein:\n\nOPTION: MENU\nOPTION: SUPPORT",
           nextState: {
             state: 'ORDER_PLACED',
             data: { ...session.data, targetLink, orderId },
@@ -159,14 +182,20 @@ export async function processBotMessage(
         };
       }
 
-      const error = await generateContextualErrorMessage({
-        errorType: 'INVALID_URL',
-        details: `User provided: ${messageText}. Needs to be a valid Instagram link.`,
-        currentState: 'Providing link after payment',
-      });
+      let errorMsg = "⚠️ Kripya sahi Instagram link bhejein (e.g., https://instagram.com/username)";
+      try {
+        const error = await generateContextualErrorMessage({
+          errorType: 'INVALID_URL',
+          details: `User provided: ${messageText}. Needs to be a valid Instagram link.`,
+          currentState: 'Providing link after payment',
+        });
+        errorMsg = error.errorMessage;
+      } catch (e) {
+        console.error("AI Error:", e);
+      }
       
       return {
-        reply: error.errorMessage + "\n\nKripya sahi Instagram link bhejein (e.g., https://instagram.com/username)",
+        reply: errorMsg + "\n\nKripya sahi Instagram link bhejein.",
         nextState: { state: 'AWAITING_LINK' },
       };
     }
