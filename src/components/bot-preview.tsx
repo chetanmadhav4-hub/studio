@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { useUser, useFirestore, setDocumentNonBlocking } from "@/firebase";
+import { useUser, useFirestore, useDoc, useMemoFirebase } from "@/firebase";
 import { doc, serverTimestamp } from "firebase/firestore";
 import { Send, Bot, MousePointer2, ExternalLink, LogIn, CheckCircle2, Link, Hash } from "lucide-react";
 
@@ -27,6 +27,21 @@ export function BotPreview() {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [formLink, setFormLink] = useState("");
   const [formUtr, setFormUtr] = useState("");
+
+  // Listen for admin notifications (Real-time rejection messages)
+  const sessionRef = useMemoFirebase(() => {
+    return doc(db, 'botSessions', 'demo_user');
+  }, [db]);
+  const { data: session } = useDoc(sessionRef);
+
+  useEffect(() => {
+    if (session?.adminNotification) {
+      const lastMsg = messages[messages.length - 1];
+      if (lastMsg.text !== session.adminNotification) {
+        setMessages((prev) => [...prev, { role: "bot", text: session.adminNotification }]);
+      }
+    }
+  }, [session?.adminNotification, session?.lastNotificationAt]);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -81,12 +96,6 @@ export function BotPreview() {
       const data = await res.json();
       if (data.reply) {
         setMessages((prev) => [...prev, { role: "bot", text: data.reply }]);
-        
-        // SYNC ORDER TO FIREBASE FOR DEMO
-        if (data.reply.includes("successfully created") && user) {
-          // Note: In real life, the server-side webhook handles the master record.
-          // For the preview, we'll wait for the user to see the confirmation.
-        }
       }
     } catch (error) {
       setMessages((prev) => [...prev, { role: "bot", text: "⚠️ Error processing. Please try again." }]);

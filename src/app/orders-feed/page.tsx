@@ -2,7 +2,7 @@
 'use client';
 
 import { useCollection, useFirestore, useMemoFirebase, useUser } from "@/firebase";
-import { collection, query, orderBy, limit, doc, updateDoc } from "firebase/firestore";
+import { collection, query, orderBy, limit, doc, updateDoc, setDoc, serverTimestamp } from "firebase/firestore";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -57,24 +57,35 @@ export default function SimpleOrdersFeed() {
 
     try {
       const newStatus = action === 'APPROVE' ? 'COMPLETED' : 'REJECTED';
-      const message = action === 'APPROVE' 
-        ? `🎉 Your InstaFlow Order #${order.id} is approved! Complete order possible soon. Stay tuned!`
-        : `⚠️ Your InstaFlow Order #${order.id} was rejected. Reason: Invalid payment or link details. Please try again or contact support.`;
-
-      // 1. Update Firestore
+      
+      // 1. Update Global Order Status
       const orderRef = doc(db, 'all_orders', order.id);
       await updateDoc(orderRef, { status: newStatus });
 
-      // 2. Send WhatsApp Notification
-      if (order.phoneNumber) {
-        await sendAdminActionNotification(order.phoneNumber, message);
+      if (action === 'APPROVE') {
+        // WhatsApp Notification ONLY on Approval
+        const approveMsg = `🎉 Your InstaFlow Order #${order.id} is approved! Complete order possible soon. Stay tuned!`;
+        if (order.phoneNumber) {
+          await sendAdminActionNotification(order.phoneNumber, approveMsg);
+        }
+      } else {
+        // On Rejection, we send message to the bot session instead of WhatsApp
+        const rejectMsg = `⚠️ Your InstaFlow Order #${order.id} was rejected. Reason: Invalid payment or link details. Please try again with correct details.`;
+        if (order.phoneNumber) {
+          const sessionRef = doc(db, 'botSessions', order.phoneNumber);
+          await updateDoc(sessionRef, { 
+            adminNotification: rejectMsg,
+            lastNotificationAt: serverTimestamp() 
+          });
+        }
       }
 
       toast({
         title: action === 'APPROVE' ? "Order Approved!" : "Order Rejected",
-        description: `User has been notified via WhatsApp.`,
+        description: action === 'APPROVE' ? "User notified via WhatsApp." : "Status updated in user's chat.",
       });
     } catch (e: any) {
+      console.error(e);
       toast({
         variant: "destructive",
         title: "Error",
