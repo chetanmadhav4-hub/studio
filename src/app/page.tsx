@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { BotPreview } from "@/components/bot-preview";
-import { CheckCircle2, Zap, ShieldCheck, MessageSquare, LogOut, MessageCircle } from "lucide-react";
+import { CheckCircle2, Zap, ShieldCheck, MessageSquare, LogOut, MessageCircle, User } from "lucide-react";
 import { useUser, useAuth } from "@/firebase";
 import { signOut } from "firebase/auth";
 import { useRouter } from "next/navigation";
@@ -45,15 +45,23 @@ export default function Home() {
                     </Link>
                   </>
                 ) : (
-                  <Button 
-                    variant="ghost" 
-                    size="sm"
-                    className="text-destructive hover:text-destructive hover:bg-destructive/10 gap-2 text-sm"
-                    onClick={handleLogout}
-                  >
-                    <LogOut className="w-4 h-4" />
-                    <span className="hidden xs:inline">Logout</span>
-                  </Button>
+                  <div className="flex items-center gap-2">
+                    <Link href="/profile">
+                      <Button variant="ghost" size="sm" className="gap-2 text-sm">
+                        <User className="w-4 h-4" />
+                        <span className="hidden xs:inline">Profile</span>
+                      </Button>
+                    </Link>
+                    <Button 
+                      variant="ghost" 
+                      size="sm"
+                      className="text-destructive hover:text-destructive hover:bg-destructive/10 gap-2 text-sm"
+                      onClick={handleLogout}
+                    >
+                      <LogOut className="w-4 h-4" />
+                      <span className="hidden xs:inline">Logout</span>
+                    </Button>
+                  </div>
                 )}
               </>
             )}
@@ -74,20 +82,7 @@ export default function Home() {
               </p>
             </div>
 
-            {!isUserLoading && !user ? (
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-                <Link href="/signup" className="w-full sm:w-auto">
-                  <Button size="lg" className="w-full sm:w-auto h-12 px-8 text-lg bg-primary">
-                    Create Account
-                  </Button>
-                </Link>
-                <Link href="/login" className="w-full sm:w-auto">
-                  <Button size="lg" variant="outline" className="w-full sm:w-auto h-12 px-8 text-lg border-primary text-primary">
-                    Login to Portal
-                  </Button>
-                </Link>
-              </div>
-            ) : user ? (
+            {user ? (
               <div className="flex justify-center">
                 <div className="px-5 py-3 bg-primary/10 text-primary rounded-xl border border-primary/20 flex items-center gap-3">
                   <MessageCircle className="w-5 h-5 animate-pulse" />
@@ -97,7 +92,7 @@ export default function Home() {
             ) : null}
 
             {/* Chat Interaction Area */}
-            <div className="w-full max-w-[420px] mx-auto mt-12 transition-all">
+            <div className="w-full max-w-[420px] mx-auto mt-8 transition-all">
               <BotPreview />
             </div>
 
