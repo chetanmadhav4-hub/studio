@@ -91,7 +91,7 @@ export default function Home() {
             </div>
 
             {user ? (
-              <div className="flex justify-center">
+              <div className="flex justify-center flex-col items-center gap-4">
                 <Dialog>
                   <DialogTrigger asChild>
                     <Button variant="outline" size="sm" className="gap-2 shadow-sm border-primary/20 text-primary hover:text-primary hover:bg-primary/5">
@@ -151,9 +151,9 @@ export default function Home() {
               <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center mb-4">
                 <MessageSquare className="w-6 h-6 text-primary" />
               </div>
-              <h3 className="text-xl font-semibold">WhatsApp Bot</h3>
+              <h3 className="text-xl font-semibold">24/7 Priority Support</h3>
               <p className="text-muted-foreground leading-relaxed text-sm md:text-base">
-                Connect your business number and automate orders directly via chat.
+                Best-in-class support team available round the clock to solve your queries instantly via WhatsApp.
               </p>
             </div>
             <div className="p-6 md:p-8 rounded-2xl border bg-background/50 hover:border-primary/50 transition-all space-y-4 shadow-sm">
@@ -162,7 +162,7 @@ export default function Home() {
               </div>
               <h3 className="text-xl font-semibold">Secure Access</h3>
               <p className="text-muted-foreground leading-relaxed text-sm md:text-base">
-                Your credentials and orders are protected with bank-grade encryption.
+                Your credentials and orders are protected with bank-grade encryption and secure authentication.
               </p>
             </div>
             <div className="p-6 md:p-8 rounded-2xl border bg-background/50 hover:border-primary/50 transition-all space-y-4 shadow-sm sm:col-span-2 md:col-span-1">
@@ -171,7 +171,7 @@ export default function Home() {
               </div>
               <h3 className="text-xl font-semibold">Instant Fulfillment</h3>
               <p className="text-muted-foreground leading-relaxed text-sm md:text-base">
-                Orders are processed the moment payment is confirmed.
+                Orders are processed automatically the moment payment is confirmed for lightning-fast results.
               </p>
             </div>
           </div>
