@@ -34,9 +34,11 @@ export default function SimpleOrdersFeed() {
 
   const ADMIN_EMAIL = 'chetanmadhav4@gmail.com';
 
+  // FIX: Only initiate query if user is admin to avoid permission errors
   const ordersQuery = useMemoFirebase(() => {
+    if (!db || !user || user.email !== ADMIN_EMAIL) return null;
     return query(collection(db, 'all_orders'), orderBy('createdAt', 'desc'), limit(100));
-  }, [db]);
+  }, [db, user]);
 
   const { data: orders, isLoading } = useCollection(ordersQuery);
 
@@ -58,7 +60,6 @@ export default function SimpleOrdersFeed() {
     try {
       const newStatus = action === 'APPROVE' ? 'COMPLETED' : 'REJECTED';
       
-      // 1. Update Global Order Status
       const orderRef = doc(db, 'all_orders', order.id);
       await updateDoc(orderRef, { status: newStatus });
 
@@ -73,7 +74,6 @@ export default function SimpleOrdersFeed() {
 
       if (action === 'APPROVE') {
         msg = `✅ *ORDER APPROVED:* Order #${shortId} approve ho gaya hai! Kaam jaldi shuru ho jayega. 🚀`;
-        // WhatsApp Notification only for Approve
         if (targetSessionId.length > 10) {
           sendAdminActionNotification(targetSessionId, msg);
         }
@@ -81,7 +81,6 @@ export default function SimpleOrdersFeed() {
         msg = `❌ *ORDER REJECTED:* Order #${shortId} reject kar diya gaya hai. ⚠️ Reason: Invalid Link ya Galat UTR ID.`;
       }
 
-      // 2. Add to Persistent Notification List in user session for BOTH actions
       await updateDoc(sessionRef, { 
         notifications: arrayUnion({
           id: notificationId,
@@ -167,7 +166,9 @@ export default function SimpleOrdersFeed() {
           </TabsList>
 
           <TabsContent value="pending" className="mt-4 space-y-4">
-            {pendingOrders.length === 0 ? (
+            {isLoading ? (
+              <div className="flex justify-center py-12"><Loader2 className="animate-spin text-primary" /></div>
+            ) : pendingOrders.length === 0 ? (
               <div className="bg-white dark:bg-zinc-900 rounded-2xl p-16 text-center space-y-3 border dark:border-zinc-800 shadow-sm">
                 <CheckCircle2 className="w-12 h-12 text-emerald-100 dark:text-emerald-950/30 mx-auto" />
                 <p className="text-sm text-slate-400 dark:text-zinc-500 font-medium">Koi pending order nahi hai!</p>
@@ -188,7 +189,9 @@ export default function SimpleOrdersFeed() {
           </TabsContent>
 
           <TabsContent value="completed" className="mt-4 space-y-4">
-            {completedOrders.length === 0 ? (
+            {isLoading ? (
+              <div className="flex justify-center py-12"><Loader2 className="animate-spin text-primary" /></div>
+            ) : completedOrders.length === 0 ? (
               <div className="bg-white dark:bg-zinc-900 rounded-2xl p-16 text-center space-y-3 border dark:border-zinc-800 shadow-sm">
                 <ShoppingBag className="w-12 h-12 text-slate-100 dark:text-zinc-800 mx-auto" />
                 <p className="text-sm text-slate-400 dark:text-zinc-500 font-medium">History khali hai.</p>
