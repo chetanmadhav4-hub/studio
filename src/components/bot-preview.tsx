@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useEffect, useRef } from "react";
@@ -18,7 +17,12 @@ export function BotPreview() {
   ]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -102,7 +106,7 @@ export function BotPreview() {
           return (
             <div key={idx} className="my-3 flex flex-col gap-2">
               {textBeforeUrl && <div className="leading-relaxed font-medium">{textBeforeUrl}</div>}
-              <div className="bg-white p-3 rounded-xl border-2 border-[#075E54]/10 shadow-lg max-w-[240px] mx-auto overflow-hidden">
+              <div className="bg-white p-3 rounded-xl border-2 border-[#075E54]/10 shadow-lg max-w-[240px] mx-auto overflow-hidden text-center">
                 <img 
                   src={imageUrl} 
                   alt="QR Code" 
@@ -196,9 +200,11 @@ export function BotPreview() {
               }`}
             >
               {renderMessageContent(msg.text)}
-              <div className="text-[9px] text-muted-foreground/60 text-right mt-1.5 font-medium">
-                {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-              </div>
+              {mounted && (
+                <div className="text-[9px] text-muted-foreground/60 text-right mt-1.5 font-medium">
+                  {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                </div>
+              )}
             </div>
           </div>
         ))}
