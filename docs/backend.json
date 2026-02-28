@@ -35,9 +35,21 @@
         "status": { "type": "string", "enum": ["COMPLETED", "PROCESSING", "PENDING"] },
         "targetLink": { "type": "string" },
         "utrId": { "type": "string" },
+        "phoneNumber": { "type": "string" },
         "createdAt": { "type": "string", "format": "date-time" }
       },
       "required": ["id", "serviceName", "quantity", "price", "status", "createdAt"]
+    },
+    "ChatMessage": {
+      "title": "ChatMessage",
+      "description": "A single message in a chat session.",
+      "type": "object",
+      "properties": {
+        "text": { "type": "string" },
+        "sender": { "type": "string", "enum": ["user", "bot", "admin"] },
+        "timestamp": { "type": "string", "format": "date-time" }
+      },
+      "required": ["text", "sender", "timestamp"]
     }
   },
   "auth": {
@@ -55,6 +67,20 @@
     "/users/{uid}/orders/{orderId}": {
       "schema": { "$ref": "#/backend/entities/Order" },
       "description": "User's individual SMM orders."
+    },
+    "/chatSessions/{phoneNumber}/messages/{messageId}": {
+      "schema": { "$ref": "#/backend/entities/ChatMessage" },
+      "description": "Logs of chat conversations for admin review."
+    },
+    "/globalStats/summary": {
+      "schema": { 
+        "type": "object",
+        "properties": {
+          "totalRevenue": { "type": "number" },
+          "totalOrders": { "type": "number" }
+        }
+      },
+      "description": "Aggregated stats for the dashboard."
     }
   }
 }

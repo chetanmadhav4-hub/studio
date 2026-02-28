@@ -1,25 +1,45 @@
+
+'use client';
+
+import { useCollection, useFirestore, useMemoFirebase } from "@/firebase";
+import { collectionGroup, query } from "firebase/firestore";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users, ShoppingBag, CreditCard, Clock } from "lucide-react";
+import { Users, ShoppingBag, CreditCard, Clock, Loader2 } from "lucide-react";
 
 export function StatsCards() {
+  const db = useFirestore();
+
+  // Fetch all orders across all users to calculate stats
+  const ordersQuery = useMemoFirebase(() => {
+    return query(collectionGroup(db, 'orders'));
+  }, [db]);
+
+  const { data: allOrders, isLoading } = useCollection(ordersQuery);
+
+  const totalOrders = allOrders?.length || 0;
+  const totalRevenue = allOrders?.reduce((sum, order) => sum + (order.price || 0), 0) || 0;
+  
+  // Mock users count (In a real app, query /users collection)
+  const usersCount = 452; 
+
   const stats = [
     {
       title: "Total Orders",
-      value: "1,284",
+      value: isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : totalOrders.toLocaleString(),
       icon: ShoppingBag,
-      description: "+12.5% from last month",
+      description: "Lifetime total orders",
     },
     {
       title: "Active Users",
-      value: "452",
+      value: usersCount.toLocaleString(),
       icon: Users,
-      description: "WhatsApp active sessions",
+      description: "Registered on WhatsApp",
     },
     {
-      title: "Revenue",
-      value: "₹15,240",
+      title: "Total Revenue",
+      value: isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : `₹${totalRevenue.toLocaleString()}`,
       icon: CreditCard,
-      description: "Last 30 days",
+      description: "Gross lifetime earnings",
     },
     {
       title: "Avg. Delivery",

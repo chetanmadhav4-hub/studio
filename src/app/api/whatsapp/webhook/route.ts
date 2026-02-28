@@ -1,50 +1,68 @@
+
 import { NextResponse } from 'next/server';
 import { processBotMessage } from '@/lib/bot-logic';
 import { UserSession } from '@/lib/bot-types';
-
-// Mock database for demo purposes (In production use Firestore)
-const sessions: Record<string, UserSession> = {};
+import { initializeFirebase } from '@/firebase';
+import { doc, getDoc, setDoc, addDoc, collection, serverTimestamp } from 'firebase/firestore';
 
 export async function POST(req: Request) {
   try {
+    const { firestore } = initializeFirebase();
     const body = await req.json();
     
-    // Check if it's a Meta Webhook payload
     const entry = body.entry?.[0];
     const changes = entry?.changes?.[0];
     const value = changes?.value;
     const message = value?.messages?.[0];
 
     if (!message) {
-      // Return success for preview or empty messages
       return NextResponse.json({ success: true });
     }
 
     const phoneNumber = message.from;
     const messageText = message.text?.body || '';
 
-    // Retrieve or initialize session
-    let session = sessions[phoneNumber] || {
-      phoneNumber,
-      state: 'START',
-      lastMessage: '',
-      data: {},
-      updatedAt: Date.now(),
-    };
+    // Log user message to Firestore
+    await addDoc(collection(firestore, 'chatSessions', phoneNumber, 'messages'), {
+      text: messageText,
+      sender: 'user',
+      timestamp: serverTimestamp(),
+    });
 
-    // Process message logic
+    // Retrieve session from Firestore (Mocking database persistence)
+    const sessionRef = doc(firestore, 'botSessions', phoneNumber);
+    const sessionSnap = await getDoc(sessionRef);
+    
+    let session: UserSession = sessionSnap.exists() 
+      ? sessionSnap.data() as UserSession 
+      : {
+          phoneNumber,
+          state: 'START',
+          lastMessage: '',
+          data: {},
+          updatedAt: Date.now(),
+        };
+
     const { reply, nextState } = await processBotMessage(session, messageText);
 
-    // Update session state
     const updatedSession = {
       ...session,
       ...nextState,
       lastMessage: messageText,
       updatedAt: Date.now(),
     };
-    sessions[phoneNumber] = updatedSession;
 
-    // Send the message back via Meta Graph API if credentials exist
+    // Save session back to Firestore
+    await setDoc(sessionRef, updatedSession);
+
+    // Log bot reply to Firestore
+    await addDoc(collection(firestore, 'chatSessions', phoneNumber, 'messages'), {
+      text: reply,
+      sender: 'bot',
+      timestamp: serverTimestamp(),
+    });
+
+    // Send the message back via Meta Graph API
     const accessToken = process.env.WHATSAPP_ACCESS_TOKEN;
     const phoneNumberId = process.env.WHATSAPP_PHONE_NUMBER_ID;
 
@@ -82,7 +100,6 @@ export async function GET(req: Request) {
   const token = searchParams.get('hub.verify_token');
   const challenge = searchParams.get('hub.challenge');
 
-  // Verify token from environment variables
   const verifyToken = process.env.WHATSAPP_VERIFY_TOKEN || 'instaflow_secret_token';
 
   if (mode === 'subscribe' && token === verifyToken) {

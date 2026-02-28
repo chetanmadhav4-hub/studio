@@ -1,3 +1,8 @@
+
+'use client';
+
+import { useCollection, useFirestore, useMemoFirebase } from "@/firebase";
+import { collectionGroup, query, orderBy, limit } from "firebase/firestore";
 import {
   Table,
   TableBody,
@@ -7,81 +12,86 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-
-const recentOrders = [
-  {
-    id: "INSTA-892341",
-    customer: "+91 9876543210",
-    service: "Instagram Followers",
-    quantity: 1000,
-    amount: "₹120",
-    status: "Completed",
-    date: "2024-05-20 14:22",
-  },
-  {
-    id: "INSTA-892342",
-    customer: "+91 9123456789",
-    service: "Instagram Followers",
-    quantity: 500,
-    amount: "₹60",
-    status: "Processing",
-    date: "2024-05-20 15:10",
-  },
-  {
-    id: "INSTA-892343",
-    customer: "+91 9988776655",
-    service: "Instagram Followers",
-    quantity: 2500,
-    amount: "₹300",
-    status: "Pending Payment",
-    date: "2024-05-20 16:05",
-  },
-  {
-    id: "INSTA-892344",
-    customer: "+91 9000011111",
-    service: "Instagram Followers",
-    quantity: 100,
-    amount: "₹12",
-    status: "Failed",
-    date: "2024-05-20 16:45",
-  },
-];
+import { Loader2, AlertCircle } from "lucide-react";
 
 export function RecentOrders() {
+  const db = useFirestore();
+
+  // Fetch 10 most recent orders globally using collection group query
+  const recentOrdersQuery = useMemoFirebase(() => {
+    return query(
+      collectionGroup(db, 'orders'), 
+      orderBy('createdAt', 'desc'), 
+      limit(10)
+    );
+  }, [db]);
+
+  const { data: orders, isLoading, error } = useCollection(recentOrdersQuery);
+
+  if (isLoading) {
+    return (
+      <div className="flex flex-col items-center justify-center py-12 gap-4">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+        <p className="text-sm text-muted-foreground">Fetching latest orders...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center py-12 gap-2 text-destructive">
+        <AlertCircle className="w-8 h-8" />
+        <p className="text-sm font-medium">Failed to load orders.</p>
+      </div>
+    );
+  }
+
   return (
     <div className="rounded-md border bg-white">
       <Table>
         <TableHeader>
           <TableRow>
             <TableHead>Order ID</TableHead>
-            <TableHead>Customer</TableHead>
             <TableHead>Service</TableHead>
             <TableHead className="text-right">Quantity</TableHead>
             <TableHead className="text-right">Amount</TableHead>
             <TableHead>Status</TableHead>
+            <TableHead>Date</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {recentOrders.map((order) => (
-            <TableRow key={order.id}>
-              <TableCell className="font-medium text-primary">{order.id}</TableCell>
-              <TableCell>{order.customer}</TableCell>
-              <TableCell>{order.service}</TableCell>
-              <TableCell className="text-right">{order.quantity}</TableCell>
-              <TableCell className="text-right">{order.amount}</TableCell>
-              <TableCell>
-                <Badge 
-                  variant={
-                    order.status === "Completed" ? "default" :
-                    order.status === "Processing" ? "secondary" :
-                    order.status === "Failed" ? "destructive" : "outline"
-                  }
-                >
-                  {order.status}
-                </Badge>
+          {orders && orders.length > 0 ? (
+            orders.map((order) => (
+              <TableRow key={order.id}>
+                <TableCell className="font-medium text-primary">{order.id}</TableCell>
+                <TableCell className="max-w-[150px] truncate">{order.serviceName}</TableCell>
+                <TableCell className="text-right">{order.quantity}</TableCell>
+                <TableCell className="text-right">₹{order.price}</TableCell>
+                <TableCell>
+                  <Badge 
+                    variant={
+                      order.status === "COMPLETED" ? "default" :
+                      order.status === "PROCESSING" ? "secondary" :
+                      order.status === "FAILED" ? "destructive" : "outline"
+                    }
+                  >
+                    {order.status}
+                  </Badge>
+                </TableCell>
+                <TableCell className="text-xs text-muted-foreground">
+                  {order.createdAt?.seconds 
+                    ? new Date(order.createdAt.seconds * 1000).toLocaleDateString()
+                    : 'Recent'}
+                </TableCell>
+              </TableRow>
+            ))
+          ) : (
+            <TableRow>
+              <TableCell colSpan={6} className="text-center py-12 text-muted-foreground">
+                No orders found.
               </TableCell>
             </TableRow>
-          ))}
+          )}
         </TableBody>
       </Table>
     </div>
