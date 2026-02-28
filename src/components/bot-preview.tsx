@@ -67,14 +67,21 @@ export function BotPreview() {
       return;
     }
 
-    // Reset inline form on success if it was a submission
-    if (messageToSend.startsWith("SUBMIT_PAYMENT:")) {
+    const isInternalSubmission = messageToSend.startsWith("SUBMIT_PAYMENT:");
+
+    // Reset inline form if it was a submission
+    if (isInternalSubmission) {
       setFormLink("");
       setFormUtr("");
     }
 
     setInput("");
-    setMessages((prev) => [...prev, { role: "user", text: messageToSend }]);
+    
+    // ONLY show the user message in chat if it's NOT an internal submission string
+    if (!isInternalSubmission) {
+      setMessages((prev) => [...prev, { role: "user", text: messageToSend }]);
+    }
+    
     setLoading(true);
 
     try {
