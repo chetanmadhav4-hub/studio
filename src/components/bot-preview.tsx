@@ -132,7 +132,7 @@ export function BotPreview() {
           return (
             <div key={idx} className="my-3 flex flex-col gap-2">
               {textBeforeUrl && <div className="leading-relaxed font-medium">{textBeforeUrl}</div>}
-              <div className="bg-white p-3 rounded-xl border-2 border-[#075E54]/10 shadow-lg max-w-[240px] mx-auto overflow-hidden text-center">
+              <div className="bg-white p-3 rounded-xl border-2 border-[#075E54]/10 shadow-lg max-w-[220px] mx-auto overflow-hidden text-center">
                 <img 
                   src={imageUrl} 
                   alt="QR Code" 
@@ -141,9 +141,9 @@ export function BotPreview() {
                 {upiLink ? (
                   <a 
                     href={upiLink}
-                    className="mt-3 flex items-center justify-center gap-2 bg-[#00A884] hover:bg-[#008F6F] text-white py-2.5 rounded-lg text-xs font-bold tracking-wide uppercase shadow-sm transition-all active:scale-95 no-underline"
+                    className="mt-3 flex items-center justify-center gap-2 bg-[#00A884] hover:bg-[#008F6F] text-white py-2 rounded-lg text-xs font-bold tracking-wide uppercase shadow-sm transition-all active:scale-95 no-underline"
                   >
-                    <ExternalLink className="w-3.5 h-3.5" />
+                    <ExternalLink className="w-3 h-3" />
                     Pay via UPI App
                   </a>
                 ) : (
@@ -171,7 +171,7 @@ export function BotPreview() {
 
     return (
       <div className="flex flex-col gap-1">
-        <div>{content}</div>
+        <div className="text-[13px] md:text-sm">{content}</div>
         {optionLines.length > 0 && (
           <div className="mt-3 grid gap-2">
             {optionLines.map((optLine, i) => {
@@ -180,7 +180,7 @@ export function BotPreview() {
                 <button
                   key={i}
                   onClick={() => handleSend(optionText)}
-                  className="w-full py-2.5 px-4 bg-white hover:bg-[#F0F2F5] text-[#00A884] font-semibold text-sm rounded-lg border border-[#00A884]/20 transition-all active:scale-[0.98] flex items-center justify-center gap-2 shadow-sm"
+                  className="w-full py-2 px-4 bg-white hover:bg-[#F0F2F5] text-[#00A884] font-semibold text-xs md:text-sm rounded-lg border border-[#00A884]/20 transition-all active:scale-[0.98] flex items-center justify-center gap-2 shadow-sm"
                 >
                   <MousePointer2 className="w-4 h-4" />
                   {optionText}
@@ -193,27 +193,33 @@ export function BotPreview() {
     );
   };
 
+  const [currentTime, setCurrentTime] = useState<string | null>(null);
+
+  useEffect(() => {
+    setCurrentTime(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
+  }, []);
+
   return (
-    <div className="relative">
+    <div className="relative w-full">
       {!user && mounted && (
-        <div className="absolute inset-0 z-50 bg-black/40 backdrop-blur-[2px] rounded-2xl flex items-center justify-center p-6 text-center">
-          <Card className="bg-white/95 border-none shadow-2xl animate-in fade-in zoom-in duration-300">
+        <div className="absolute inset-0 z-50 bg-black/50 backdrop-blur-[2px] rounded-2xl flex items-center justify-center p-4 text-center">
+          <Card className="bg-white border-none shadow-2xl w-full max-w-[280px]">
             <CardHeader className="pb-2">
-              <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-2">
-                <LogIn className="w-6 h-6 text-primary" />
+              <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-1">
+                <LogIn className="w-5 h-5 text-primary" />
               </div>
-              <CardTitle className="text-lg">Authentication Required</CardTitle>
+              <CardTitle className="text-base">Login Required</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <p className="text-sm text-muted-foreground">
-                Kripya login karein taaki aap bot ke saare features use kar sakein aur orders laga sakein.
+              <p className="text-[13px] text-muted-foreground">
+                Kripya login karein taaki aap bot ke saare features use kar sakein.
               </p>
               <div className="flex flex-col gap-2">
-                <Button onClick={() => router.push("/login")} className="w-full">
+                <Button onClick={() => router.push("/login")} size="sm" className="w-full">
                   Login Now
                 </Button>
-                <Button onClick={() => router.push("/signup")} variant="outline" className="w-full border-primary text-primary hover:bg-primary/5">
-                  Create Account
+                <Button onClick={() => router.push("/signup")} size="sm" variant="outline" className="w-full border-primary text-primary">
+                  Sign Up
                 </Button>
               </div>
             </CardContent>
@@ -221,22 +227,22 @@ export function BotPreview() {
         </div>
       )}
       
-      <Card className={`max-w-md mx-auto h-[680px] flex flex-col bg-[#E5DDD5] shadow-2xl rounded-2xl overflow-hidden border-none ring-1 ring-black/5 transition-all ${!user ? 'opacity-50 pointer-events-none grayscale-[30%]' : ''}`}>
-        <CardHeader className="bg-[#075E54] text-white py-4 px-5 flex flex-row items-center gap-3 shrink-0 shadow-md relative z-10">
-          <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center border border-white/10 overflow-hidden">
-            <Bot className="w-6 h-6 text-white" />
+      <Card className={`w-full h-[520px] md:h-[620px] flex flex-col bg-[#E5DDD5] shadow-xl rounded-2xl overflow-hidden border-none ring-1 ring-black/5 transition-all ${!user ? 'opacity-40 grayscale-[20%]' : ''}`}>
+        <CardHeader className="bg-[#075E54] text-white py-3 px-4 flex flex-row items-center gap-3 shrink-0 shadow-md relative z-10">
+          <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-white/20 flex items-center justify-center border border-white/10 overflow-hidden">
+            <Bot className="w-5 h-5 md:w-6 md:h-6 text-white" />
           </div>
           <div>
-            <CardTitle className="text-base font-bold tracking-tight">InstaFlow Bot</CardTitle>
+            <CardTitle className="text-sm md:text-base font-bold tracking-tight">InstaFlow Bot</CardTitle>
             <div className="flex items-center gap-1.5">
-              <span className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" />
-              <p className="text-[11px] font-medium text-emerald-100">Online & active</p>
+              <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse" />
+              <p className="text-[10px] font-medium text-emerald-100">Online</p>
             </div>
           </div>
         </CardHeader>
         <CardContent 
           ref={scrollRef}
-          className="flex-1 overflow-y-auto p-5 space-y-4 scroll-smooth bg-[url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png')] bg-repeat"
+          className="flex-1 overflow-y-auto p-4 space-y-4 scroll-smooth bg-[url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png')] bg-repeat"
         >
           {messages.map((msg, i) => (
             <div
@@ -246,45 +252,43 @@ export function BotPreview() {
               }`}
             >
               <div
-                className={`max-w-[88%] rounded-2xl px-3.5 py-2.5 text-sm shadow-sm relative transition-all duration-300 ${
+                className={`max-w-[85%] rounded-2xl px-3 py-2 text-sm shadow-sm relative ${
                   msg.role === "user"
                     ? "bg-[#DCF8C6] text-foreground rounded-tr-none"
                     : "bg-white text-foreground rounded-tl-none"
                 }`}
               >
                 {renderMessageContent(msg.text)}
-                {mounted && (
-                  <div className="text-[9px] text-muted-foreground/60 text-right mt-1.5 font-medium">
-                    {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                  </div>
-                )}
+                <div className="text-[9px] text-muted-foreground/60 text-right mt-1 font-medium">
+                  {currentTime}
+                </div>
               </div>
             </div>
           ))}
           {loading && (
             <div className="flex justify-start">
-              <div className="bg-white rounded-2xl px-5 py-2.5 text-sm animate-pulse shadow-sm text-muted-foreground font-medium">
-                Bot is thinking...
+              <div className="bg-white rounded-2xl px-4 py-2 text-[13px] animate-pulse shadow-sm text-muted-foreground">
+                Bot is typing...
               </div>
             </div>
           )}
         </CardContent>
-        <div className="p-4 bg-[#F0F2F5] flex gap-3 shrink-0 border-t border-black/5">
+        <div className="p-3 bg-[#F0F2F5] flex gap-2 shrink-0 border-t border-black/5">
           <Input
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleSend()}
-            placeholder={user ? "Type a message..." : "Please login to chat"}
+            placeholder={user ? "Type a message..." : "Login to chat"}
             disabled={!user}
-            className="bg-white border-none rounded-full h-11 px-5 focus-visible:ring-2 focus-visible:ring-[#075E54]/20 shadow-sm"
+            className="bg-white border-none rounded-full h-10 px-4 text-sm focus-visible:ring-1 focus-visible:ring-[#075E54]/20 shadow-sm"
           />
           <Button 
             onClick={() => handleSend()}
             disabled={loading || !user}
             size="icon" 
-            className="rounded-full bg-[#00A884] hover:bg-[#008F6F] h-11 w-11 shrink-0 shadow-md transition-transform active:scale-95"
+            className="rounded-full bg-[#00A884] hover:bg-[#008F6F] h-10 w-10 shrink-0 shadow-md transition-transform active:scale-95"
           >
-            <Send className="w-5 h-5 text-white" />
+            <Send className="w-4 h-4 text-white" />
           </Button>
         </div>
       </Card>
