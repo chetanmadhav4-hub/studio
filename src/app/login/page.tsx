@@ -15,7 +15,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Zap, Loader2 } from 'lucide-react';
 
 export default function LoginPage() {
-  const [identifier, setIdentifier] = useState(''); // Can be username or email
+  const [identifier, setIdentifier] = useState(''); 
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const auth = useAuth();
@@ -25,10 +25,11 @@ export default function LoginPage() {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!identifier.trim() || !password.trim()) {
+    const id = identifier.trim();
+    if (!id || !password.trim()) {
       toast({
         variant: "destructive",
-        title: "Missing Details",
+        title: "Details Missing",
         description: "Please enter your username/email and password.",
       });
       return;
@@ -37,34 +38,51 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      let loginEmail = identifier.trim();
+      let loginEmail = id;
 
-      // 1. If identifier doesn't look like an email, assume it's a username
-      if (!loginEmail.includes('@')) {
-        const usernameRef = doc(db, 'usernames', loginEmail.toLowerCase());
+      // Check if it's a username (doesn't contain @)
+      if (!id.includes('@')) {
+        const usernameRef = doc(db, 'usernames', id.toLowerCase());
         const usernameSnap = await getDoc(usernameRef);
         
         if (!usernameSnap.exists()) {
-          throw new Error('Username not found. Please check and try again.');
+          setLoading(false);
+          toast({
+            variant: "destructive",
+            title: "Error",
+            description: "Username not found. Please check or use your email.",
+          });
+          return;
         }
-        loginEmail = usernameSnap.data().email;
+        
+        const data = usernameSnap.data();
+        if (!data || !data.email) {
+          throw new Error('Could not find email associated with this username.');
+        }
+        loginEmail = data.email;
       }
 
-      // 2. Sign in with Firebase Auth
+      // Final validation before Firebase Auth call
+      if (!loginEmail || !loginEmail.includes('@')) {
+        throw new Error('Invalid email format detected.');
+      }
+
+      // Sign in with Firebase Auth
       await signInWithEmailAndPassword(auth, loginEmail, password);
 
       toast({
-        title: "Logged In Successfully!",
-        description: "Welcome back to InstaFlow.",
+        title: "Logged In!",
+        description: "Welcome to InstaFlow.",
       });
       
       router.push('/');
     } catch (error: any) {
-      console.error(error);
+      console.error('Login Error:', error);
       let message = "Invalid credentials. Please try again.";
-      if (error.code === 'auth/invalid-email') message = "The email address is badly formatted.";
+      if (error.code === 'auth/invalid-email') message = "Email format is incorrect.";
       if (error.code === 'auth/user-not-found') message = "Account not found.";
       if (error.code === 'auth/wrong-password') message = "Incorrect password.";
+      if (error.code === 'auth/invalid-credential') message = "Invalid credentials.";
       
       toast({
         variant: "destructive",

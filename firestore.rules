@@ -3,11 +3,10 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     
-    // Global orders list for the tracker
-    // ONLY the specific admin email can read this
+    // Admin ONLY access to master order list
     match /all_orders/{orderId} {
       allow read: if request.auth != null && request.auth.token.email == 'chetanmadhav4@gmail.com';
-      allow write: if true; 
+      allow write: if true; // Bot writes to this
     }
 
     // User profile and sub-collections
