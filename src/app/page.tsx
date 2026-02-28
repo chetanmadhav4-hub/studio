@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect } from "react";
@@ -5,7 +6,8 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { BotPreview } from "@/components/bot-preview";
 import { OrderHistory } from "@/components/order-history";
-import { CheckCircle2, Zap, MessageSquare, History, Moon, Sun, LayoutGrid } from "lucide-react";
+import { NotificationBell } from "@/components/notification-bell";
+import { CheckCircle2, Zap, History, Moon, Sun, LayoutGrid } from "lucide-react";
 import { useUser } from "@/firebase";
 import {
   Dialog,
@@ -53,7 +55,7 @@ export default function Home() {
             <span className="font-bold text-xl tracking-tight text-primary">InstaFlow</span>
           </div>
           
-          <div className="flex items-center gap-2 sm:gap-3">
+          <div className="flex items-center gap-1 sm:gap-2">
             {!isUserLoading && (
               <>
                 {!user ? (
@@ -68,20 +70,22 @@ export default function Home() {
                     </Link>
                   </>
                 ) : (
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1 sm:gap-2">
                     <Button 
                       variant="ghost" 
                       size="sm"
-                      className="gap-2 text-sm dark:text-foreground hover:bg-accent"
+                      className="h-9 w-9 p-0 rounded-full hover:bg-accent"
                       onClick={toggleTheme}
                     >
-                      {isDark ? <Sun className="w-4 h-4 text-amber-500" /> : <Moon className="w-4 h-4 text-primary" />}
+                      {isDark ? <Sun className="w-5 h-5 text-amber-500" /> : <Moon className="w-5 h-5 text-primary" />}
                     </Button>
+
+                    <NotificationBell />
 
                     {/* ONLY SHOW TRACKER BUTTON TO ADMIN */}
                     {user.email === ADMIN_EMAIL && (
                       <Link href="/orders-feed">
-                        <Button className="bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-bold px-3 h-8 gap-1.5 shadow-sm rounded-lg transition-all active:scale-95">
+                        <Button className="bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-bold px-3 h-8 gap-1.5 shadow-sm rounded-lg transition-all active:scale-95 ml-1">
                           <LayoutGrid className="w-3.5 h-3.5" />
                           LIVE TRACKER
                         </Button>
@@ -89,7 +93,7 @@ export default function Home() {
                     )}
 
                     <Link href="/profile">
-                      <Button variant="ghost" size="sm" className="gap-2 text-sm dark:text-foreground p-1">
+                      <Button variant="ghost" size="sm" className="gap-2 text-sm p-1 ml-1">
                         <Avatar className="w-7 h-7 border">
                           <AvatarFallback className="text-[10px] bg-primary text-white">
                             {user.email?.charAt(0).toUpperCase()}
@@ -121,14 +125,14 @@ export default function Home() {
               <div className="flex justify-center flex-col items-center gap-4">
                 <Dialog>
                   <DialogTrigger asChild>
-                    <Button variant="outline" size="sm" className="gap-2 shadow-sm border-primary/20 text-primary hover:text-primary hover:bg-primary/5 dark:bg-card dark:text-foreground text-xs h-9">
+                    <Button variant="outline" size="sm" className="gap-2 shadow-sm border-primary/20 text-primary hover:text-primary hover:bg-primary/5 dark:bg-zinc-900 dark:text-zinc-100 dark:border-zinc-800 text-xs h-9">
                       <History className="w-4 h-4" />
                       View Order History
                     </Button>
                   </DialogTrigger>
-                  <DialogContent className="max-w-[95vw] md:max-w-md max-h-[85vh] overflow-y-auto rounded-2xl">
+                  <DialogContent className="max-w-[95vw] md:max-w-md max-h-[85vh] overflow-y-auto rounded-2xl dark:bg-zinc-950 dark:border-zinc-800">
                     <DialogHeader>
-                      <DialogTitle className="flex items-center gap-2">
+                      <DialogTitle className="flex items-center gap-2 dark:text-zinc-100">
                         <History className="w-5 h-5 text-primary" />
                         My Orders
                       </DialogTitle>
