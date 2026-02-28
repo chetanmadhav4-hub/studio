@@ -174,7 +174,7 @@ export async function processBotMessage(
         }
 
         return {
-          reply: confirmationText + "\n\nNaya order lagane ke liye niche select karein:\n\nOPTION: MENU\nOPTION: SUPPORT",
+          reply: confirmationText + "\n\nNaya order lagane ke liye niche select karein:\n\nOPTION: MENU",
           nextState: {
             state: 'ORDER_PLACED',
             data: { ...session.data, targetLink, orderId },
