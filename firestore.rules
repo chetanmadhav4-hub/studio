@@ -1,24 +1,22 @@
+
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // --- COLLECTION GROUP RULES (MUST BE AT TOP) ---
-    // These allow the Admin Dashboard to list documents across ALL paths
-    
+    // --- COLLECTION GROUP RULES ---
+    // Allow any logged in user (Admin) to see all orders for the live tracker
     match /{path=**}/orders/{orderId} {
       allow read, list: if request.auth != null;
     }
     
     match /{path=**}/messages/{messageId} {
-      allow read, list: if true;
+      allow read, list: if request.auth != null;
     }
 
     // --- SPECIFIC PATH RULES ---
 
     match /users/{userId} {
-      // Allow any logged in user to read (for the admin user list)
       allow read, list: if request.auth != null;
-      // Users can only write their own profile
       allow write: if request.auth != null && request.auth.uid == userId;
 
       match /orders/{orderId} {

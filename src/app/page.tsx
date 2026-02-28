@@ -6,8 +6,8 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { BotPreview } from "@/components/bot-preview";
 import { OrderHistory } from "@/components/order-history";
-import { CheckCircle2, Zap, ShieldCheck, MessageSquare, History, Moon, Sun } from "lucide-react";
-import { useUser, useAuth } from "@/firebase";
+import { CheckCircle2, Zap, ShieldCheck, MessageSquare, History, Moon, Sun, LayoutGrid } from "lucide-react";
+import { useUser } from "@/firebase";
 import { useRouter } from "next/navigation";
 import {
   Dialog,
@@ -22,7 +22,6 @@ export default function Home() {
   const { user, isUserLoading } = useUser();
   const [isDark, setIsDark] = useState(false);
 
-  // Initialize theme from localStorage
   useEffect(() => {
     const theme = localStorage.getItem("theme");
     if (theme === "dark") {
@@ -45,7 +44,6 @@ export default function Home() {
 
   return (
     <div className="min-h-screen flex flex-col bg-background transition-colors duration-300">
-      {/* Header */}
       <header className="border-b bg-white dark:bg-card sticky top-0 z-50 transition-colors">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -80,6 +78,13 @@ export default function Home() {
                       {isDark ? <Sun className="w-4 h-4 text-amber-500" /> : <Moon className="w-4 h-4 text-primary" />}
                     </Button>
 
+                    <Link href="/orders-feed">
+                      <Button variant="ghost" size="sm" className="gap-2 text-sm text-primary font-bold">
+                        <LayoutGrid className="w-4 h-4" />
+                        <span className="hidden xs:inline">Orders Tracker</span>
+                      </Button>
+                    </Link>
+
                     <Link href="/profile">
                       <Button variant="ghost" size="sm" className="gap-2 text-sm dark:text-foreground">
                         <Avatar className="w-6 h-6 border">
@@ -98,7 +103,6 @@ export default function Home() {
         </div>
       </header>
 
-      {/* Hero Section */}
       <section className="bg-gradient-to-b from-white to-background dark:from-card dark:to-background pt-12 pb-16 md:pt-20 md:pb-24 transition-colors">
         <div className="container mx-auto px-4">
           <div className="max-w-2xl mx-auto text-center space-y-6">
@@ -133,7 +137,6 @@ export default function Home() {
               </div>
             ) : null}
 
-            {/* Chat Interaction Area */}
             <div className="w-full max-w-[420px] mx-auto mt-4 transition-all">
               <BotPreview />
             </div>
@@ -156,7 +159,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Features Grid */}
       <section id="features" className="py-16 md:py-24 bg-white dark:bg-card transition-colors">
         <div className="container mx-auto px-4">
           <div className="text-center max-w-3xl mx-auto mb-12 md:mb-16 space-y-4">
