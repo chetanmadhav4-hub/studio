@@ -31,7 +31,6 @@ export async function processBotMessage(
   const normalizedMsg = messageText.trim().toLowerCase();
 
   // 1. GLOBAL SERVICE INTERRUPTION & MENU
-  // If user clicks a service button at ANY time, reset to that service flow
   let interceptedServiceKey = '';
   Object.entries(SERVICES_CONFIG).forEach(([key, service]) => {
     if (normalizedMsg === service.name.toLowerCase()) {
@@ -50,7 +49,6 @@ export async function processBotMessage(
     };
   }
 
-  // Handle Global Menu command
   if (normalizedMsg === 'hi' || normalizedMsg === 'start' || normalizedMsg === 'menu') {
     let menu = "👋 *Welcome to InstaFlow Bot!*\n\nAsli automation ka maza lein. 🚀\n\nNiche di gayi list mein se koi bhi service select karein:\n\n";
     Object.entries(SERVICES_CONFIG).forEach(([_, service]) => {
@@ -94,7 +92,7 @@ export async function processBotMessage(
 
       const price = calculatePrice(quantity, service.pricePer1000);
       return {
-        reply: `✅ Aapne *${quantity} ${service.name}* select kiye hain.\n💰 Total price: *₹${price}*\n\nAage badhne ke liye 'YES, PAY NOW' par click karein.`,
+        reply: `✅ Aapne *${quantity} ${service.name}* select kiye hain.\n💰 Total price: *₹${price}*\n\nAage badhne ke liye 'YES, PAY NOW' par click karein.\n\nOPTION: YES, PAY NOW\nOPTION: MENU`,
         nextState: {
           state: 'AWAITING_PAYMENT_CONFIRMATION',
           data: { ...session.data, quantity, price },
@@ -122,7 +120,6 @@ export async function processBotMessage(
           paymentLink: upiPayload,
         });
 
-        // Removed OPTION: MENU from here as requested
         return {
           reply: `${instructions.message}\n\n👤 *Account:* ${accountName}\n🆔 *UPI ID:* ${upiId}\n💰 *Amount:* ₹${price}\n\n📸 *SCAN TO PAY ₹${price} FOR ${serviceName}:*\n${qrImageUrl}\n\n✅ Payment ke baad, apna *Instagram Link* bhejein order start karne ke liye.`,
           nextState: {
@@ -132,7 +129,6 @@ export async function processBotMessage(
         };
       }
       
-      // If user is here but clicks nothing or types something else, remind them
       return {
         reply: "⚠️ Aage badhne ke liye kripya niche diye gaye buttons ka istemal karein.\n\nOPTION: YES, PAY NOW\nOPTION: MENU",
         nextState: { state: 'AWAITING_PAYMENT_CONFIRMATION' },
@@ -140,7 +136,6 @@ export async function processBotMessage(
     }
 
     case 'AWAITING_LINK': {
-      // If it's a valid link:
       if (isValidInstagramUrl(messageText)) {
         const targetLink = messageText;
         const orderId = `INSTA-${Math.floor(100000 + Math.random() * 900000)}`;
@@ -163,7 +158,6 @@ export async function processBotMessage(
         };
       }
 
-      // If it's not a link and not a service button (already checked globally), show error
       const error = await generateContextualErrorMessage({
         errorType: 'INVALID_URL',
         details: `User provided: ${messageText}. Needs to be a valid Instagram link.`,
