@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server';
 import { processBotMessage } from '@/lib/bot-logic';
 import { UserSession } from '@/lib/bot-types';
 import { initializeFirebase } from '@/firebase';
-import { doc, getDoc, setDoc, addDoc, collection, serverTimestamp } from 'firebase/firestore';
+import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 
 export async function POST(req: Request) {
   try {
@@ -51,7 +51,7 @@ export async function POST(req: Request) {
     const accessToken = process.env.WHATSAPP_ACCESS_TOKEN;
     const phoneNumberId = process.env.WHATSAPP_PHONE_NUMBER_ID;
 
-    // IF ORDER PLACED: Write to ALL_ORDERS and Notify Admin
+    // IF ORDER PLACED: Write to ALL_ORDERS and Notify Admin on his WhatsApp
     if (updatedSession.state === 'ORDER_PLACED' && updatedSession.data?.orderId) {
       const { orderId, utrId, targetLink, serviceName, quantity, price } = updatedSession.data;
       
@@ -70,7 +70,7 @@ export async function POST(req: Request) {
       // Save to global master list for the tracker
       await setDoc(doc(firestore, 'all_orders', orderId), orderData);
 
-      // Notify Admin via WhatsApp
+      // NOTIFY ADMIN VIA WHATSAPP IMMEDIATELY
       if (accessToken && phoneNumberId) {
         const adminMsg = `🚀 *Naya Order Aaya Hai!*
 
@@ -79,7 +79,9 @@ export async function POST(req: Request) {
 🔗 *Link:* ${targetLink}
 🛠️ *Service:* ${serviceName}
 📊 *Qty:* ${quantity}
-💰 *Amount:* ₹${price}`;
+💰 *Amount:* ₹${price}
+
+Check Live Tracker: https://${req.headers.get('host')}/orders-feed`;
 
         await fetch(`https://graph.facebook.com/v17.0/${phoneNumberId}/messages`, {
           method: 'POST',
