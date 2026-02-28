@@ -39,7 +39,7 @@ export default function Home() {
           <div className="flex flex-col lg:flex-row items-center gap-12">
             <div className="flex-1 space-y-8 text-center lg:text-left">
               <h1 className="text-5xl lg:text-6xl font-extrabold text-foreground leading-tight">
-                Automate Your SMM Orders via <span className="text-primary">WhatsApp</span>
+                Welcome to <span className="text-primary">InstaFlow</span>
               </h1>
               <p className="text-xl text-muted-foreground max-w-2xl mx-auto lg:mx-0">
                 Join thousands of users who grow their social media presence automatically. Secure login, instant payments, and 24/7 delivery.
