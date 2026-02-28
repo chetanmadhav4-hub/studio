@@ -19,7 +19,8 @@ import {
   XCircle, 
   Clock,
   User as UserIcon,
-  AlertTriangle
+  AlertTriangle,
+  Phone
 } from "lucide-react";
 import { useState } from "react";
 import Link from "next/link";
@@ -63,18 +64,21 @@ export default function SimpleOrdersFeed() {
       const orderRef = doc(db, 'all_orders', order.id);
       await updateDoc(orderRef, { status: newStatus });
 
-      const targetPhoneNumber = order.phoneNumber || 'demo_user';
-      const sessionRef = doc(db, 'botSessions', targetPhoneNumber);
+      // Target session should be the phoneNumber or UID used as ID
+      const targetSessionId = order.phoneNumber; 
+      if (!targetSessionId) throw new Error("Target session ID missing on order.");
+      
+      const sessionRef = doc(db, 'botSessions', targetSessionId);
 
       if (action === 'APPROVE') {
         const approveMsg = `✅ *ORDER APPROVED:* Aapka Order #${order.id.slice(-6)} approve ho gaya hai! Kaam jaldi shuru ho jayega. Stay tuned! 🚀`;
         
-        // WhatsApp Notification
-        if (order.phoneNumber && order.phoneNumber !== 'demo_user') {
-          await sendAdminActionNotification(order.phoneNumber, approveMsg);
+        // 1. WhatsApp Notification (if it's a real phone number)
+        if (targetSessionId.length > 10) {
+          await sendAdminActionNotification(targetSessionId, approveMsg);
         }
 
-        // Real-time Bot UI Notification
+        // 2. Real-time Bot UI Notification (Private to this user)
         await updateDoc(sessionRef, { 
           adminNotification: approveMsg,
           lastNotificationAt: serverTimestamp() 
@@ -82,7 +86,7 @@ export default function SimpleOrdersFeed() {
       } else {
         const rejectMsg = `❌ *ORDER REJECTED:* Aapka Order #${order.id.slice(-6)} reject kar diya gaya hai.\n\n⚠️ *Reason:* Invalid Instagram Link ya Galat UTR ID. Kripya sahi details ke saath fir se try karein.`;
         
-        // Real-time Bot UI Notification (No WhatsApp for rejection as requested)
+        // Real-time Bot UI Notification (No WhatsApp for rejection, private to this user)
         await updateDoc(sessionRef, { 
           adminNotification: rejectMsg,
           lastNotificationAt: serverTimestamp() 
@@ -230,12 +234,20 @@ function OrderCard({ order, onCopy, onAction, copiedId, isProcessing, showAction
         </div>
       </CardHeader>
       <CardContent className="p-4 space-y-4">
-        <div className="flex items-center gap-2 mb-1">
-          <div className="w-6 h-6 bg-slate-100 rounded-full flex items-center justify-center">
-            <UserIcon className="w-3 h-3 text-slate-500" />
+        {/* User Identity Section */}
+        <div className="flex items-center gap-2 mb-1 p-2 bg-slate-50 rounded-lg border border-slate-100">
+          <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
+            <UserIcon className="w-4 h-4 text-primary" />
           </div>
-          <span className="text-xs font-bold text-slate-700">+{order.phoneNumber}</span>
-          <span className="text-[10px] text-slate-400 ml-auto">ID: {order.id.slice(-6)}</span>
+          <div className="flex flex-col">
+            <p className="text-[9px] text-muted-foreground font-bold uppercase leading-none">Ordered By</p>
+            <span className="text-xs font-bold text-slate-800">
+              {order.phoneNumber?.length > 15 ? `UID: ${order.phoneNumber.slice(0,8)}...` : `+${order.phoneNumber}`}
+            </span>
+          </div>
+          <Badge variant="outline" className="ml-auto text-[9px] font-mono border-slate-200 text-slate-400">
+            ID: {order.id.slice(-6)}
+          </Badge>
         </div>
 
         <div className="bg-slate-50 p-3 rounded-xl border border-slate-100 flex items-center justify-between">

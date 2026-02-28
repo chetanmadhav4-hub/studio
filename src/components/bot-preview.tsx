@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useUser, useFirestore, useDoc, useMemoFirebase } from "@/firebase";
 import { doc, serverTimestamp } from "firebase/firestore";
-import { Send, Bot, MousePointer2, ExternalLink, LogIn, CheckCircle2, Link, Hash, BellRing } from "lucide-react";
+import { Send, Bot, MousePointer2, ExternalLink, LogIn, CheckCircle2, Link, Hash, BellRing, User as UserIcon } from "lucide-react";
 
 interface ChatMessage {
   role: "user" | "bot" | "admin_alert";
@@ -28,10 +28,13 @@ export function BotPreview() {
   const [formLink, setFormLink] = useState("");
   const [formUtr, setFormUtr] = useState("");
 
-  // Listen for admin notifications (Real-time rejection/approval messages)
+  // IMPORTANT: Listen to the PRIVATE session of the logged-in user
   const sessionRef = useMemoFirebase(() => {
-    return doc(db, 'botSessions', 'demo_user');
-  }, [db]);
+    if (!db || !user) return null;
+    // For web preview, we use the user's UID as the unique session ID
+    return doc(db, 'botSessions', user.uid);
+  }, [db, user]);
+  
   const { data: session } = useDoc(sessionRef);
 
   useEffect(() => {
@@ -90,7 +93,7 @@ export function BotPreview() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          entry: [{ changes: [{ value: { messages: [{ from: "demo_user", text: { body: messageToSend } }] } }] }],
+          entry: [{ changes: [{ value: { messages: [{ from: user.uid, text: { body: messageToSend } }] } }] }],
         }),
       });
 
@@ -114,7 +117,7 @@ export function BotPreview() {
             <div className={`w-8 h-8 rounded-full flex items-center justify-center ${isRejection ? 'bg-red-100 text-red-600' : 'bg-emerald-100 text-emerald-600'}`}>
               <BellRing className="w-4 h-4" />
             </div>
-            <span className={`text-[11px] font-bold uppercase tracking-wider ${isRejection ? 'text-red-700' : 'text-emerald-700'}`}>Admin Notification</span>
+            <span className={`text-[11px] font-bold uppercase tracking-wider ${isRejection ? 'text-red-700' : 'text-emerald-700'}`}>Admin Update (Only for You)</span>
           </div>
           <p className={`text-xs md:text-sm font-medium leading-relaxed ${isRejection ? 'text-red-900' : 'text-emerald-900'}`}>{text.replace(/\*/g, '')}</p>
         </div>
@@ -203,10 +206,26 @@ export function BotPreview() {
             </div>
           </div>
         ))}
+        {!user && (
+          <div className="flex justify-center pt-8">
+            <Link href="/login">
+              <Button size="sm" className="gap-2 rounded-full font-bold shadow-lg">
+                <LogIn className="w-4 h-4" /> Start Ordering Now
+              </Button>
+            </Link>
+          </div>
+        )}
         {loading && <div className="text-xs italic opacity-50">Bot is thinking...</div>}
       </CardContent>
       <div className="p-3 bg-[#F0F2F5] flex gap-2 border-t">
-        <Input value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={(e) => e.key === "Enter" && handleSend()} placeholder="Type message..." disabled={!user} className="bg-white rounded-full h-10 px-4" />
+        <Input 
+          value={input} 
+          onChange={(e) => setInput(e.target.value)} 
+          onKeyDown={(e) => e.key === "Enter" && handleSend()} 
+          placeholder={user ? "Type message..." : "Please Login to Chat"} 
+          disabled={!user} 
+          className="bg-white rounded-full h-10 px-4" 
+        />
         <Button onClick={() => handleSend()} disabled={loading || !user} size="icon" className="rounded-full bg-[#00A884] h-10 w-10">
           <Send className="w-4 h-4 text-white" />
         </Button>
