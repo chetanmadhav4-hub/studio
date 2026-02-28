@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect, useRef } from "react";
@@ -40,7 +41,6 @@ export function BotPreview() {
     const messageToSend = customInput || input;
     if (!messageToSend.trim() || loading) return;
 
-    // Check if user is logged in
     if (!user) {
       setMessages((prev) => [
         ...prev,
@@ -54,17 +54,12 @@ export function BotPreview() {
       return;
     }
 
-    // Handle Redirections from simulated buttons
     if (messageToSend === "Login Now") {
       router.push("/login");
       return;
     }
     if (messageToSend === "Create Account") {
       router.push("/signup");
-      return;
-    }
-    if (messageToSend === "SUPPORT") {
-      window.open("https://wa.me/919116399517?text=Hi, I need support with my InstaFlow order.", "_blank");
       return;
     }
 
@@ -100,9 +95,8 @@ export function BotPreview() {
       if (data.reply) {
         setMessages((prev) => [...prev, { role: "bot", text: data.reply }]);
         
-        // If order is placed, save it to user's history in Firestore using data from bot response
         if (data.state === 'ORDER_PLACED' && user && data.orderData) {
-          const { orderId, serviceName, quantity, price, targetLink } = data.orderData;
+          const { orderId, serviceName, quantity, price, targetLink, utrId } = data.orderData;
           
           if (orderId) {
             setDocumentNonBlocking(
@@ -114,7 +108,8 @@ export function BotPreview() {
                 price: price || 0,
                 status: "PROCESSING",
                 createdAt: serverTimestamp(),
-                targetLink: targetLink || messageToSend,
+                targetLink: targetLink || "",
+                utrId: utrId || "",
               },
               { merge: true }
             );
@@ -203,6 +198,9 @@ export function BotPreview() {
           <div className="mt-3 grid gap-2">
             {optionLines.map((optLine, i) => {
               const optionText = optLine.replace("OPTION: ", "").trim();
+              if (optionText.startsWith("✅")) {
+                 return <div key={i} className="text-center py-2 px-4 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 font-bold text-xs rounded-lg border border-emerald-200 dark:border-emerald-800">{optionText}</div>
+              }
               return (
                 <button
                   key={i}

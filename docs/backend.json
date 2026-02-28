@@ -34,6 +34,7 @@
         "price": { "type": "number" },
         "status": { "type": "string", "enum": ["COMPLETED", "PROCESSING", "PENDING"] },
         "targetLink": { "type": "string" },
+        "utrId": { "type": "string" },
         "createdAt": { "type": "string", "format": "date-time" }
       },
       "required": ["id", "serviceName", "quantity", "price", "status", "createdAt"]

@@ -1,9 +1,12 @@
+
 export type BotState = 
   | 'START' 
   | 'AWAITING_SERVICE_SELECTION'
   | 'AWAITING_QUANTITY' 
   | 'AWAITING_PAYMENT_CONFIRMATION' 
+  | 'AWAITING_PAYMENT_DETAILS'
   | 'AWAITING_LINK' 
+  | 'AWAITING_UTR_ID'
   | 'ORDER_PLACED' 
   | 'ERROR';
 
@@ -18,6 +21,7 @@ export interface UserSession {
     price?: number;
     paymentLinkId?: string;
     targetLink?: string;
+    utrId?: string;
     orderId?: string;
     smmOrderId?: string;
   };
@@ -32,6 +36,7 @@ export interface OrderRecord {
   price: number;
   status: 'PENDING_PAYMENT' | 'PAID' | 'PLACED' | 'FAILED';
   targetLink?: string;
+  utrId?: string;
   smmOrderId?: string;
   createdAt: number;
 }

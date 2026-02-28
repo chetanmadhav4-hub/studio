@@ -1,3 +1,4 @@
+
 import { BotState, UserSession } from './bot-types';
 import { aiGeneratedOrderConfirmation } from '@/ai/flows/ai-generated-order-confirmation';
 import { generateContextualErrorMessage } from '@/ai/flows/ai-generated-contextual-error-messages';
@@ -13,7 +14,6 @@ export const SERVICES_CONFIG: Record<string, { name: string; pricePer1000: numbe
 };
 
 export function calculatePrice(quantity: number, pricePer1000: number): number {
-  // Ensure minimum price of ₹1
   return Math.max(1, Math.ceil((quantity / 1000) * pricePer1000));
 }
 
@@ -22,16 +22,18 @@ export function isValidInstagramUrl(url: string): boolean {
   return regex.test(url);
 }
 
-/**
- * Handles the state machine logic for the bot.
- */
+export function isValidUtr(utr: string): boolean {
+  const regex = /^\d{12}$/;
+  return regex.test(utr.trim());
+}
+
 export async function processBotMessage(
   session: UserSession,
   messageText: string
 ): Promise<{ reply: string; nextState: Partial<UserSession> }> {
   const normalizedMsg = messageText.trim().toLowerCase();
 
-  // 1. GLOBAL SERVICE INTERRUPTION (Allows switching service anytime)
+  // GLOBAL SERVICE INTERRUPTION
   let interceptedServiceKey = '';
   Object.entries(SERVICES_CONFIG).forEach(([key, service]) => {
     if (normalizedMsg.includes(service.name.toLowerCase()) || (normalizedMsg.length < 3 && normalizedMsg === key)) {
@@ -50,7 +52,7 @@ export async function processBotMessage(
     };
   }
 
-  // 2. MENU COMMAND
+  // MENU COMMAND
   if (normalizedMsg === 'hi' || normalizedMsg === 'start' || normalizedMsg === 'menu') {
     let menu = "👋 *Welcome to InstaFlow Bot!*\n\nNiche di gayi list mein se koi bhi service select karein:\n\n";
     Object.entries(SERVICES_CONFIG).forEach(([_, service]) => {
@@ -66,7 +68,7 @@ export async function processBotMessage(
     };
   }
 
-  // 3. STATE-BASED LOGIC
+  // STATE-BASED LOGIC
   switch (session.state) {
     case 'AWAITING_SERVICE_SELECTION': {
       return {
@@ -76,10 +78,8 @@ export async function processBotMessage(
     }
 
     case 'AWAITING_QUANTITY': {
-      // Try to extract only numbers from the message
       const numberMatch = normalizedMsg.match(/\d+/);
       const quantity = numberMatch ? parseInt(numberMatch[0]) : NaN;
-      
       const serviceId = session.data.serviceId || '1';
       const service = SERVICES_CONFIG[serviceId];
 
@@ -92,9 +92,7 @@ export async function processBotMessage(
             currentState: `Selecting quantity for ${service.name}`,
           });
           errorMessage = errorRes.errorMessage;
-        } catch (e) {
-          console.error("AI Error:", e);
-        }
+        } catch (e) {}
         
         return {
           reply: errorMessage,
@@ -114,90 +112,93 @@ export async function processBotMessage(
 
     case 'AWAITING_PAYMENT_CONFIRMATION': {
       if (normalizedMsg.includes('yes') || normalizedMsg.includes('pay')) {
-        const quantity = session.data.quantity || 0;
         const price = session.data.price || 0;
-        const serviceName = session.data.serviceName || 'Service';
-        
         const upiId = 'smmxpressbot@slc';
         const accountName = 'CHETAN KUMAR MEGHWAL';
-        
         const upiPayload = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(accountName)}&am=${price}&cu=INR`;
         const qrImageUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(upiPayload)}`;
 
-        let instructionsText = `📲 *Pay via any UPI app*\n\nAapko ₹*${price}* pay karne hain. QR code scan karein ya UPI ID use karein.`;
-        try {
-          const instructions = await aiGeneratedPaymentInstructionsAndConfirmation({
-            type: 'payment_instructions',
-            quantity,
-            price,
-            paymentLink: upiPayload,
-          });
-          instructionsText = instructions.message;
-        } catch (e) {
-          console.error("AI Error:", e);
-        }
-
         return {
-          reply: `${instructionsText}\n\n👤 *Account:* ${accountName}\n🆔 *UPI ID:* ${upiId}\n💰 *Amount:* ₹${price}\n\n📸 *SCAN TO PAY ₹${price} FOR ${serviceName}:*\n${qrImageUrl}\n\n${upiPayload}\n\n✅ Payment ke baad, apna *Instagram Link and UTR ID* bhejein order start karne ke liye.`,
+          reply: `📲 *Pay via any UPI app*\n\nAapko ₹*${price}* pay karne hain. QR code scan karein ya UPI ID use karein.\n\n👤 *Account:* ${accountName}\n🆔 *UPI ID:* ${upiId}\n💰 *Amount:* ₹${price}\n\n📸 *SCAN TO PAY:*\n${qrImageUrl}\n\n${upiPayload}\n\n✅ Payment ke baad niche details fill karein:\n\nOPTION: 🔗 Send Instagram Link\nOPTION: 🆔 Send UTR ID`,
           nextState: {
-            state: 'AWAITING_LINK',
+            state: 'AWAITING_PAYMENT_DETAILS',
             data: { ...session.data },
           },
         };
       }
-      
       return {
         reply: "⚠️ Aage badhne ke liye niche diye gaye buttons ka istemal karein.\n\nOPTION: YES, PAY NOW\nOPTION: MENU",
         nextState: { state: 'AWAITING_PAYMENT_CONFIRMATION' },
       };
     }
 
-    case 'AWAITING_LINK': {
-      if (isValidInstagramUrl(messageText)) {
-        const targetLink = messageText;
+    case 'AWAITING_PAYMENT_DETAILS': {
+      if (normalizedMsg.includes('instagram link')) {
+        return { reply: "🔗 Kripya apna *Instagram Profile/Post Link* bhejein:", nextState: { state: 'AWAITING_LINK' } };
+      }
+      if (normalizedMsg.includes('utr id')) {
+        return { reply: "🆔 Kripya apna 12-digit *UTR ID / Transaction ID* bhejein:", nextState: { state: 'AWAITING_UTR_ID' } };
+      }
+      if (normalizedMsg.includes('submit order')) {
+        if (!session.data.targetLink || !session.data.utrId) {
+          return { reply: "⚠️ Dono details (Link aur UTR ID) dena zaroori hai.\n\nOPTION: 🔗 Send Instagram Link\nOPTION: 🆔 Send UTR ID", nextState: { state: 'AWAITING_PAYMENT_DETAILS' } };
+        }
+        
         const orderId = `INSTA-${Math.floor(100000 + Math.random() * 900000)}`;
-        
-        let confirmationText = `🎉 *Woohoo! Your InstaFlow order successfully created!*\n\n- *Order ID:* ${orderId}\n- *Service:* ${session.data.serviceName}\n- *Quantity:* ${session.data.quantity}\n- *Amount:* ₹${session.data.price}\n- *Start Time:* 0-30 minutes\n- *Target Link:* ${targetLink}`;
-        
         try {
           const confirmation = await aiGeneratedOrderConfirmation({
             orderId,
             quantity: session.data.quantity || 0,
             serviceName: session.data.serviceName || 'Instagram Service',
-            instagramProfileLink: targetLink,
+            instagramProfileLink: session.data.targetLink,
             price: session.data.price || 0,
             startTime: '0-30 minutes',
           });
-          confirmationText = confirmation.message;
+          return {
+            reply: confirmation.message + "\n\nNaya order lagane ke liye click karein:\n\nOPTION: MENU",
+            nextState: { state: 'ORDER_PLACED', data: { ...session.data, orderId } }
+          };
         } catch (e) {
-          console.error("AI Error:", e);
+          return {
+            reply: `🎉 *Order Created!* ID: ${orderId}\n\nNaya order lagane ke liye click karein:\n\nOPTION: MENU`,
+            nextState: { state: 'ORDER_PLACED', data: { ...session.data, orderId } }
+          };
         }
+      }
 
+      const hasLink = !!session.data.targetLink;
+      const hasUtr = !!session.data.utrId;
+      let prompt = "✅ Payment ke baad details fill karein:\n\n";
+      if (!hasLink) prompt += "OPTION: 🔗 Send Instagram Link\n";
+      else prompt += "✅ Link Received\n";
+      if (!hasUtr) prompt += "OPTION: 🆔 Send UTR ID\n";
+      else prompt += "✅ UTR ID Received\n";
+      
+      if (hasLink && hasUtr) prompt += "\n✨ Ab order submit karein:\nOPTION: 🚀 SUBMIT ORDER";
+
+      return { reply: prompt, nextState: { state: 'AWAITING_PAYMENT_DETAILS' } };
+    }
+
+    case 'AWAITING_LINK': {
+      if (isValidInstagramUrl(messageText)) {
+        const newData = { ...session.data, targetLink: messageText };
         return {
-          reply: confirmationText + "\n\nNaya order lagane ke liye niche select karein:\n\nOPTION: MENU",
-          nextState: {
-            state: 'ORDER_PLACED',
-            data: { ...session.data, targetLink, orderId },
-          },
+          reply: `✅ Link save ho gaya! ${!newData.utrId ? "\n\nAb UTR ID bhejein:" : "\n\nDetails check karke submit karein:"}\n\n${!newData.utrId ? "OPTION: 🆔 Send UTR ID" : "OPTION: 🚀 SUBMIT ORDER"}`,
+          nextState: { state: 'AWAITING_PAYMENT_DETAILS', data: newData },
         };
       }
+      return { reply: "⚠️ Sahi Instagram link bhejein (e.g., https://instagram.com/username)", nextState: { state: 'AWAITING_LINK' } };
+    }
 
-      let errorMsg = "⚠️ Kripya sahi Instagram link bhejein (e.g., https://instagram.com/username)";
-      try {
-        const error = await generateContextualErrorMessage({
-          errorType: 'INVALID_URL',
-          details: `User provided: ${messageText}. Needs to be a valid Instagram link.`,
-          currentState: 'Providing link after payment',
-        });
-        errorMsg = error.errorMessage;
-      } catch (e) {
-        console.error("AI Error:", e);
+    case 'AWAITING_UTR_ID': {
+      if (isValidUtr(messageText)) {
+        const newData = { ...session.data, utrId: messageText.trim() };
+        return {
+          reply: `✅ UTR ID save ho gaya! ${!newData.targetLink ? "\n\nAb Instagram Link bhejein:" : "\n\nDetails check karke submit karein:"}\n\n${!newData.targetLink ? "OPTION: 🔗 Send Instagram Link" : "OPTION: 🚀 SUBMIT ORDER"}`,
+          nextState: { state: 'AWAITING_PAYMENT_DETAILS', data: newData },
+        };
       }
-      
-      return {
-        reply: errorMsg + "\n\nKripya sahi Instagram link bhejein.",
-        nextState: { state: 'AWAITING_LINK' },
-      };
+      return { reply: "⚠️ Kripya sahi 12-digit UTR ID bhejein jo payment app mein dikhta hai.", nextState: { state: 'AWAITING_UTR_ID' } };
     }
 
     default:
