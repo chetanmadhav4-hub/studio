@@ -86,7 +86,7 @@ export function useCollection<T = any>(
             path = internalQuery._query.path.canonicalString();
           }
         } catch (e) {
-          path = 'collection-group-query';
+          path = 'collection-group-query-failed';
         }
 
         const contextualError = new FirestorePermissionError({
