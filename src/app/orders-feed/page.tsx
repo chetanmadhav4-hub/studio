@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useCollection, useFirestore, useMemoFirebase, useUser } from "@/firebase";
@@ -6,16 +5,18 @@ import { collection, query, orderBy, limit } from "firebase/firestore";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, ExternalLink, Copy, CheckCircle2, ShoppingBag, ArrowLeft, RefreshCcw } from "lucide-react";
+import { Loader2, ExternalLink, Copy, CheckCircle2, ShoppingBag, RefreshCcw, Lock } from "lucide-react";
 import { useState } from "react";
 import Link from "next/link";
 import { useToast } from "@/hooks/use-toast";
 
 export default function SimpleOrdersFeed() {
-  const { user } = useUser();
+  const { user, isUserLoading } = useUser();
   const db = useFirestore();
   const { toast } = useToast();
   const [copiedId, setCopiedId] = useState<string | null>(null);
+
+  const ADMIN_EMAIL = 'chetanmadhav4@gmail.com';
 
   // QUERY THE GLOBAL MASTER COLLECTION
   const ordersQuery = useMemoFirebase(() => {
@@ -32,12 +33,32 @@ export default function SimpleOrdersFeed() {
     setTimeout(() => setCopiedId(null), 2000);
   };
 
-  if (!user) {
+  if (isUserLoading) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-background p-4 text-center gap-4">
-        <h2 className="text-xl font-bold">Access Restricted</h2>
-        <p className="text-muted-foreground">Please Login to view the tracker.</p>
-        <Link href="/login"><Button>Login Now</Button></Link>
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  // ONLY ADMIN EMAIL CAN ACCESS
+  if (!user || user.email !== ADMIN_EMAIL) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-background p-4 text-center gap-6">
+        <div className="w-20 h-20 bg-red-50 rounded-full flex items-center justify-center">
+          <Lock className="w-10 h-10 text-red-500" />
+        </div>
+        <div className="space-y-2">
+          <h2 className="text-2xl font-bold text-slate-900">Access Restricted</h2>
+          <p className="text-muted-foreground max-w-xs mx-auto">
+            Ye page sirf Admin (chetanmadhav4@gmail.com) ke liye hai.
+          </p>
+        </div>
+        <Link href="/login">
+          <Button className="w-full sm:w-auto h-11 px-8 rounded-xl font-bold">
+            Login as Admin
+          </Button>
+        </Link>
       </div>
     );
   }
@@ -51,7 +72,7 @@ export default function SimpleOrdersFeed() {
               <ShoppingBag className="w-6 h-6 text-white" />
             </div>
             <div>
-              <h1 className="text-lg font-bold text-slate-900">Live Orders</h1>
+              <h1 className="text-lg font-bold text-slate-900">Admin Live Tracker</h1>
               <p className="text-[10px] text-emerald-500 font-bold uppercase tracking-widest">Master Feed</p>
             </div>
           </div>
@@ -115,7 +136,7 @@ export default function SimpleOrdersFeed() {
         )}
       </div>
       <div className="fixed bottom-6 left-4 right-4 bg-slate-900 text-white p-3 rounded-2xl text-center text-[10px] font-bold shadow-2xl opacity-90 border border-white/10">
-        🚀 MASTER TRACKER - All orders will appear here instantly!
+        🚀 MASTER TRACKER - Logged in as Admin
       </div>
     </div>
   );

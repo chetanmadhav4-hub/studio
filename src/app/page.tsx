@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useEffect } from "react";
@@ -6,9 +5,8 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { BotPreview } from "@/components/bot-preview";
 import { OrderHistory } from "@/components/order-history";
-import { CheckCircle2, Zap, ShieldCheck, MessageSquare, History, Moon, Sun, LayoutGrid } from "lucide-react";
+import { CheckCircle2, Zap, MessageSquare, History, Moon, Sun, LayoutGrid } from "lucide-react";
 import { useUser } from "@/firebase";
-import { useRouter } from "next/navigation";
 import {
   Dialog,
   DialogContent,
@@ -21,6 +19,8 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 export default function Home() {
   const { user, isUserLoading } = useUser();
   const [isDark, setIsDark] = useState(false);
+
+  const ADMIN_EMAIL = 'chetanmadhav4@gmail.com';
 
   useEffect(() => {
     const theme = localStorage.getItem("theme");
@@ -78,12 +78,15 @@ export default function Home() {
                       {isDark ? <Sun className="w-4 h-4 text-amber-500" /> : <Moon className="w-4 h-4 text-primary" />}
                     </Button>
 
-                    <Link href="/orders-feed">
-                      <Button className="bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-bold px-3 h-8 gap-1.5 shadow-sm rounded-lg transition-all active:scale-95">
-                        <LayoutGrid className="w-3.5 h-3.5" />
-                        LIVE TRACKER
-                      </Button>
-                    </Link>
+                    {/* ONLY SHOW TRACKER BUTTON TO ADMIN */}
+                    {user.email === ADMIN_EMAIL && (
+                      <Link href="/orders-feed">
+                        <Button className="bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-bold px-3 h-8 gap-1.5 shadow-sm rounded-lg transition-all active:scale-95">
+                          <LayoutGrid className="w-3.5 h-3.5" />
+                          LIVE TRACKER
+                        </Button>
+                      </Link>
+                    )}
 
                     <Link href="/profile">
                       <Button variant="ghost" size="sm" className="gap-2 text-sm dark:text-foreground p-1">
