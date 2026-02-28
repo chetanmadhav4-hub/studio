@@ -61,57 +61,59 @@ export default function Home() {
         </div>
       </header>
 
-      {/* Hero Section */}
-      <section className="bg-gradient-to-b from-white to-background pt-8 pb-16 md:pt-16 md:pb-24">
+      {/* Hero Section - Centered on Bot Interaction */}
+      <section className="bg-gradient-to-b from-white to-background pt-12 pb-16 md:pt-20 md:pb-24">
         <div className="container mx-auto px-4">
-          <div className="flex flex-col lg:flex-row items-center gap-8 lg:gap-12">
-            <div className="flex-1 space-y-6 md:space-y-8 text-center lg:text-left order-2 lg:order-1">
+          <div className="max-w-2xl mx-auto text-center space-y-8">
+            <div className="space-y-4">
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-foreground leading-tight">
                 Welcome to <span className="text-primary">InstaFlow</span>
               </h1>
-              <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto lg:mx-0">
+              <p className="text-lg md:text-xl text-muted-foreground max-w-xl mx-auto">
                 Join thousands of users who grow their social media presence automatically. Secure login, instant payments, and 24/7 delivery.
               </p>
-              
-              {!isUserLoading && !user ? (
-                <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
-                  <Link href="/signup" className="w-full sm:w-auto">
-                    <Button size="lg" className="w-full sm:w-auto h-12 px-8 text-lg bg-primary">
-                      Create Account
-                    </Button>
-                  </Link>
-                  <Link href="/login" className="w-full sm:w-auto">
-                    <Button size="lg" variant="outline" className="w-full sm:w-auto h-12 px-8 text-lg border-primary text-primary">
-                      Login to Portal
-                    </Button>
-                  </Link>
-                </div>
-              ) : user ? (
-                <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
-                  <div className="px-5 py-3 bg-primary/10 text-primary rounded-xl border border-primary/20 flex items-center gap-3">
-                    <MessageCircle className="w-5 h-5" />
-                    <span className="font-bold text-sm md:text-base text-center">Bot is active for you! Interact below.</span>
-                  </div>
-                </div>
-              ) : null}
+            </div>
 
-              <div className="hidden sm:flex items-center justify-center lg:justify-start gap-6 pt-4">
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <CheckCircle2 className="w-4 h-4 text-accent" />
-                  Instant Activation
-                </div>
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <CheckCircle2 className="w-4 h-4 text-accent" />
-                  24/7 Automation
-                </div>
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <CheckCircle2 className="w-4 h-4 text-accent" />
-                  Secure Payments
+            {!isUserLoading && !user ? (
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+                <Link href="/signup" className="w-full sm:w-auto">
+                  <Button size="lg" className="w-full sm:w-auto h-12 px-8 text-lg bg-primary">
+                    Create Account
+                  </Button>
+                </Link>
+                <Link href="/login" className="w-full sm:w-auto">
+                  <Button size="lg" variant="outline" className="w-full sm:w-auto h-12 px-8 text-lg border-primary text-primary">
+                    Login to Portal
+                  </Button>
+                </Link>
+              </div>
+            ) : user ? (
+              <div className="flex justify-center">
+                <div className="px-5 py-3 bg-primary/10 text-primary rounded-xl border border-primary/20 flex items-center gap-3">
+                  <MessageCircle className="w-5 h-5 animate-pulse" />
+                  <span className="font-bold text-sm md:text-base">Bot is active for you! Interact below.</span>
                 </div>
               </div>
-            </div>
-            <div className="flex-1 w-full max-w-[400px] lg:max-w-md order-1 lg:order-2">
+            ) : null}
+
+            {/* Chat Interaction Area */}
+            <div className="w-full max-w-[420px] mx-auto mt-12 transition-all">
               <BotPreview />
+            </div>
+
+            <div className="hidden sm:flex items-center justify-center gap-8 pt-8 opacity-60">
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <CheckCircle2 className="w-4 h-4 text-accent" />
+                Instant Activation
+              </div>
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <CheckCircle2 className="w-4 h-4 text-accent" />
+                24/7 Automation
+              </div>
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <CheckCircle2 className="w-4 h-4 text-accent" />
+                Secure Payments
+              </div>
             </div>
           </div>
         </div>
