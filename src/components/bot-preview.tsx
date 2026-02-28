@@ -54,13 +54,17 @@ export function BotPreview() {
       return;
     }
 
-    // Handle Auth Redirections from simulated buttons
+    // Handle Redirections from simulated buttons
     if (messageToSend === "Login Now") {
       router.push("/login");
       return;
     }
     if (messageToSend === "Create Account") {
       router.push("/signup");
+      return;
+    }
+    if (messageToSend === "SUPPORT") {
+      window.open("https://wa.me/919116399517?text=Hi, I need support with my InstaFlow order.", "_blank");
       return;
     }
 
