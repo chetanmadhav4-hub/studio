@@ -9,15 +9,14 @@ export async function POST(req: Request) {
   try {
     const body = await req.json();
     
-    // Validate Meta Webhook Payload
-    // if (body.object !== 'whatsapp_business_account') return new Response('Not Found', { status: 404 });
-    
+    // Check if it's a Meta Webhook payload
     const entry = body.entry?.[0];
     const changes = entry?.changes?.[0];
     const value = changes?.value;
     const message = value?.messages?.[0];
 
     if (!message) {
+      // Return success for preview or empty messages
       return NextResponse.json({ success: true });
     }
 
@@ -44,25 +43,25 @@ export async function POST(req: Request) {
       updatedAt: Date.now(),
     };
 
-    // Log the reply for the dashboard demo
-    console.log(`[WhatsApp Bot] Replying to ${phoneNumber}: ${reply}`);
+    // Send the message back via Meta Graph API if credentials exist
+    const accessToken = process.env.WHATSAPP_ACCESS_TOKEN;
+    const phoneNumberId = process.env.WHATSAPP_PHONE_NUMBER_ID;
 
-    // In a real application, you would use the Meta Graph API to send the message back:
-    /*
-    await fetch(`https://graph.facebook.com/v17.0/${process.env.WHATSAPP_PHONE_NUMBER_ID}/messages`, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${process.env.WHATSAPP_ACCESS_TOKEN}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        messaging_product: 'whatsapp',
-        to: phoneNumber,
-        type: 'text',
-        text: { body: reply },
-      }),
-    });
-    */
+    if (accessToken && phoneNumberId && phoneNumber !== 'demo_user') {
+      await fetch(`https://graph.facebook.com/v17.0/${phoneNumberId}/messages`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          messaging_product: 'whatsapp',
+          to: phoneNumber,
+          type: 'text',
+          text: { body: reply },
+        }),
+      });
+    }
 
     return NextResponse.json({ 
       success: true, 
@@ -81,8 +80,10 @@ export async function GET(req: Request) {
   const token = searchParams.get('hub.verify_token');
   const challenge = searchParams.get('hub.challenge');
 
-  // Verify token (Mocking for now)
-  if (mode === 'subscribe' && token === 'instaflow_secret_token') {
+  // Verify token from environment variables
+  const verifyToken = process.env.WHATSAPP_VERIFY_TOKEN || 'instaflow_secret_token';
+
+  if (mode === 'subscribe' && token === verifyToken) {
     return new Response(challenge, { status: 200 });
   }
   
