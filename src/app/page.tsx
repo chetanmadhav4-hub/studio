@@ -1,10 +1,24 @@
 
+'use client';
+
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { BotPreview } from "@/components/bot-preview";
-import { CheckCircle2, Zap, ShieldCheck, MessageSquare } from "lucide-react";
+import { CheckCircle2, Zap, ShieldCheck, MessageSquare, LogOut, MessageCircle } from "lucide-react";
+import { useUser, useAuth } from "@/firebase";
+import { signOut } from "firebase/auth";
+import { useRouter } from "next/navigation";
 
 export default function Home() {
+  const { user, isUserLoading } = useUser();
+  const auth = useAuth();
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    await signOut(auth);
+    router.refresh();
+  };
+
   return (
     <div className="min-h-screen flex flex-col">
       {/* Header */}
@@ -21,14 +35,31 @@ export default function Home() {
             <Link href="#how-it-works" className="hover:text-primary transition-colors">How it Works</Link>
           </nav>
           <div className="flex items-center gap-3">
-            <Link href="/login">
-              <Button variant="ghost">Login</Button>
-            </Link>
-            <Link href="/signup">
-              <Button className="bg-primary text-white hover:bg-primary/90">
-                Sign Up
-              </Button>
-            </Link>
+            {!isUserLoading && (
+              <>
+                {!user ? (
+                  <>
+                    <Link href="/login">
+                      <Button variant="ghost">Login</Button>
+                    </Link>
+                    <Link href="/signup">
+                      <Button className="bg-primary text-white hover:bg-primary/90">
+                        Sign Up
+                      </Button>
+                    </Link>
+                  </>
+                ) : (
+                  <Button 
+                    variant="ghost" 
+                    className="text-destructive hover:text-destructive hover:bg-destructive/10 gap-2"
+                    onClick={handleLogout}
+                  >
+                    <LogOut className="w-4 h-4" />
+                    Logout
+                  </Button>
+                )}
+              </>
+            )}
           </div>
         </div>
       </header>
@@ -44,18 +75,31 @@ export default function Home() {
               <p className="text-xl text-muted-foreground max-w-2xl mx-auto lg:mx-0">
                 Join thousands of users who grow their social media presence automatically. Secure login, instant payments, and 24/7 delivery.
               </p>
-              <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
-                <Link href="/signup">
-                  <Button size="lg" className="h-12 px-8 text-lg bg-primary">
-                    Create Account
-                  </Button>
-                </Link>
-                <Link href="/login">
-                  <Button size="lg" variant="outline" className="h-12 px-8 text-lg border-primary text-primary">
-                    Login to Portal
-                  </Button>
-                </Link>
-              </div>
+              
+              {!isUserLoading && !user && (
+                <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
+                  <Link href="/signup">
+                    <Button size="lg" className="h-12 px-8 text-lg bg-primary">
+                      Create Account
+                    </Button>
+                  </Link>
+                  <Link href="/login">
+                    <Button size="lg" variant="outline" className="h-12 px-8 text-lg border-primary text-primary">
+                      Login to Portal
+                    </Button>
+                  </Link>
+                </div>
+              )}
+
+              {user && (
+                <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
+                  <div className="px-6 py-3 bg-primary/10 text-primary rounded-xl border border-primary/20 flex items-center gap-3 animate-pulse">
+                    <MessageCircle className="w-5 h-5" />
+                    <span className="font-bold">Bot is active for you! Use it on the right.</span>
+                  </div>
+                </div>
+              )}
+
               <div className="flex items-center justify-center lg:justify-start gap-6 pt-4">
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
                   <CheckCircle2 className="w-4 h-4 text-accent" />
