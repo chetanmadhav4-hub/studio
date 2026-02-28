@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect } from "react";
@@ -5,8 +6,8 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { BotPreview } from "@/components/bot-preview";
 import { OrderHistory } from "@/components/order-history";
-import { CheckCircle2, Zap, ShieldCheck, MessageSquare, User, History, Moon, Sun, LayoutDashboard } from "lucide-react";
-import { useUser } from "@/firebase";
+import { CheckCircle2, Zap, ShieldCheck, MessageSquare, History, Moon, Sun } from "lucide-react";
+import { useUser, useAuth } from "@/firebase";
 import { useRouter } from "next/navigation";
 import {
   Dialog,
@@ -15,10 +16,10 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 export default function Home() {
   const { user, isUserLoading } = useUser();
-  const router = useRouter();
   const [isDark, setIsDark] = useState(false);
 
   // Initialize theme from localStorage
@@ -70,14 +71,6 @@ export default function Home() {
                   </>
                 ) : (
                   <div className="flex items-center gap-2">
-                    {/* Admin Dashboard Link for easy access */}
-                    <Link href="/dashboard">
-                      <Button variant="outline" size="sm" className="gap-2 text-sm border-primary/20 text-primary hover:bg-primary/5">
-                        <LayoutDashboard className="w-4 h-4" />
-                        <span className="hidden md:inline">Dashboard</span>
-                      </Button>
-                    </Link>
-
                     <Button 
                       variant="ghost" 
                       size="sm"
@@ -220,5 +213,3 @@ export default function Home() {
     </div>
   );
 }
-
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";

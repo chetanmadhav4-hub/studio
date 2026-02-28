@@ -21,15 +21,16 @@ export async function POST(req: Request) {
 
     const phoneNumber = message.from;
     const messageText = message.text?.body || '';
+    const adminNumber = '9116053238'; // Admin phone number
 
-    // Log user message to Firestore
+    // Log user message to Firestore for history
     await addDoc(collection(firestore, 'chatSessions', phoneNumber, 'messages'), {
       text: messageText,
       sender: 'user',
       timestamp: serverTimestamp(),
     });
 
-    // Retrieve session from Firestore (Mocking database persistence)
+    // Retrieve session from Firestore
     const sessionRef = doc(firestore, 'botSessions', phoneNumber);
     const sessionSnap = await getDoc(sessionRef);
     
@@ -62,24 +63,46 @@ export async function POST(req: Request) {
       timestamp: serverTimestamp(),
     });
 
-    // Send the message back via Meta Graph API
     const accessToken = process.env.WHATSAPP_ACCESS_TOKEN;
     const phoneNumberId = process.env.WHATSAPP_PHONE_NUMBER_ID;
 
-    if (accessToken && phoneNumberId && phoneNumber !== 'demo_user') {
-      await fetch(`https://graph.facebook.com/v17.0/${phoneNumberId}/messages`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${accessToken}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          messaging_product: 'whatsapp',
-          to: phoneNumber,
-          type: 'text',
-          text: { body: reply },
-        }),
-      });
+    if (accessToken && phoneNumberId) {
+      // 1. Send reply back to user
+      if (phoneNumber !== 'demo_user') {
+        await fetch(`https://graph.facebook.com/v17.0/${phoneNumberId}/messages`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${accessToken}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            messaging_product: 'whatsapp',
+            to: phoneNumber,
+            type: 'text',
+            text: { body: reply },
+          }),
+        });
+      }
+
+      // 2. Notify ADMIN if order is placed
+      if (updatedSession.state === 'ORDER_PLACED' && updatedSession.data) {
+        const { orderId, utrId, targetLink } = updatedSession.data;
+        const adminMsg = `🚀 *Naya Order Aaya Hai!*\n\n📦 *Order ID:* ${orderId}\n🆔 *UTR ID:* ${utrId}\n🔗 *Link:* ${targetLink}\n\nKripya panel check karein.`;
+
+        await fetch(`https://graph.facebook.com/v17.0/${phoneNumberId}/messages`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${accessToken}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            messaging_product: 'whatsapp',
+            to: adminNumber,
+            type: 'text',
+            text: { body: adminMsg },
+          }),
+        });
+      }
     }
 
     return NextResponse.json({ 
