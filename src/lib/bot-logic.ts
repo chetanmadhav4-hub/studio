@@ -34,7 +34,6 @@ export async function processBotMessage(
   // 1. GLOBAL SERVICE INTERRUPTION (Allows switching service anytime)
   let interceptedServiceKey = '';
   Object.entries(SERVICES_CONFIG).forEach(([key, service]) => {
-    // Match by name or ID (buttons send text)
     if (normalizedMsg.includes(service.name.toLowerCase()) || normalizedMsg === key) {
       interceptedServiceKey = key;
     }
@@ -112,9 +111,7 @@ export async function processBotMessage(
         const upiId = 'smmxpressbot@slc';
         const accountName = 'CHETAN KUMAR MEGHWAL';
         
-        // UPI Intent Link
         const upiPayload = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(accountName)}&am=${price}&cu=INR`;
-        // QR Code generation via goqr.me
         const qrImageUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(upiPayload)}`;
 
         const instructions = await aiGeneratedPaymentInstructionsAndConfirmation({
@@ -125,7 +122,7 @@ export async function processBotMessage(
         });
 
         return {
-          reply: `${instructions.message}\n\n👤 *Account:* ${accountName}\n🆔 *UPI ID:* ${upiId}\n💰 *Amount:* ₹${price}\n\n📸 *SCAN TO PAY ₹${price} FOR ${serviceName}:*\n${qrImageUrl}\n\n${upiPayload}\n\n✅ Payment ke baad, apna *Instagram Link* bhejein order start karne ke liye.`,
+          reply: `${instructions.message}\n\n👤 *Account:* ${accountName}\n🆔 *UPI ID:* ${upiId}\n💰 *Amount:* ₹${price}\n\n📸 *SCAN TO PAY ₹${price} FOR ${serviceName}:*\n${qrImageUrl}\n\n${upiPayload}\n\n✅ Payment ke baad, apna *Instagram Link and payment ka screenshot* bhejein order start karne ke liye.`,
           nextState: {
             state: 'AWAITING_LINK',
             data: { ...session.data },
@@ -133,7 +130,6 @@ export async function processBotMessage(
         };
       }
       
-      // Fallback for non-YES responses
       return {
         reply: "⚠️ Aage badhne ke liye niche diye gaye buttons ka istemal karein.\n\nOPTION: YES, PAY NOW\nOPTION: MENU",
         nextState: { state: 'AWAITING_PAYMENT_CONFIRMATION' },
@@ -163,7 +159,6 @@ export async function processBotMessage(
         };
       }
 
-      // If it's not a link, check if it's a menu button (handled at top) or show error
       const error = await generateContextualErrorMessage({
         errorType: 'INVALID_URL',
         details: `User provided: ${messageText}. Needs to be a valid Instagram link.`,
