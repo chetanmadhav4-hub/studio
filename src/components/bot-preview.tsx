@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useEffect, useRef } from "react";
@@ -97,23 +96,25 @@ export function BotPreview() {
       if (data.reply) {
         setMessages((prev) => [...prev, { role: "bot", text: data.reply }]);
         
-        // If order is placed, save it to user's history in Firestore
-        if (data.state === 'ORDER_PLACED' && user) {
-          const orderId = `INSTA-${Math.floor(100000 + Math.random() * 900000)}`;
+        // If order is placed, save it to user's history in Firestore using data from bot response
+        if (data.state === 'ORDER_PLACED' && user && data.orderData) {
+          const { orderId, serviceName, quantity, price, targetLink } = data.orderData;
           
-          setDocumentNonBlocking(
-            doc(db, 'users', user.uid, 'orders', orderId),
-            {
-              id: orderId,
-              serviceName: "Instagram Order", 
-              quantity: 0, 
-              price: 0,
-              status: "PROCESSING",
-              createdAt: serverTimestamp(),
-              targetLink: messageToSend,
-            },
-            { merge: true }
-          );
+          if (orderId) {
+            setDocumentNonBlocking(
+              doc(db, 'users', user.uid, 'orders', orderId),
+              {
+                id: orderId,
+                serviceName: serviceName || "Instagram Order", 
+                quantity: quantity || 0, 
+                price: price || 0,
+                status: "PROCESSING",
+                createdAt: serverTimestamp(),
+                targetLink: targetLink || messageToSend,
+              },
+              { merge: true }
+            );
+          }
         }
       }
     } catch (error) {

@@ -36,12 +36,13 @@ export async function POST(req: Request) {
     const { reply, nextState } = await processBotMessage(session, messageText);
 
     // Update session state
-    sessions[phoneNumber] = {
+    const updatedSession = {
       ...session,
       ...nextState,
       lastMessage: messageText,
       updatedAt: Date.now(),
     };
+    sessions[phoneNumber] = updatedSession;
 
     // Send the message back via Meta Graph API if credentials exist
     const accessToken = process.env.WHATSAPP_ACCESS_TOKEN;
@@ -66,7 +67,8 @@ export async function POST(req: Request) {
     return NextResponse.json({ 
       success: true, 
       reply, 
-      state: sessions[phoneNumber].state 
+      state: updatedSession.state,
+      orderData: updatedSession.data 
     });
   } catch (error) {
     console.error('Webhook Error:', error);
