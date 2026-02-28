@@ -3,8 +3,8 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // --- COLLECTION GROUP RULES ---
-    // Allow any logged in user (Admin) to see all orders for the live tracker
+    // --- COLLECTION GROUP RULES (CRITICAL FOR LIVE TRACKER) ---
+    // Allow any authenticated user to list orders (Admin/User for themselves)
     match /{path=**}/orders/{orderId} {
       allow read, list: if request.auth != null;
     }
