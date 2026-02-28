@@ -25,11 +25,8 @@ service cloud.firestore {
      * @description Rules for User Profiles.
      */
     match /users/{userId} {
-      // Allow user to see and edit only their own profile
       allow get: if isOwner(userId);
-      // Allow any logged in user to create their own profile during signup
       allow create: if isOwner(userId);
-      // Only owner can update or delete
       allow update, delete: if isExistingOwner(userId);
 
       match /orders/{orderId} {
@@ -49,13 +46,12 @@ service cloud.firestore {
     }
 
     /**
-     * @description Rules for Bot Sessions (Needed by Webhook and Admin).
+     * @description Rules for Bot Sessions (Used by Webhook and Admin).
      */
     match /botSessions/{sessionId} {
-      // Webhook needs to create/update sessions without being logged in (as a background service)
-      // In a production app, we'd verify the request origin, but for this prototype we allow it.
+      // Webhook creates/updates sessions anonymously
       allow get, create, update: if true;
-      // Admin needs to list all sessions
+      // Admin lists sessions
       allow list: if isSignedIn();
     }
 
@@ -63,25 +59,35 @@ service cloud.firestore {
      * @description Rules for Chat Logs.
      */
     match /chatSessions/{phoneNumber}/messages/{messageId} {
-      // Webhook logs messages
+      // Webhook and Admin can log messages
       allow create: if true;
       // Admin reads logs
       allow get, list: if isSignedIn();
     }
 
     /**
-     * @description Collection Group rules for Orders (needed for Admin Dashboard).
+     * @description Global stats.
+     */
+    match /globalStats/{document} {
+      allow read: if isSignedIn();
+      allow write: if false;
+    }
+
+    // --- Collection Group Rules (Crucial for Dashboard) ---
+
+    /**
+     * @description Allows any signed-in user to perform collection group queries on 'orders'.
+     * This is required for the Admin Dashboard to see all orders from all users.
      */
     match /{path=**}/orders/{orderId} {
       allow read: if isSignedIn();
     }
     
     /**
-     * @description Global stats.
+     * @description Allows admin to see all chat messages via collection group if needed.
      */
-    match /globalStats/{document} {
+    match /{path=**}/messages/{messageId} {
       allow read: if isSignedIn();
-      allow write: if false; // Only updated via backend logic if we had any
     }
   }
 }
