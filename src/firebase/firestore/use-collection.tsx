@@ -74,11 +74,18 @@ export function useCollection<T = any>(
         setIsLoading(false);
       },
       (error: FirestoreError) => {
-        const internalQuery = memoizedTargetRefOrQuery as unknown as InternalQuery;
-        const path: string =
-          memoizedTargetRefOrQuery.type === 'collection'
-            ? (memoizedTargetRefOrQuery as CollectionReference).path
-            : internalQuery._query?.path?.canonicalString?.() || 'unknown-query-path';
+        // More robust path extraction for common SDK internal structures
+        let path = 'unknown-query-path';
+        
+        if (memoizedTargetRefOrQuery.type === 'collection') {
+          path = (memoizedTargetRefOrQuery as CollectionReference).path;
+        } else {
+          const internal = memoizedTargetRefOrQuery as any;
+          // Try different internal paths depending on the query type (Group or regular)
+          path = internal._query?.path?.canonicalString?.() || 
+                 internal.path || 
+                 'collection-group-query';
+        }
 
         const contextualError = new FirestorePermissionError({
           operation: 'list',

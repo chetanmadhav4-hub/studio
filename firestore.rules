@@ -32,12 +32,6 @@ service cloud.firestore {
       // Only owner can update or delete
       allow update, delete: if isExistingOwner(userId);
 
-      match /userSessions/{sessionId} {
-        allow get, list: if isOwner(userId);
-        allow create: if isOwner(userId);
-        allow update, delete: if isExistingOwner(userId);
-      }
-
       match /orders/{orderId} {
         allow get, list: if isOwner(userId);
         allow create: if isOwner(userId);
@@ -46,18 +40,48 @@ service cloud.firestore {
     }
 
     /**
-     * @description Rules for Username Mapping (Uniqueness check).
+     * @description Rules for Username Mapping.
      */
     match /usernames/{username} {
-      // Allow anyone (even non-logged-in users) to check if a username exists
-      // This is necessary for checking availability during signup and looking up email for login.
       allow get: if true;
-      
-      // Only the authenticated user can create their own username mapping
       allow create: if isSignedIn() && request.resource.data.uid == request.auth.uid;
-      
-      // Only the owner can update or delete their mapping
       allow update, delete: if isSignedIn() && resource.data.uid == request.auth.uid;
+    }
+
+    /**
+     * @description Rules for Bot Sessions (Needed by Webhook and Admin).
+     */
+    match /botSessions/{sessionId} {
+      // Webhook needs to create/update sessions without being logged in (as a background service)
+      // In a production app, we'd verify the request origin, but for this prototype we allow it.
+      allow get, create, update: if true;
+      // Admin needs to list all sessions
+      allow list: if isSignedIn();
+    }
+
+    /**
+     * @description Rules for Chat Logs.
+     */
+    match /chatSessions/{phoneNumber}/messages/{messageId} {
+      // Webhook logs messages
+      allow create: if true;
+      // Admin reads logs
+      allow get, list: if isSignedIn();
+    }
+
+    /**
+     * @description Collection Group rules for Orders (needed for Admin Dashboard).
+     */
+    match /{path=**}/orders/{orderId} {
+      allow read: if isSignedIn();
+    }
+    
+    /**
+     * @description Global stats.
+     */
+    match /globalStats/{document} {
+      allow read: if isSignedIn();
+      allow write: if false; // Only updated via backend logic if we had any
     }
   }
 }
