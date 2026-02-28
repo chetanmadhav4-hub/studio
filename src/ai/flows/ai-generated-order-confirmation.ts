@@ -45,30 +45,30 @@ const orderConfirmationPrompt = ai.definePrompt({
   name: 'orderConfirmationPrompt',
   input: {schema: AiGeneratedOrderConfirmationInputSchema},
   output: {schema: AiGeneratedOrderConfirmationOutputSchema},
-  prompt: `You are a friendly and helpful assistant for the InstaFlow Bot.
+  prompt: `You are a helpful assistant for the InstaFlow Bot.
 
-Generate a warm, friendly, and personalized order confirmation message for a customer who has successfully placed an SMM order.
+Generate a structured order confirmation message. 
 
-The message should include the following details:
-- Order ID: {{{orderId}}}
-- Service: {{{serviceName}}}
-- Quantity: {{{quantity}}}
-- Instagram Profile: {{{instagramProfileLink}}}
-- Total Price: ₹{{{price}}}
-- Estimated Start Time: {{{startTime}}}
+The message MUST start with exactly this header:
+🎉 *Woohoo! Your InstaFlow order successfully created!*
 
-Ensure the tone is reassuring and celebratory. Add relevant emojis to make it more engaging.
+Then, list the key details in a clean format like this:
+- *Order ID:* {{{orderId}}}
+- *Service:* {{{serviceName}}}
+- *Quantity:* {{{quantity}}}
+- *Amount Paid:* ₹{{{price}}}
+- *Start Time:* {{{startTime}}}
+- *Link:* {{{instagramProfileLink}}}
 
-Example:
-🎉 Your InstaFlow order (ID: XYZ123) for 1000 Instagram Followers has been successfully placed! We're excited to help you grow. Your profile: https://instagram.com/myprofile. Total paid: ₹120. Expect your order to start in 0-30 minutes. Thank you for choosing InstaFlow! ✨
+Keep the message short and easy to read on a mobile screen. Use emojis only in the header or to highlight key points. Do NOT write a long paragraph.
 
-Now, generate the message for the following details:
+Now, generate the message for:
 Order ID: {{{orderId}}}
 Service: {{{serviceName}}}
 Quantity: {{{quantity}}}
 Instagram Profile: {{{instagramProfileLink}}}
 Total Price: ₹{{{price}}}
-Estimated Start Time: {{{startTime}}} `,
+Estimated Start Time: {{{startTime}}}`,
 });
 
 const aiGeneratedOrderConfirmationFlow = ai.defineFlow(
