@@ -10,7 +10,7 @@ import { useAuth, useUser, useFirestore } from '@/firebase';
 import { updatePassword, signOut, EmailAuthProvider, reauthenticateWithCredential } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
-import { Zap, Loader2, LogOut, ShieldEllipsis, MessageSquare, ScrollText, ArrowLeft } from 'lucide-react';
+import { Zap, Loader2, LogOut, ShieldEllipsis, MessageSquare, ScrollText, ArrowLeft, LayoutDashboard } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -119,9 +119,17 @@ export default function ProfilePage() {
         </div>
 
         <Card className="border-none shadow-md">
-          <CardHeader>
-            <CardTitle>My Profile</CardTitle>
-            <CardDescription>View and manage your account settings.</CardDescription>
+          <CardHeader className="flex flex-row items-center justify-between">
+            <div>
+              <CardTitle>My Profile</CardTitle>
+              <CardDescription>View and manage your account settings.</CardDescription>
+            </div>
+            <Link href="/dashboard">
+              <Button variant="outline" size="sm" className="gap-2 border-primary/20 text-primary">
+                <LayoutDashboard className="w-4 h-4" />
+                Admin Dashboard
+              </Button>
+            </Link>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
