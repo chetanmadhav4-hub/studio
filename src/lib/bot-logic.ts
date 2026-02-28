@@ -2,7 +2,6 @@
 import { BotState, UserSession } from './bot-types';
 import { aiGeneratedOrderConfirmation } from '@/ai/flows/ai-generated-order-confirmation';
 import { generateContextualErrorMessage } from '@/ai/flows/ai-generated-contextual-error-messages';
-import { aiGeneratedPaymentInstructionsAndConfirmation } from '@/ai/flows/ai-generated-payment-instructions-and-confirmation';
 
 export const SERVICES_CONFIG: Record<string, { name: string; pricePer1000: number; min: number }> = {
   '1': { name: 'Instagram Followers', pricePer1000: 87, min: 100 },
@@ -119,7 +118,7 @@ export async function processBotMessage(
         const qrImageUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(upiPayload)}`;
 
         return {
-          reply: `📲 *Pay via any UPI app*\n\nAapko ₹*${price}* pay karne hain. QR code scan karein ya UPI ID use karein.\n\n👤 *Account:* ${accountName}\n🆔 *UPI ID:* ${upiId}\n💰 *Amount:* ₹${price}\n\n📸 *SCAN TO PAY:*\n${qrImageUrl}\n\n${upiPayload}\n\n✅ Payment ke baad niche details fill karein:\n\nOPTION: 🔗 Send Instagram Link\nOPTION: 🆔 Send UTR ID`,
+          reply: `📲 *Pay via any UPI app*\n\nAapko ₹*${price}* pay karne hain. QR code scan karein ya UPI ID use karein.\n\n👤 *Account:* ${accountName}\n🆔 *UPI ID:* ${upiId}\n💰 *Amount:* ₹${price}\n\n📸 *SCAN TO PAY:*\n${qrImageUrl}\n\n${upiPayload}\n\n✅ Payment ke baad, apna Instagram Link and UTR ID bhejein order start karne ke liye:\n\nOPTION: 🔗 Send Instagram Link\nOPTION: 🆔 Send UTR ID`,
           nextState: {
             state: 'AWAITING_PAYMENT_DETAILS',
             data: { ...session.data },
@@ -168,11 +167,12 @@ export async function processBotMessage(
 
       const hasLink = !!session.data.targetLink;
       const hasUtr = !!session.data.utrId;
-      let prompt = "✅ Payment ke baad details fill karein:\n\n";
+      let prompt = "✅ Details fill karein:\n\n";
       if (!hasLink) prompt += "OPTION: 🔗 Send Instagram Link\n";
-      else prompt += "✅ Link Received\n";
+      else prompt += "✅ Instagram Link: Received\n";
+      
       if (!hasUtr) prompt += "OPTION: 🆔 Send UTR ID\n";
-      else prompt += "✅ UTR ID Received\n";
+      else prompt += "✅ UTR ID: Received\n";
       
       if (hasLink && hasUtr) prompt += "\n✨ Ab order submit karein:\nOPTION: 🚀 SUBMIT ORDER";
 
@@ -182,8 +182,9 @@ export async function processBotMessage(
     case 'AWAITING_LINK': {
       if (isValidInstagramUrl(messageText)) {
         const newData = { ...session.data, targetLink: messageText };
+        const hasUtr = !!newData.utrId;
         return {
-          reply: `✅ Link save ho gaya! ${!newData.utrId ? "\n\nAb UTR ID bhejein:" : "\n\nDetails check karke submit karein:"}\n\n${!newData.utrId ? "OPTION: 🆔 Send UTR ID" : "OPTION: 🚀 SUBMIT ORDER"}`,
+          reply: `✅ Link save ho gaya!${!hasUtr ? "\n\nAb UTR ID bhejein:" : "\n\nDetails check karke submit karein:"}\n\n${!hasUtr ? "OPTION: 🆔 Send UTR ID" : "OPTION: 🚀 SUBMIT ORDER"}`,
           nextState: { state: 'AWAITING_PAYMENT_DETAILS', data: newData },
         };
       }
@@ -193,8 +194,9 @@ export async function processBotMessage(
     case 'AWAITING_UTR_ID': {
       if (isValidUtr(messageText)) {
         const newData = { ...session.data, utrId: messageText.trim() };
+        const hasLink = !!newData.targetLink;
         return {
-          reply: `✅ UTR ID save ho gaya! ${!newData.targetLink ? "\n\nAb Instagram Link bhejein:" : "\n\nDetails check karke submit karein:"}\n\n${!newData.targetLink ? "OPTION: 🔗 Send Instagram Link" : "OPTION: 🚀 SUBMIT ORDER"}`,
+          reply: `✅ UTR ID save ho gaya!${!hasLink ? "\n\nAb Instagram Link bhejein:" : "\n\nDetails check karke submit karein:"}\n\n${!hasLink ? "OPTION: 🔗 Send Instagram Link" : "OPTION: 🚀 SUBMIT ORDER"}`,
           nextState: { state: 'AWAITING_PAYMENT_DETAILS', data: newData },
         };
       }

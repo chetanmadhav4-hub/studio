@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useUser, useFirestore, setDocumentNonBlocking } from "@/firebase";
 import { doc, serverTimestamp } from "firebase/firestore";
-import { Send, Bot, MousePointer2, ExternalLink, LogIn } from "lucide-react";
+import { Send, Bot, MousePointer2, ExternalLink, LogIn, CheckCircle2 } from "lucide-react";
 
 interface ChatMessage {
   role: "user" | "bot";
@@ -185,6 +185,9 @@ export function BotPreview() {
         if (part.startsWith('*') && part.endsWith('*')) {
           return <strong key={i} className="font-bold">{part.slice(1, -1)}</strong>;
         }
+        if (part.startsWith('✅')) {
+           return <span key={i} className="text-emerald-500 font-bold">{part}</span>
+        }
         return part;
       });
 
@@ -198,16 +201,19 @@ export function BotPreview() {
           <div className="mt-3 grid gap-2">
             {optionLines.map((optLine, i) => {
               const optionText = optLine.replace("OPTION: ", "").trim();
-              if (optionText.startsWith("✅")) {
-                 return <div key={i} className="text-center py-2 px-4 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 font-bold text-xs rounded-lg border border-emerald-200 dark:border-emerald-800">{optionText}</div>
-              }
+              const isSubmit = optionText.includes("SUBMIT");
+              
               return (
                 <button
                   key={i}
                   onClick={() => handleSend(optionText)}
-                  className="w-full py-2 px-4 bg-white dark:bg-zinc-900 hover:bg-[#F0F2F5] dark:hover:bg-zinc-800 text-[#00A884] font-semibold text-xs md:text-sm rounded-lg border border-[#00A884]/20 transition-all active:scale-[0.98] flex items-center justify-center gap-2 shadow-sm"
+                  className={`w-full py-2 px-4 font-semibold text-xs md:text-sm rounded-lg border transition-all active:scale-[0.98] flex items-center justify-center gap-2 shadow-sm ${
+                    isSubmit 
+                    ? "bg-[#00A884] hover:bg-[#008F6F] text-white border-none animate-pulse" 
+                    : "bg-white dark:bg-zinc-900 hover:bg-[#F0F2F5] dark:hover:bg-zinc-800 text-[#00A884] border-[#00A884]/20"
+                  }`}
                 >
-                  <MousePointer2 className="w-4 h-4" />
+                  {isSubmit ? <Send className="w-4 h-4" /> : <MousePointer2 className="w-4 h-4" />}
                   {optionText}
                 </button>
               );
