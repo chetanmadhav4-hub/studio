@@ -70,13 +70,7 @@ export default function Home() {
                   </>
                 ) : (
                   <div className="flex items-center gap-2">
-                    <Link href="/profile">
-                      <Button variant="ghost" size="sm" className="gap-2 text-sm dark:text-foreground">
-                        <User className="w-4 h-4" />
-                        <span className="hidden xs:inline">Profile</span>
-                      </Button>
-                    </Link>
-                    {/* Theme Toggle Button */}
+                    {/* Theme Toggle Button first */}
                     <Button 
                       variant="ghost" 
                       size="sm"
@@ -86,6 +80,14 @@ export default function Home() {
                       {isDark ? <Sun className="w-4 h-4 text-amber-500" /> : <Moon className="w-4 h-4 text-primary" />}
                       <span className="hidden xs:inline">{isDark ? "Light" : "Dark"}</span>
                     </Button>
+
+                    {/* Profile Link second */}
+                    <Link href="/profile">
+                      <Button variant="ghost" size="sm" className="gap-2 text-sm dark:text-foreground">
+                        <User className="w-4 h-4" />
+                        <span className="hidden xs:inline">Profile</span>
+                      </Button>
+                    </Link>
                   </div>
                 )}
               </>
