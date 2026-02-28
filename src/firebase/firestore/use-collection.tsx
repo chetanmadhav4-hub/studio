@@ -25,9 +25,7 @@ export interface UseCollectionResult<T> {
   error: FirestoreError | Error | null; // Error object, or null.
 }
 
-/* Internal implementation of Query:
-  https://github.com/firebase/firebase-js-sdk/blob/c5f08a9bc5da0d2b0207802c972d53724ccef055/packages/firestore/src/lite-api/reference.ts#L143
-*/
+/* Internal implementation of Query for path extraction */
 export interface InternalQuery extends Query<DocumentData> {
   _query?: {
     path?: {
@@ -75,17 +73,17 @@ export function useCollection<T = any>(
         setIsLoading(false);
       },
       (firestoreError: FirestoreError) => {
-        // Robust path extraction for reporting
-        let path = 'query';
+        // Precise path extraction for reporting Security Rules denials
+        let path = 'unknown-collection';
         
         try {
-          const internal = memoizedTargetRefOrQuery as any;
+          const internalQuery = memoizedTargetRefOrQuery as InternalQuery;
           if (memoizedTargetRefOrQuery.type === 'collection') {
             path = (memoizedTargetRefOrQuery as CollectionReference).path;
-          } else if (internal._query?.collectionGroup) {
-            path = `collection-group:${internal._query.collectionGroup}`;
-          } else {
-            path = internal._query?.path?.canonicalString?.() || internal.path || 'query';
+          } else if (internalQuery._query?.collectionGroup) {
+            path = `collection-group:${internalQuery._query.collectionGroup}`;
+          } else if (internalQuery._query?.path) {
+            path = internalQuery._query.path.canonicalString();
           }
         } catch (e) {
           path = 'collection-group-query';
@@ -94,12 +92,13 @@ export function useCollection<T = any>(
         const contextualError = new FirestorePermissionError({
           operation: 'list',
           path,
-        })
+        });
 
-        setError(contextualError)
-        setData(null)
-        setIsLoading(false)
+        setError(contextualError);
+        setData(null);
+        setIsLoading(false);
 
+        // Global error propagation for agentive fixing loops
         errorEmitter.emit('permission-error', contextualError);
       }
     );
