@@ -3,10 +3,12 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     
-    // Admin ONLY access to master order list
+    // Master collection of orders for the admin tracker
     match /all_orders/{orderId} {
-      allow read: if request.auth != null && request.auth.token.email == 'chetanmadhav4@gmail.com';
-      allow write: if true; // Bot writes to this
+      // Only admin can read and update (approve/reject)
+      allow read, update: if request.auth != null && request.auth.token.email == 'chetanmadhav4@gmail.com';
+      // Bot (webhook) or anyone can create an entry when ordering
+      allow create: if true;
     }
 
     // User profile and sub-collections
