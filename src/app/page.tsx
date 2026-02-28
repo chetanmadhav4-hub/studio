@@ -1,9 +1,11 @@
+
 'use client';
 
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { BotPreview } from "@/components/bot-preview";
-import { CheckCircle2, Zap, ShieldCheck, MessageSquare, LogOut, MessageCircle, User } from "lucide-react";
+import { OrderHistory } from "@/components/order-history";
+import { CheckCircle2, Zap, ShieldCheck, MessageSquare, LogOut, User } from "lucide-react";
 import { useUser, useAuth } from "@/firebase";
 import { signOut } from "firebase/auth";
 import { useRouter } from "next/navigation";
@@ -83,11 +85,8 @@ export default function Home() {
             </div>
 
             {user ? (
-              <div className="flex justify-center">
-                <div className="px-5 py-3 bg-primary/10 text-primary rounded-xl border border-primary/20 flex items-center gap-3">
-                  <MessageCircle className="w-5 h-5 animate-pulse" />
-                  <span className="font-bold text-sm md:text-base">Bot is active for you! Interact below.</span>
-                </div>
+              <div className="w-full max-w-[420px] mx-auto">
+                <OrderHistory />
               </div>
             ) : null}
 

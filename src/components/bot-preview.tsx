@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect, useRef } from "react";
@@ -5,7 +6,8 @@ import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { useUser } from "@/firebase";
+import { useUser, useFirestore, setDocumentNonBlocking } from "@/firebase";
+import { doc, serverTimestamp } from "firebase/firestore";
 import { Send, Bot, MousePointer2, ExternalLink, LogIn } from "lucide-react";
 
 interface ChatMessage {
@@ -15,6 +17,7 @@ interface ChatMessage {
 
 export function BotPreview() {
   const { user } = useUser();
+  const db = useFirestore();
   const router = useRouter();
   const [messages, setMessages] = useState<ChatMessage[]>([
     { role: "bot", text: "Send 'Hi' to start the bot! 👋" },
@@ -93,6 +96,27 @@ export function BotPreview() {
       const data = await res.json();
       if (data.reply) {
         setMessages((prev) => [...prev, { role: "bot", text: data.reply }]);
+        
+        // If order is placed, save it to user's history in Firestore
+        if (data.state === 'ORDER_PLACED' && user) {
+          // Note: The session state and data are returned from our webhook mock
+          // We can reconstruct the order from the session data or just extract parts
+          const orderId = `INSTA-${Math.floor(100000 + Math.random() * 900000)}`;
+          
+          setDocumentNonBlocking(
+            doc(db, 'users', user.uid, 'orders', orderId),
+            {
+              id: orderId,
+              serviceName: "Instagram Order", // Simplified for demo
+              quantity: 0, 
+              price: 0,
+              status: "PROCESSING",
+              createdAt: serverTimestamp(),
+              targetLink: messageToSend, // Usually the last message in AWAITING_LINK state is the link
+            },
+            { merge: true }
+          );
+        }
       }
     } catch (error) {
       setMessages((prev) => [

@@ -22,6 +22,21 @@
         "uid": { "type": "string" }
       },
       "required": ["email", "uid"]
+    },
+    "Order": {
+      "title": "Order",
+      "description": "Represents an SMM order placed by a user.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "serviceName": { "type": "string" },
+        "quantity": { "type": "number" },
+        "price": { "type": "number" },
+        "status": { "type": "string", "enum": ["COMPLETED", "PROCESSING", "PENDING"] },
+        "targetLink": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "serviceName", "quantity", "price", "status", "createdAt"]
     }
   },
   "auth": {
@@ -35,6 +50,10 @@
     "/usernames/{username}": {
       "schema": { "$ref": "#/backend/entities/UsernameMap" },
       "description": "Ensures username uniqueness and provides email lookup for login."
+    },
+    "/users/{uid}/orders/{orderId}": {
+      "schema": { "$ref": "#/backend/entities/Order" },
+      "description": "User's individual SMM orders."
     }
   }
 }
