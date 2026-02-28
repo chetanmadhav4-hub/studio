@@ -75,16 +75,19 @@ export function useCollection<T = any>(
       },
       (error: FirestoreError) => {
         // More robust path extraction for common SDK internal structures
-        let path = 'unknown-query-path';
+        let path = 'collection-group-query';
         
-        if (memoizedTargetRefOrQuery.type === 'collection') {
-          path = (memoizedTargetRefOrQuery as CollectionReference).path;
-        } else {
-          const internal = memoizedTargetRefOrQuery as any;
-          // Try different internal paths depending on the query type (Group or regular)
-          path = internal._query?.path?.canonicalString?.() || 
-                 internal.path || 
-                 'collection-group-query';
+        try {
+          if (memoizedTargetRefOrQuery.type === 'collection') {
+            path = (memoizedTargetRefOrQuery as CollectionReference).path;
+          } else {
+            const internal = memoizedTargetRefOrQuery as any;
+            path = internal._query?.path?.canonicalString?.() || 
+                   internal.path || 
+                   'collection-group-query';
+          }
+        } catch (e) {
+          console.warn("Could not determine firestore path for error reporting", e);
         }
 
         const contextualError = new FirestorePermissionError({

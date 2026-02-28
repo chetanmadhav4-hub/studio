@@ -46,23 +46,18 @@ service cloud.firestore {
     }
 
     /**
-     * @description Rules for Bot Sessions (Used by Webhook and Admin).
+     * @description Rules for Bot Sessions.
      */
     match /botSessions/{sessionId} {
-      // Webhook creates/updates sessions anonymously
-      allow get, create, update: if true;
-      // Admin lists sessions
-      allow list: if isSignedIn();
+      allow read, write: if true; // Webhook needs access
     }
 
     /**
      * @description Rules for Chat Logs.
      */
     match /chatSessions/{phoneNumber}/messages/{messageId} {
-      // Webhook and Admin can log messages
       allow create: if true;
-      // Admin reads logs
-      allow get, list: if isSignedIn();
+      allow read: if isSignedIn();
     }
 
     /**
@@ -70,24 +65,23 @@ service cloud.firestore {
      */
     match /globalStats/{document} {
       allow read: if isSignedIn();
-      allow write: if false;
     }
 
-    // --- Collection Group Rules (Crucial for Dashboard) ---
+    // --- Collection Group Rules ---
+    // These must be at the top level to work for collectionGroup() queries.
 
     /**
      * @description Allows any signed-in user to perform collection group queries on 'orders'.
-     * This is required for the Admin Dashboard to see all orders from all users.
      */
     match /{path=**}/orders/{orderId} {
-      allow read: if isSignedIn();
+      allow list, get: if isSignedIn();
     }
     
     /**
-     * @description Allows admin to see all chat messages via collection group if needed.
+     * @description Allows admin to see all chat messages via collection group.
      */
     match /{path=**}/messages/{messageId} {
-      allow read: if isSignedIn();
+      allow list, get: if isSignedIn();
     }
   }
 }
