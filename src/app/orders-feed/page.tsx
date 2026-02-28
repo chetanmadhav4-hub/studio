@@ -19,7 +19,7 @@ export default function SimpleOrdersFeed() {
 
   const ADMIN_EMAIL = 'chetanmadhav4@gmail.com';
 
-  // QUERY THE GLOBAL MASTER COLLECTION
+  // QUERY THE GLOBAL MASTER COLLECTION (Simple query, no collectionGroup)
   const ordersQuery = useMemoFirebase(() => {
     return query(collection(db, 'all_orders'), orderBy('createdAt', 'desc'), limit(50));
   }, [db]);
@@ -86,6 +86,14 @@ export default function SimpleOrdersFeed() {
           <div className="flex flex-col items-center justify-center py-24 gap-3">
             <Loader2 className="w-8 h-8 animate-spin text-primary" />
             <p className="text-sm font-medium text-slate-500">Loading master records...</p>
+          </div>
+        ) : error ? (
+          <div className="bg-white rounded-2xl p-12 text-center space-y-4 border shadow-sm">
+             <div className="w-12 h-12 bg-red-50 rounded-full flex items-center justify-center mx-auto">
+              <Lock className="w-6 h-6 text-red-500" />
+            </div>
+            <p className="text-sm text-slate-900 font-bold">Permission Error</p>
+            <p className="text-xs text-slate-500">Check security rules for 'all_orders'.</p>
           </div>
         ) : orders && orders.length > 0 ? (
           <div className="space-y-4">
