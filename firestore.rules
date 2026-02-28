@@ -3,37 +3,45 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // --- COLLECTION GROUP RULES (CRITICAL FOR LIVE TRACKER) ---
-    // Allow any authenticated user to list orders (Admin/User for themselves)
+    // --- COLLECTION GROUP RULES ---
+    // These MUST be at the root level for collectionGroup() queries to work.
+    // Allow any authenticated user to read/list all orders for the Live Tracker.
     match /{path=**}/orders/{orderId} {
       allow read, list: if request.auth != null;
     }
     
+    // Allow any authenticated user to read/list chat messages (for support history).
     match /{path=**}/messages/{messageId} {
       allow read, list: if request.auth != null;
     }
 
-    // --- SPECIFIC PATH RULES ---
-
+    // --- USER PROFILE RULES ---
     match /users/{userId} {
-      allow read, list: if request.auth != null;
+      // Allow any authenticated user to see user profiles (for tracker/admin visibility).
+      allow read: if request.auth != null;
+      // Only the user themselves can write to their profile.
       allow write: if request.auth != null && request.auth.uid == userId;
 
+      // Note: Sub-collection rules are already covered by the collectionGroup rule above,
+      // but we can add specific write permissions here if needed.
       match /orders/{orderId} {
-        allow read, write: if request.auth != null && request.auth.uid == userId;
+        allow write: if request.auth != null && request.auth.uid == userId;
       }
     }
 
+    // --- USERNAME MAPPING ---
     match /usernames/{username} {
       allow read: if true;
       allow create: if request.auth != null && request.resource.data.uid == request.auth.uid;
       allow update, delete: if request.auth != null && resource.data.uid == request.auth.uid;
     }
 
+    // --- BOT SESSIONS ---
     match /botSessions/{sessionId} {
       allow read, write: if true; 
     }
 
+    // --- CHAT SESSIONS ---
     match /chatSessions/{phoneNumber} {
       allow read, write: if true;
       
@@ -42,6 +50,7 @@ service cloud.firestore {
       }
     }
 
+    // --- GLOBAL STATS ---
     match /globalStats/{document} {
       allow read: if request.auth != null;
     }

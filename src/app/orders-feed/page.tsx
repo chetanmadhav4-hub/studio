@@ -6,7 +6,7 @@ import { collectionGroup, query, orderBy, limit } from "firebase/firestore";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, ExternalLink, Copy, CheckCircle2, ShoppingBag, ArrowLeft } from "lucide-react";
+import { Loader2, ExternalLink, Copy, CheckCircle2, ShoppingBag, ArrowLeft, AlertCircle, RefreshCcw } from "lucide-react";
 import { useState } from "react";
 import Link from "next/link";
 import { useToast } from "@/hooks/use-toast";
@@ -19,10 +19,12 @@ export default function SimpleOrdersFeed() {
 
   // Use collectionGroup to fetch ALL orders from all users
   const ordersQuery = useMemoFirebase(() => {
+    // Note: Collection group queries with orderBy REQUIRE a composite index.
+    // If permission error persists, it often means the index is still being built.
     return query(collectionGroup(db, 'orders'), orderBy('createdAt', 'desc'), limit(50));
   }, [db]);
 
-  const { data: orders, isLoading } = useCollection(ordersQuery);
+  const { data: orders, isLoading, error } = useCollection(ordersQuery);
 
   const handleCopy = (text: string, id: string) => {
     if (!text) return;
@@ -68,7 +70,28 @@ export default function SimpleOrdersFeed() {
           </Link>
         </div>
 
-        {isLoading ? (
+        {error ? (
+          <Card className="border-red-100 bg-red-50 p-8 text-center space-y-4 rounded-2xl shadow-sm">
+            <div className="w-14 h-14 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto shadow-inner">
+              <AlertCircle className="w-7 h-7" />
+            </div>
+            <div className="space-y-2">
+              <p className="text-base font-bold text-red-900">Tracker Loading Error</p>
+              <p className="text-xs text-red-700 leading-relaxed px-4">
+                Bhai, Firestore rules ya index update ho rahe hain. Kripya 1-2 minute baad refresh karke dekhein.
+              </p>
+            </div>
+            <Button 
+              variant="default" 
+              size="sm" 
+              onClick={() => window.location.reload()} 
+              className="bg-red-600 hover:bg-red-700 text-white gap-2"
+            >
+              <RefreshCcw className="w-4 h-4" />
+              Abhi Refresh Karein
+            </Button>
+          </Card>
+        ) : isLoading ? (
           <div className="flex flex-col items-center justify-center py-24 gap-3">
             <Loader2 className="w-8 h-8 animate-spin text-primary" />
             <p className="text-sm font-medium text-slate-500">Naye orders check ho rahe hain...</p>
@@ -76,8 +99,8 @@ export default function SimpleOrdersFeed() {
         ) : orders && orders.length > 0 ? (
           <div className="space-y-4">
             {orders.map((order) => (
-              <Card key={order.id} className="border-none shadow-md overflow-hidden rounded-2xl bg-white">
-                <CardHeader className="border-b border-slate-50 p-4">
+              <Card key={order.id} className="border-none shadow-md overflow-hidden rounded-2xl bg-white transition-all hover:shadow-lg">
+                <CardHeader className="border-b border-slate-50 p-4 bg-slate-50/30">
                   <div className="flex justify-between items-start">
                     <div className="space-y-0.5">
                       <p className="text-[9px] text-muted-foreground font-bold uppercase tracking-tighter">SERVICE</p>
@@ -90,7 +113,7 @@ export default function SimpleOrdersFeed() {
                 </CardHeader>
                 <CardContent className="p-4 space-y-4">
                   {/* UTR Section */}
-                  <div className="bg-slate-50 p-3 rounded-xl border border-slate-100 flex items-center justify-between">
+                  <div className="bg-slate-50 p-3 rounded-xl border border-slate-100 flex items-center justify-between group">
                     <div className="overflow-hidden">
                       <p className="text-[9px] text-muted-foreground font-bold uppercase mb-1">UTR ID</p>
                       <p className="font-mono text-xs font-bold text-slate-800 truncate">{order.utrId || 'PENDING'}</p>
@@ -98,7 +121,7 @@ export default function SimpleOrdersFeed() {
                     <Button 
                       variant="ghost" 
                       size="icon" 
-                      className="h-8 w-8 text-primary hover:bg-primary/5 shrink-0"
+                      className="h-8 w-8 text-primary hover:bg-primary/10 shrink-0 rounded-full transition-colors"
                       onClick={() => handleCopy(order.utrId || '', order.id)}
                     >
                       {copiedId === order.id ? <CheckCircle2 className="w-4 h-4 text-emerald-500" /> : <Copy className="w-4 h-4" />}
@@ -108,14 +131,14 @@ export default function SimpleOrdersFeed() {
                   {/* Link Section */}
                   <div className="bg-slate-50 p-3 rounded-xl border border-slate-100 space-y-2">
                     <p className="text-[9px] text-muted-foreground font-bold uppercase">INSTAGRAM LINK</p>
-                    <p className="text-[11px] text-blue-600 font-medium break-all line-clamp-2 leading-relaxed">{order.targetLink}</p>
+                    <p className="text-[11px] text-blue-600 font-medium break-all line-clamp-2 leading-relaxed bg-blue-50/30 p-2 rounded border border-blue-50">{order.targetLink}</p>
                     <Button 
                       asChild 
-                      className="w-full bg-blue-600 hover:bg-blue-700 h-9 text-xs font-bold gap-2 shadow-sm rounded-lg"
+                      className="w-full bg-blue-600 hover:bg-blue-700 h-9 text-xs font-bold gap-2 shadow-sm rounded-lg transition-transform active:scale-95"
                     >
                       <a href={order.targetLink} target="_blank" rel="noopener noreferrer">
                         <ExternalLink className="w-3.5 h-3.5" />
-                        Open Link
+                        Open Profile
                       </a>
                     </Button>
                   </div>
@@ -143,8 +166,8 @@ export default function SimpleOrdersFeed() {
       </div>
 
       {/* Persistent Info Tip */}
-      <div className="fixed bottom-6 left-4 right-4 bg-slate-900 text-white p-3 rounded-2xl text-center text-[10px] font-bold shadow-2xl opacity-95 flex items-center justify-center gap-2">
-        🚀 Har 5-10 minute mein refresh karte rahein!
+      <div className="fixed bottom-6 left-4 right-4 bg-slate-900 text-white p-3 rounded-2xl text-center text-[10px] font-bold shadow-2xl opacity-95 flex items-center justify-center gap-2 border border-white/10">
+        🚀 Har 5 minute mein refresh karke naye orders dekhein!
       </div>
     </div>
   );
