@@ -2,7 +2,7 @@
 'use client';
 
 import { useCollection, useFirestore, useMemoFirebase, useUser } from "@/firebase";
-import { collection, query, orderBy, limit, doc, updateDoc, setDoc, serverTimestamp } from "firebase/firestore";
+import { collection, query, orderBy, limit, doc, updateDoc, serverTimestamp } from "firebase/firestore";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -18,7 +18,8 @@ import {
   Check, 
   XCircle, 
   Clock,
-  User as UserIcon
+  User as UserIcon,
+  AlertTriangle
 } from "lucide-react";
 import { useState } from "react";
 import Link from "next/link";
@@ -62,27 +63,35 @@ export default function SimpleOrdersFeed() {
       const orderRef = doc(db, 'all_orders', order.id);
       await updateDoc(orderRef, { status: newStatus });
 
+      const targetPhoneNumber = order.phoneNumber || 'demo_user';
+      const sessionRef = doc(db, 'botSessions', targetPhoneNumber);
+
       if (action === 'APPROVE') {
-        // WhatsApp Notification ONLY on Approval
-        const approveMsg = `🎉 Your InstaFlow Order #${order.id} is approved! Complete order possible soon. Stay tuned!`;
-        if (order.phoneNumber) {
+        const approveMsg = `✅ *ORDER APPROVED:* Aapka Order #${order.id.slice(-6)} approve ho gaya hai! Kaam jaldi shuru ho jayega. Stay tuned! 🚀`;
+        
+        // WhatsApp Notification
+        if (order.phoneNumber && order.phoneNumber !== 'demo_user') {
           await sendAdminActionNotification(order.phoneNumber, approveMsg);
         }
+
+        // Real-time Bot UI Notification
+        await updateDoc(sessionRef, { 
+          adminNotification: approveMsg,
+          lastNotificationAt: serverTimestamp() 
+        });
       } else {
-        // On Rejection, we send message to the bot session instead of WhatsApp
-        const rejectMsg = `⚠️ Your InstaFlow Order #${order.id} was rejected. Reason: Invalid payment or link details. Please try again with correct details.`;
-        if (order.phoneNumber) {
-          const sessionRef = doc(db, 'botSessions', order.phoneNumber);
-          await updateDoc(sessionRef, { 
-            adminNotification: rejectMsg,
-            lastNotificationAt: serverTimestamp() 
-          });
-        }
+        const rejectMsg = `❌ *ORDER REJECTED:* Aapka Order #${order.id.slice(-6)} reject kar diya gaya hai.\n\n⚠️ *Reason:* Invalid Instagram Link ya Galat UTR ID. Kripya sahi details ke saath fir se try karein.`;
+        
+        // Real-time Bot UI Notification (No WhatsApp for rejection as requested)
+        await updateDoc(sessionRef, { 
+          adminNotification: rejectMsg,
+          lastNotificationAt: serverTimestamp() 
+        });
       }
 
       toast({
         title: action === 'APPROVE' ? "Order Approved!" : "Order Rejected",
-        description: action === 'APPROVE' ? "User notified via WhatsApp." : "Status updated in user's chat.",
+        description: action === 'APPROVE' ? "User notified via WhatsApp & Bot." : "Rejection reason sent to user's chat.",
       });
     } catch (e: any) {
       console.error(e);

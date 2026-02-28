@@ -8,10 +8,10 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useUser, useFirestore, useDoc, useMemoFirebase } from "@/firebase";
 import { doc, serverTimestamp } from "firebase/firestore";
-import { Send, Bot, MousePointer2, ExternalLink, LogIn, CheckCircle2, Link, Hash } from "lucide-react";
+import { Send, Bot, MousePointer2, ExternalLink, LogIn, CheckCircle2, Link, Hash, BellRing } from "lucide-react";
 
 interface ChatMessage {
-  role: "user" | "bot";
+  role: "user" | "bot" | "admin_alert";
   text: string;
 }
 
@@ -28,7 +28,7 @@ export function BotPreview() {
   const [formLink, setFormLink] = useState("");
   const [formUtr, setFormUtr] = useState("");
 
-  // Listen for admin notifications (Real-time rejection messages)
+  // Listen for admin notifications (Real-time rejection/approval messages)
   const sessionRef = useMemoFirebase(() => {
     return doc(db, 'botSessions', 'demo_user');
   }, [db]);
@@ -37,8 +37,9 @@ export function BotPreview() {
   useEffect(() => {
     if (session?.adminNotification) {
       const lastMsg = messages[messages.length - 1];
+      // Only add if it's a new notification to avoid duplicates
       if (lastMsg.text !== session.adminNotification) {
-        setMessages((prev) => [...prev, { role: "bot", text: session.adminNotification }]);
+        setMessages((prev) => [...prev, { role: "admin_alert", text: session.adminNotification }]);
       }
     }
   }, [session?.adminNotification, session?.lastNotificationAt]);
@@ -104,7 +105,22 @@ export function BotPreview() {
     }
   };
 
-  const renderMessageContent = (text: string) => {
+  const renderMessageContent = (text: string, role: string) => {
+    if (role === "admin_alert") {
+      const isRejection = text.includes("REJECTED");
+      return (
+        <div className={`p-3 rounded-xl border-2 shadow-lg space-y-2 animate-in slide-in-from-bottom-2 duration-500 ${isRejection ? 'bg-red-50 border-red-200' : 'bg-emerald-50 border-emerald-200'}`}>
+          <div className="flex items-center gap-2 mb-1">
+            <div className={`w-8 h-8 rounded-full flex items-center justify-center ${isRejection ? 'bg-red-100 text-red-600' : 'bg-emerald-100 text-emerald-600'}`}>
+              <BellRing className="w-4 h-4" />
+            </div>
+            <span className={`text-[11px] font-bold uppercase tracking-wider ${isRejection ? 'text-red-700' : 'text-emerald-700'}`}>Admin Notification</span>
+          </div>
+          <p className={`text-xs md:text-sm font-medium leading-relaxed ${isRejection ? 'text-red-900' : 'text-emerald-900'}`}>{text.replace(/\*/g, '')}</p>
+        </div>
+      );
+    }
+
     const urlRegex = /(https?:\/\/[^\s]+)/g;
     const upiRegex = /upi:\/\/pay\S+/;
     const formTag = "[PAYMENT_FORM]";
@@ -182,8 +198,8 @@ export function BotPreview() {
       <CardContent ref={scrollRef} className="flex-1 overflow-y-auto p-4 space-y-4 bg-[url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png')] bg-repeat">
         {messages.map((msg, i) => (
           <div key={i} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
-            <div className={`max-w-[85%] rounded-2xl px-3 py-2 text-sm shadow-sm ${msg.role === "user" ? "bg-[#DCF8C6] rounded-tr-none" : "bg-white rounded-tl-none"}`}>
-              {renderMessageContent(msg.text)}
+            <div className={`max-w-[85%] rounded-2xl px-3 py-2 text-sm shadow-sm ${msg.role === "user" ? "bg-[#DCF8C6] rounded-tr-none" : "bg-white rounded-tl-none"} ${msg.role === "admin_alert" ? "p-0 bg-transparent border-none shadow-none" : ""}`}>
+              {renderMessageContent(msg.text, msg.role)}
             </div>
           </div>
         ))}
