@@ -124,7 +124,7 @@ export async function processBotMessage(
         const upiPayload = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(accountName)}&am=${price}&cu=INR`;
         const qrImageUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(upiPayload)}`;
 
-        let instructionsText = `Dost, aapko *${quantity}* followers ke liye *₹${price}* pay karne honge. QR code scan karein ya UPI ID use karein. Payment hone ke baad link bhejein.`;
+        let instructionsText = `📲 *Pay via any UPI app*\n\nAapko ₹*${price}* pay karne hain. QR code scan karein ya UPI ID use karein.`;
         try {
           const instructions = await aiGeneratedPaymentInstructionsAndConfirmation({
             type: 'payment_instructions',

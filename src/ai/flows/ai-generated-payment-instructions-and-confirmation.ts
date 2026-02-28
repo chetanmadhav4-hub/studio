@@ -45,10 +45,10 @@ Context:
 - Start Time: {{{startTimeText}}}
 
 Instructions:
-1. If type is 'payment_instructions': Create a clear message telling the user to pay ₹{{{price}}} for their order of {{{quantity}}} items. Mention they can scan the QR code below. Mention the account name CHETAN KUMAR MEGHWAL.
+1. If type is 'payment_instructions': Create a short and clear message. Start with "Pay via any UPI app". Mention the amount ₹{{{price}}} and the account name CHETAN KUMAR MEGHWAL. Use emojis.
 2. If type is 'order_confirmation': Create a happy message for Order ID {{{orderId}}}. Reassure them it starts in {{{startTimeText}}}.
 
-Keep it friendly, using Hindi/English mix (Hinglish). Use emojis. Do NOT include URLs directly in the message text.`,
+Keep it friendly, using Hindi/English mix (Hinglish). Do NOT include URLs directly in the message text.`,
 });
 
 const aiGeneratedPaymentInstructionsAndConfirmationFlow = ai.defineFlow(
