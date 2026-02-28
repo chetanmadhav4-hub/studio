@@ -4,82 +4,62 @@ service cloud.firestore {
 
     // --- Helper Functions ---
 
-    /** @description Checks if the user is authenticated. */
     function isSignedIn() {
       return request.auth != null;
     }
 
-    /** @description Checks if the authenticated user matches the provided userId. */
     function isOwner(userId) {
       return isSignedIn() && request.auth.uid == userId;
     }
 
-    /** @description Checks if the user is the owner and the document exists. */
-    function isExistingOwner(userId) {
-      return resource != null && isOwner(userId);
-    }
-
-    // --- Collection Group Rules ---
-    // These must be at the top level to work for collectionGroup() queries.
+    // --- Collection Group Rules (Must be at top level) ---
 
     /**
-     * @description Allows any signed-in user to perform collection group queries on 'orders'.
+     * @description Allows any signed-in user (Admin) to perform collection group queries on 'orders'.
      */
-    match /{path=**}/orders/{orderId} {
-      allow list, get: if isSignedIn();
+    match /{anyPath=**}/orders/{orderId} {
+      allow read: if isSignedIn();
+      allow write: if isSignedIn();
     }
     
     /**
-     * @description Allows admin to see all chat messages via collection group.
+     * @description Allows any signed-in user (Admin) to see all chat messages via collection group.
      */
-    match /{path=**}/messages/{messageId} {
-      allow list, get: if isSignedIn();
+    match /{anyPath=**}/messages/{messageId} {
+      allow read: if isSignedIn();
+      allow create: if true; // Webhook needs to create
     }
 
     // --- Specific Collection Rules ---
 
-    /**
-     * @description Rules for User Profiles.
-     */
     match /users/{userId} {
-      allow get: if isOwner(userId);
-      allow create: if isOwner(userId);
-      allow update, delete: if isExistingOwner(userId);
+      allow get, create: if isOwner(userId);
+      allow update, delete: if isOwner(userId);
 
       match /orders/{orderId} {
-        allow get, list: if isOwner(userId);
-        allow create: if isOwner(userId);
-        allow update, delete: if isExistingOwner(userId);
+        allow read, write: if isOwner(userId);
       }
     }
 
-    /**
-     * @description Rules for Username Mapping.
-     */
     match /usernames/{username} {
       allow get: if true;
       allow create: if isSignedIn() && request.resource.data.uid == request.auth.uid;
       allow update, delete: if isSignedIn() && resource.data.uid == request.auth.uid;
     }
 
-    /**
-     * @description Rules for Bot Sessions.
-     */
     match /botSessions/{sessionId} {
       allow read, write: if true; // Webhook and Admin need access
     }
 
-    /**
-     * @description Rules for Chat Logs.
-     */
-    match /chatSessions/{phoneNumber}/messages/{messageId} {
-      allow create: if true;
-      allow read: if isSignedIn();
+    match /chatSessions/{phoneNumber} {
+      allow read, write: if true;
+      
+      match /messages/{messageId} {
+        allow read: if isSignedIn();
+        allow create: if true;
+      }
     }
 
-    /**
-     * @description Global stats.
-     */
     match /globalStats/{document} {
       allow read: if isSignedIn();
     }

@@ -33,7 +33,8 @@ export interface InternalQuery extends Query<DocumentData> {
     path?: {
       canonicalString(): string;
       toString(): string;
-    }
+    },
+    collectionGroup?: string;
   }
 }
 
@@ -73,22 +74,21 @@ export function useCollection<T = any>(
         setError(null);
         setIsLoading(false);
       },
-      (error: FirestoreError) => {
-        // Robust path extraction for common SDK internal structures
+      (firestoreError: FirestoreError) => {
+        // Robust path extraction for reporting
         let path = 'collection-group-query';
         
         try {
+          const internal = memoizedTargetRefOrQuery as any;
           if (memoizedTargetRefOrQuery.type === 'collection') {
             path = (memoizedTargetRefOrQuery as CollectionReference).path;
+          } else if (internal._query?.collectionGroup) {
+            path = `collection-group:${internal._query.collectionGroup}`;
           } else {
-            const internal = memoizedTargetRefOrQuery as any;
-            // Try to find the collection name for collection group queries or standard queries
-            path = internal._query?.path?.canonicalString?.() || 
-                   internal.path || 
-                   (internal._query?.collectionGroup ? `collection-group:${internal._query.collectionGroup}` : 'collection-group-query');
+            path = internal._query?.path?.canonicalString?.() || internal.path || 'query';
           }
         } catch (e) {
-          console.warn("Could not determine firestore path for error reporting", e);
+          // Fallback to a generic identifier
         }
 
         const contextualError = new FirestorePermissionError({
