@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useUser, useFirestore, setDocumentNonBlocking } from "@/firebase";
 import { doc, serverTimestamp } from "firebase/firestore";
-import { Send, Bot, MousePointer2, ExternalLink, LogIn, CheckCircle2 } from "lucide-react";
+import { Send, Bot, MousePointer2, ExternalLink, LogIn, CheckCircle2, Link, Hash } from "lucide-react";
 
 interface ChatMessage {
   role: "user" | "bot";
@@ -26,6 +26,10 @@ export function BotPreview() {
   const [loading, setLoading] = useState(false);
   const [mounted, setMounted] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  // Inline form state
+  const [formLink, setFormLink] = useState("");
+  const [formUtr, setFormUtr] = useState("");
 
   useEffect(() => {
     setMounted(true);
@@ -61,6 +65,12 @@ export function BotPreview() {
     if (messageToSend === "Create Account") {
       router.push("/signup");
       return;
+    }
+
+    // Reset inline form on success if it was a submission
+    if (messageToSend.startsWith("SUBMIT_PAYMENT:")) {
+      setFormLink("");
+      setFormUtr("");
     }
 
     setInput("");
@@ -129,11 +139,15 @@ export function BotPreview() {
   const renderMessageContent = (text: string) => {
     const urlRegex = /(https?:\/\/[^\s]+)/g;
     const upiRegex = /upi:\/\/pay\S+/;
+    const formTag = "[PAYMENT_FORM]";
     
-    const upiMatch = text.match(upiRegex);
+    const hasForm = text.includes(formTag);
+    const cleanText = text.replace(formTag, "").trim();
+
+    const upiMatch = cleanText.match(upiRegex);
     const upiLink = upiMatch ? upiMatch[0] : null;
 
-    const lines = text.split("\n");
+    const lines = cleanText.split("\n");
     const optionLines = lines.filter(line => line.startsWith("OPTION: "));
     const otherLines = lines.filter(line => !line.startsWith("OPTION: ") && !line.match(upiRegex));
 
@@ -197,6 +211,43 @@ export function BotPreview() {
     return (
       <div className="flex flex-col gap-1">
         <div className="text-[13px] md:text-sm">{content}</div>
+        
+        {hasForm && (
+          <div className="mt-4 p-3 bg-white dark:bg-zinc-900 rounded-xl border-2 border-primary/20 shadow-md space-y-3">
+            <div className="space-y-1">
+              <label className="text-[10px] font-bold text-primary uppercase flex items-center gap-1">
+                <Link className="w-3 h-3" /> Instagram Link
+              </label>
+              <Input 
+                placeholder="https://instagram.com/..." 
+                className="h-8 text-xs bg-muted/20" 
+                value={formLink}
+                onChange={(e) => setFormLink(e.target.value)}
+              />
+            </div>
+            <div className="space-y-1">
+              <label className="text-[10px] font-bold text-primary uppercase flex items-center gap-1">
+                <Hash className="w-3 h-3" /> UTR ID (12 Digits)
+              </label>
+              <Input 
+                placeholder="123456789012" 
+                className="h-8 text-xs bg-muted/20" 
+                value={formUtr}
+                onChange={(e) => setFormUtr(e.target.value)}
+                maxLength={12}
+              />
+            </div>
+            <Button 
+              size="sm" 
+              className="w-full bg-[#00A884] hover:bg-[#008F6F] h-8 text-xs font-bold tracking-tight shadow-sm"
+              onClick={() => handleSend(`SUBMIT_PAYMENT:${formLink}|${formUtr}`)}
+              disabled={!formLink || formUtr.length < 12}
+            >
+              🚀 SUBMIT ORDER
+            </Button>
+          </div>
+        )}
+
         {optionLines.length > 0 && (
           <div className="mt-3 grid gap-2">
             {optionLines.map((optLine, i) => {

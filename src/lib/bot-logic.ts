@@ -32,6 +32,52 @@ export async function processBotMessage(
 ): Promise<{ reply: string; nextState: Partial<UserSession> }> {
   const normalizedMsg = messageText.trim().toLowerCase();
 
+  // SPECIAL HANDLER FOR INLINE FORM SUBMISSION
+  if (normalizedMsg.startsWith('submit_payment:')) {
+    const detailsPart = messageText.substring('submit_payment:'.length).trim();
+    const [link, utr] = detailsPart.split('|');
+
+    if (!link || !isValidInstagramUrl(link.trim())) {
+      return { 
+        reply: "⚠️ Kripya sahi Instagram Profile/Post Link enter karein.\n\n[PAYMENT_FORM]", 
+        nextState: { state: 'AWAITING_PAYMENT_DETAILS' } 
+      };
+    }
+    if (!utr || !isValidUtr(utr.trim())) {
+      return { 
+        reply: "⚠️ Kripya sahi 12-digit UTR ID enter karein.\n\n[PAYMENT_FORM]", 
+        nextState: { state: 'AWAITING_PAYMENT_DETAILS' } 
+      };
+    }
+
+    const orderId = `INSTA-${Math.floor(100000 + Math.random() * 900000)}`;
+    try {
+      const confirmation = await aiGeneratedOrderConfirmation({
+        orderId,
+        quantity: session.data.quantity || 0,
+        serviceName: session.data.serviceName || 'Instagram Service',
+        instagramProfileLink: link.trim(),
+        price: session.data.price || 0,
+        startTime: '0-30 minutes',
+      });
+      return {
+        reply: confirmation.message + "\n\nNaya order lagane ke liye MENU likhein.\n\nOPTION: MENU",
+        nextState: { 
+          state: 'ORDER_PLACED', 
+          data: { ...session.data, orderId, targetLink: link.trim(), utrId: utr.trim() } 
+        }
+      };
+    } catch (e) {
+      return {
+        reply: `🎉 *Order Created!* ID: ${orderId}\n\nNaya order lagane ke liye MENU likhein.\n\nOPTION: MENU`,
+        nextState: { 
+          state: 'ORDER_PLACED', 
+          data: { ...session.data, orderId, targetLink: link.trim(), utrId: utr.trim() } 
+        }
+      };
+    }
+  }
+
   // GLOBAL SERVICE INTERRUPTION
   let interceptedServiceKey = '';
   Object.entries(SERVICES_CONFIG).forEach(([key, service]) => {
@@ -118,7 +164,7 @@ export async function processBotMessage(
         const qrImageUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(upiPayload)}`;
 
         return {
-          reply: `📲 *Pay via any UPI app*\n\nAapko ₹*${price}* pay karne hain. QR code scan karein ya UPI ID use karein.\n\n👤 *Account:* ${accountName}\n🆔 *UPI ID:* ${upiId}\n💰 *Amount:* ₹${price}\n\n📸 *SCAN TO PAY:*\n${qrImageUrl}\n\n${upiPayload}\n\n✅ Payment ke baad, apna Instagram Link and UTR ID bhejein order start karne ke liye:\n\nOPTION: 🔗 Send Instagram Link\nOPTION: 🆔 Send UTR ID`,
+          reply: `📲 *Pay via any UPI app*\n\n👤 *Account:* ${accountName}\n🆔 *UPI ID:* ${upiId}\n💰 *Amount:* ₹${price}\n\n📸 *SCAN TO PAY:*\n${qrImageUrl}\n\n${upiPayload}\n\n✅ Payment ke baad, apna Instagram Link and UTR ID niche fill karein:\n\n[PAYMENT_FORM]`,
           nextState: {
             state: 'AWAITING_PAYMENT_DETAILS',
             data: { ...session.data },
@@ -132,75 +178,11 @@ export async function processBotMessage(
     }
 
     case 'AWAITING_PAYMENT_DETAILS': {
-      if (normalizedMsg.includes('instagram link')) {
-        return { reply: "🔗 Kripya apna *Instagram Profile/Post Link* bhejein:", nextState: { state: 'AWAITING_LINK' } };
-      }
-      if (normalizedMsg.includes('utr id')) {
-        return { reply: "🆔 Kripya apna 12-digit *UTR ID / Transaction ID* bhejein:", nextState: { state: 'AWAITING_UTR_ID' } };
-      }
-      if (normalizedMsg.includes('submit order')) {
-        if (!session.data.targetLink || !session.data.utrId) {
-          return { reply: "⚠️ Dono details (Link aur UTR ID) dena zaroori hai.\n\nOPTION: 🔗 Send Instagram Link\nOPTION: 🆔 Send UTR ID", nextState: { state: 'AWAITING_PAYMENT_DETAILS' } };
-        }
-        
-        const orderId = `INSTA-${Math.floor(100000 + Math.random() * 900000)}`;
-        try {
-          const confirmation = await aiGeneratedOrderConfirmation({
-            orderId,
-            quantity: session.data.quantity || 0,
-            serviceName: session.data.serviceName || 'Instagram Service',
-            instagramProfileLink: session.data.targetLink,
-            price: session.data.price || 0,
-            startTime: '0-30 minutes',
-          });
-          return {
-            reply: confirmation.message + "\n\nNaya order lagane ke liye click karein:\n\nOPTION: MENU",
-            nextState: { state: 'ORDER_PLACED', data: { ...session.data, orderId } }
-          };
-        } catch (e) {
-          return {
-            reply: `🎉 *Order Created!* ID: ${orderId}\n\nNaya order lagane ke liye click karein:\n\nOPTION: MENU`,
-            nextState: { state: 'ORDER_PLACED', data: { ...session.data, orderId } }
-          };
-        }
-      }
-
-      const hasLink = !!session.data.targetLink;
-      const hasUtr = !!session.data.utrId;
-      let prompt = "✅ Details fill karein:\n\n";
-      if (!hasLink) prompt += "OPTION: 🔗 Send Instagram Link\n";
-      else prompt += "✅ Instagram Link: Received\n";
-      
-      if (!hasUtr) prompt += "OPTION: 🆔 Send UTR ID\n";
-      else prompt += "✅ UTR ID: Received\n";
-      
-      if (hasLink && hasUtr) prompt += "\n✨ Ab order submit karein:\nOPTION: 🚀 SUBMIT ORDER";
-
-      return { reply: prompt, nextState: { state: 'AWAITING_PAYMENT_DETAILS' } };
-    }
-
-    case 'AWAITING_LINK': {
-      if (isValidInstagramUrl(messageText)) {
-        const newData = { ...session.data, targetLink: messageText };
-        const hasUtr = !!newData.utrId;
-        return {
-          reply: `✅ Link save ho gaya!${!hasUtr ? "\n\nAb UTR ID bhejein:" : "\n\nDetails check karke submit karein:"}\n\n${!hasUtr ? "OPTION: 🆔 Send UTR ID" : "OPTION: 🚀 SUBMIT ORDER"}`,
-          nextState: { state: 'AWAITING_PAYMENT_DETAILS', data: newData },
-        };
-      }
-      return { reply: "⚠️ Sahi Instagram link bhejein (e.g., https://instagram.com/username)", nextState: { state: 'AWAITING_LINK' } };
-    }
-
-    case 'AWAITING_UTR_ID': {
-      if (isValidUtr(messageText)) {
-        const newData = { ...session.data, utrId: messageText.trim() };
-        const hasLink = !!newData.targetLink;
-        return {
-          reply: `✅ UTR ID save ho gaya!${!hasLink ? "\n\nAb Instagram Link bhejein:" : "\n\nDetails check karke submit karein:"}\n\n${!hasLink ? "OPTION: 🔗 Send Instagram Link" : "OPTION: 🚀 SUBMIT ORDER"}`,
-          nextState: { state: 'AWAITING_PAYMENT_DETAILS', data: newData },
-        };
-      }
-      return { reply: "⚠️ Kripya sahi 12-digit UTR ID bhejein jo payment app mein dikhta hai.", nextState: { state: 'AWAITING_UTR_ID' } };
+      // If user types something else while form is shown, remind them to use the form
+      return {
+        reply: "⚠️ Kripya QR code ke niche diye gaye box mein details bhar kar Submit karein.\n\n[PAYMENT_FORM]",
+        nextState: { state: 'AWAITING_PAYMENT_DETAILS' },
+      };
     }
 
     default:
