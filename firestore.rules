@@ -2,27 +2,29 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // --- Collection Group Rules (Must be at top level for group queries) ---
+    // --- COLLECTION GROUP RULES ---
+    // These must be at the top level and use the {path=**} syntax for group queries to work.
 
     /**
-     * @description Allows any signed-in user (Admin) to perform collection group queries on 'orders'.
+     * @description Allow signed-in users (Admins) to query all 'orders' collections across the database.
      */
     match /{path=**}/orders/{orderId} {
       allow read, write: if request.auth != null;
     }
     
     /**
-     * @description Allows any signed-in user (Admin) to see all chat messages via collection group.
+     * @description Allow querying all 'messages' collections for admin review or webhook processing.
      */
     match /{path=**}/messages/{messageId} {
-      allow read, write: if request.auth != null || true; // Allow webhook/public creation
+      allow read, write: if request.auth != null || true; 
     }
 
-    // --- Specific Collection Rules ---
+    // --- SPECIFIC PATH RULES ---
 
     match /users/{userId} {
       allow read, write: if request.auth != null && request.auth.uid == userId;
 
+      // Note: This sub-match is still useful for direct document access by the owner
       match /orders/{orderId} {
         allow read, write: if request.auth != null && request.auth.uid == userId;
       }

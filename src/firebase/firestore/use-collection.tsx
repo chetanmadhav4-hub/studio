@@ -76,7 +76,7 @@ export function useCollection<T = any>(
       },
       (firestoreError: FirestoreError) => {
         // Robust path extraction for reporting
-        let path = 'collection-group-query';
+        let path = 'query';
         
         try {
           const internal = memoizedTargetRefOrQuery as any;
@@ -88,7 +88,7 @@ export function useCollection<T = any>(
             path = internal._query?.path?.canonicalString?.() || internal.path || 'query';
           }
         } catch (e) {
-          // Fallback to a generic identifier
+          path = 'collection-group-query';
         }
 
         const contextualError = new FirestorePermissionError({
