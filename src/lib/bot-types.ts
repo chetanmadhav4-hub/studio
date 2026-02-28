@@ -10,6 +10,12 @@ export type BotState =
   | 'ORDER_PLACED' 
   | 'ERROR';
 
+export interface UserNotification {
+  id: string;
+  message: string;
+  createdAt: number;
+}
+
 export interface UserSession {
   phoneNumber: string;
   state: BotState;
@@ -25,6 +31,7 @@ export interface UserSession {
     orderId?: string;
     smmOrderId?: string;
   };
+  notifications?: UserNotification[];
   updatedAt: number;
 }
 
@@ -34,7 +41,7 @@ export interface OrderRecord {
   serviceName: string;
   quantity: number;
   price: number;
-  status: 'PENDING_PAYMENT' | 'PAID' | 'PLACED' | 'FAILED';
+  status: 'PENDING_PAYMENT' | 'PAID' | 'PLACED' | 'FAILED' | 'COMPLETED' | 'REJECTED';
   targetLink?: string;
   utrId?: string;
   smmOrderId?: string;

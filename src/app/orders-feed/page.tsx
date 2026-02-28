@@ -2,7 +2,7 @@
 'use client';
 
 import { useCollection, useFirestore, useMemoFirebase, useUser } from "@/firebase";
-import { collection, query, orderBy, limit, doc, updateDoc, serverTimestamp } from "firebase/firestore";
+import { collection, query, orderBy, limit, doc, updateDoc, serverTimestamp, arrayUnion } from "firebase/firestore";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -70,28 +70,29 @@ export default function SimpleOrdersFeed() {
       const sessionRef = doc(db, 'botSessions', targetSessionId);
       const shortId = order.id.slice(-6);
 
+      const notificationId = Math.random().toString(36).slice(2, 9);
+      let msg = '';
+
       if (action === 'APPROVE') {
-        const approveMsg = `✅ *ORDER APPROVED:* Order #${shortId} approve ho gaya hai! Kaam jaldi shuru ho jayega. 🚀`;
+        msg = `✅ *ORDER APPROVED:* Order #${shortId} approve ho gaya hai! Kaam jaldi shuru ho jayega. 🚀`;
         
         // 1. WhatsApp Notification
         if (targetSessionId.length > 10) {
-          await sendAdminActionNotification(targetSessionId, approveMsg);
+          sendAdminActionNotification(targetSessionId, msg);
         }
-
-        // 2. Private Notification Bell Update
-        await updateDoc(sessionRef, { 
-          adminNotification: approveMsg,
-          lastNotificationAt: serverTimestamp() 
-        });
       } else {
-        const rejectMsg = `❌ *ORDER REJECTED:* Order #${shortId} reject kar diya gaya hai. ⚠️ Reason: Invalid Link ya Galat UTR ID.`;
-        
-        // 2. Private Notification Bell Update (No WhatsApp for rejection)
-        await updateDoc(sessionRef, { 
-          adminNotification: rejectMsg,
-          lastNotificationAt: serverTimestamp() 
-        });
+        msg = `❌ *ORDER REJECTED:* Order #${shortId} reject kar diya gaya hai. ⚠️ Reason: Invalid Link ya Galat UTR ID.`;
       }
+
+      // 2. Add to Persistent Notification List in user session
+      await updateDoc(sessionRef, { 
+        notifications: arrayUnion({
+          id: notificationId,
+          message: msg,
+          createdAt: Date.now()
+        }),
+        lastNotificationAt: serverTimestamp() 
+      });
 
       toast({
         title: action === 'APPROVE' ? "Order Approved!" : "Order Rejected",

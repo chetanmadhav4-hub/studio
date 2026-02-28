@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useUser, useFirestore, useDoc, useMemoFirebase } from "@/firebase";
-import { doc, updateDoc } from "firebase/firestore";
+import { doc, updateDoc, deleteField } from "firebase/firestore";
 import { 
   Send, 
   Bot, 
@@ -17,7 +17,8 @@ import {
   Bell, 
   X,
   CheckCircle2,
-  AlertCircle
+  AlertCircle,
+  Trash2
 } from "lucide-react";
 import {
   Popover,
@@ -25,6 +26,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import Link from "next/link";
+import { UserNotification } from "@/lib/bot-types";
 
 interface ChatMessage {
   role: "user" | "bot";
@@ -54,10 +56,12 @@ export function BotPreview() {
   const { data: session } = useDoc(sessionRef);
 
   useEffect(() => {
-    if (session?.adminNotification) {
+    if (session?.notifications && session.notifications.length > 0) {
       setHasNewNotification(true);
+    } else {
+      setHasNewNotification(false);
     }
-  }, [session?.adminNotification, session?.lastNotificationAt]);
+  }, [session?.notifications]);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -120,10 +124,15 @@ export function BotPreview() {
     }
   };
 
-  const clearNotification = async () => {
-    setHasNewNotification(false);
-    if (sessionRef) {
-      updateDoc(sessionRef, { adminNotification: null });
+  const clearNotifications = async () => {
+    if (!sessionRef) return;
+    try {
+      await updateDoc(sessionRef, { 
+        notifications: deleteField() 
+      });
+      setHasNewNotification(false);
+    } catch (e) {
+      console.error("Error clearing notifications:", e);
     }
   };
 
@@ -205,43 +214,65 @@ export function BotPreview() {
         </div>
 
         {user && (
-          <Popover onOpenChange={(open) => !open && session?.adminNotification && clearNotification()}>
+          <Popover>
             <PopoverTrigger asChild>
               <Button variant="ghost" size="icon" className="relative text-white hover:bg-white/10 rounded-full">
                 <Bell className="w-6 h-6" />
                 {hasNewNotification && (
-                  <span className="absolute top-2 right-2 w-3 h-3 bg-red-500 rounded-full border-2 border-[#075E54] animate-pulse" />
+                  <>
+                    <span className="absolute top-2 right-2 w-3 h-3 bg-red-500 rounded-full border-2 border-[#075E54] animate-pulse" />
+                    <span className="absolute -top-1 -right-1 flex items-center justify-center min-w-[18px] h-[18px] bg-red-600 rounded-full text-[10px] font-bold border-2 border-[#075E54]">
+                      {session?.notifications?.length || 0}
+                    </span>
+                  </>
                 )}
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-72 p-0 rounded-xl overflow-hidden shadow-2xl border-none">
+            <PopoverContent className="w-80 p-0 rounded-xl overflow-hidden shadow-2xl border-none">
               <div className="bg-[#075E54] p-3 text-white flex items-center justify-between">
-                <h4 className="text-xs font-bold uppercase tracking-wider">Notifications</h4>
-                <Button variant="ghost" size="icon" className="h-6 w-6 text-white/70" onClick={clearNotification}>
-                  <X className="w-4 h-4" />
-                </Button>
+                <h4 className="text-xs font-bold uppercase tracking-wider">Order Updates</h4>
+                {session?.notifications && session.notifications.length > 0 && (
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="h-7 text-[10px] text-white hover:bg-white/10 gap-1 font-bold"
+                    onClick={clearNotifications}
+                  >
+                    <Trash2 className="w-3 h-3" /> Clear All
+                  </Button>
+                )}
               </div>
-              <div className="p-4 bg-white dark:bg-zinc-900 max-h-60 overflow-y-auto">
-                {session?.adminNotification ? (
-                  <div className={`p-3 rounded-xl border shadow-sm space-y-2 ${session.adminNotification.includes('REJECTED') ? 'bg-red-50 border-red-100' : 'bg-emerald-50 border-emerald-100'}`}>
-                    <div className="flex items-center gap-2">
-                      {session.adminNotification.includes('REJECTED') ? (
-                        <AlertCircle className="w-4 h-4 text-red-500" />
-                      ) : (
-                        <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-                      )}
-                      <span className={`text-[10px] font-bold uppercase ${session.adminNotification.includes('REJECTED') ? 'text-red-700' : 'text-emerald-700'}`}>
-                        Order Update
-                      </span>
+              <div className="p-4 bg-white dark:bg-zinc-900 max-h-80 overflow-y-auto space-y-3">
+                {session?.notifications && session.notifications.length > 0 ? (
+                  session.notifications.map((notif: UserNotification) => (
+                    <div 
+                      key={notif.id}
+                      className={`p-3 rounded-xl border shadow-sm space-y-2 ${notif.message.includes('REJECTED') ? 'bg-red-50 border-red-100' : 'bg-emerald-50 border-emerald-100'}`}
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          {notif.message.includes('REJECTED') ? (
+                            <AlertCircle className="w-4 h-4 text-red-500" />
+                          ) : (
+                            <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+                          )}
+                          <span className={`text-[10px] font-bold uppercase ${notif.message.includes('REJECTED') ? 'text-red-700' : 'text-emerald-700'}`}>
+                            {notif.message.includes('REJECTED') ? 'Action Needed' : 'Order Update'}
+                          </span>
+                        </div>
+                        <span className="text-[9px] text-slate-400 font-medium">
+                          {new Date(notif.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        </span>
+                      </div>
+                      <p className="text-xs font-medium leading-relaxed text-slate-700 dark:text-slate-300">
+                        {notif.message.replace(/\*/g, '')}
+                      </p>
                     </div>
-                    <p className="text-xs font-medium leading-relaxed text-slate-700 dark:text-slate-300">
-                      {session.adminNotification.replace(/\*/g, '')}
-                    </p>
-                  </div>
+                  )).reverse()
                 ) : (
-                  <div className="py-8 text-center space-y-2">
-                    <Bell className="w-8 h-8 text-slate-200 mx-auto" />
-                    <p className="text-xs text-slate-400 font-medium">No new notifications</p>
+                  <div className="py-12 text-center space-y-2">
+                    <Bell className="w-10 h-10 text-slate-100 mx-auto" />
+                    <p className="text-xs text-slate-400 font-medium italic">Sabhi clear hai. Koi naya update nahi!</p>
                   </div>
                 )}
               </div>
