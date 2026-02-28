@@ -25,18 +25,27 @@ export default function LoginPage() {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!identifier.trim() || !password.trim()) {
+      toast({
+        variant: "destructive",
+        title: "Missing Details",
+        description: "Please enter your username/email and password.",
+      });
+      return;
+    }
+    
     setLoading(true);
 
     try {
-      let loginEmail = identifier;
+      let loginEmail = identifier.trim();
 
       // 1. If identifier doesn't look like an email, assume it's a username
-      if (!identifier.includes('@')) {
-        const usernameRef = doc(db, 'usernames', identifier.toLowerCase());
+      if (!loginEmail.includes('@')) {
+        const usernameRef = doc(db, 'usernames', loginEmail.toLowerCase());
         const usernameSnap = await getDoc(usernameRef);
         
         if (!usernameSnap.exists()) {
-          throw new Error('Username not found.');
+          throw new Error('Username not found. Please check and try again.');
         }
         loginEmail = usernameSnap.data().email;
       }
@@ -51,10 +60,16 @@ export default function LoginPage() {
       
       router.push('/');
     } catch (error: any) {
+      console.error(error);
+      let message = "Invalid credentials. Please try again.";
+      if (error.code === 'auth/invalid-email') message = "The email address is badly formatted.";
+      if (error.code === 'auth/user-not-found') message = "Account not found.";
+      if (error.code === 'auth/wrong-password') message = "Incorrect password.";
+      
       toast({
         variant: "destructive",
         title: "Login Failed",
-        description: error.message || "Invalid credentials. Please try again.",
+        description: error.message || message,
       });
     } finally {
       setLoading(false);
