@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect, useRef } from "react";
@@ -73,15 +74,16 @@ export function BotPreview() {
 
   const renderMessageContent = (text: string) => {
     const urlRegex = /(https?:\/\/[^\s]+)/g;
-    const upiRegex = /(upi:\/\/pay[^\s]+)/g;
+    const upiRegex = /upi:\/\/pay\S+/;
     
-    // Extract UPI link if present in the whole message
+    // Extract UPI link from the whole message
     const upiMatch = text.match(upiRegex);
     const upiLink = upiMatch ? upiMatch[0] : null;
 
     const lines = text.split("\n");
     const optionLines = lines.filter(line => line.startsWith("OPTION: "));
-    const otherLines = lines.filter(line => !line.startsWith("OPTION: ") && !line.includes("upi://pay"));
+    // Filter out the raw UPI link and options from the displayed text
+    const otherLines = lines.filter(line => !line.startsWith("OPTION: ") && !line.match(upiRegex));
 
     const content = otherLines.map((line, idx) => {
       const matches = line.match(urlRegex);
@@ -104,7 +106,7 @@ export function BotPreview() {
                 <img 
                   src={imageUrl} 
                   alt="QR Code" 
-                  className="rounded-lg w-full h-auto block"
+                  className="rounded-lg w-full h-auto block bg-white"
                 />
                 {upiLink ? (
                   <a 
