@@ -1,12 +1,12 @@
 'use client';
 
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { BotPreview } from "@/components/bot-preview";
 import { OrderHistory } from "@/components/order-history";
-import { CheckCircle2, Zap, ShieldCheck, MessageSquare, LogOut, User, History } from "lucide-react";
-import { useUser, useAuth } from "@/firebase";
-import { signOut } from "firebase/auth";
+import { CheckCircle2, Zap, ShieldCheck, MessageSquare, User, History, Moon, Sun } from "lucide-react";
+import { useUser } from "@/firebase";
 import { useRouter } from "next/navigation";
 import {
   Dialog,
@@ -18,18 +18,34 @@ import {
 
 export default function Home() {
   const { user, isUserLoading } = useUser();
-  const auth = useAuth();
   const router = useRouter();
+  const [isDark, setIsDark] = useState(false);
 
-  const handleLogout = async () => {
-    await signOut(auth);
-    router.refresh();
+  // Initialize theme from localStorage
+  useEffect(() => {
+    const theme = localStorage.getItem("theme");
+    if (theme === "dark") {
+      setIsDark(true);
+      document.documentElement.classList.add("dark");
+    }
+  }, []);
+
+  const toggleTheme = () => {
+    if (isDark) {
+      document.documentElement.classList.remove("dark");
+      localStorage.setItem("theme", "light");
+      setIsDark(false);
+    } else {
+      document.documentElement.classList.add("dark");
+      localStorage.setItem("theme", "dark");
+      setIsDark(true);
+    }
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-background">
+    <div className="min-h-screen flex flex-col bg-background transition-colors duration-300">
       {/* Header */}
-      <header className="border-b bg-white sticky top-0 z-50">
+      <header className="border-b bg-white dark:bg-card sticky top-0 z-50 transition-colors">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
@@ -55,19 +71,20 @@ export default function Home() {
                 ) : (
                   <div className="flex items-center gap-2">
                     <Link href="/profile">
-                      <Button variant="ghost" size="sm" className="gap-2 text-sm">
+                      <Button variant="ghost" size="sm" className="gap-2 text-sm dark:text-foreground">
                         <User className="w-4 h-4" />
                         <span className="hidden xs:inline">Profile</span>
                       </Button>
                     </Link>
+                    {/* Theme Toggle Button */}
                     <Button 
                       variant="ghost" 
                       size="sm"
-                      className="text-destructive hover:text-destructive hover:bg-destructive/10 gap-2 text-sm"
-                      onClick={handleLogout}
+                      className="gap-2 text-sm dark:text-foreground hover:bg-accent"
+                      onClick={toggleTheme}
                     >
-                      <LogOut className="w-4 h-4" />
-                      <span className="hidden xs:inline">Logout</span>
+                      {isDark ? <Sun className="w-4 h-4 text-amber-500" /> : <Moon className="w-4 h-4 text-primary" />}
+                      <span className="hidden xs:inline">{isDark ? "Light" : "Dark"}</span>
                     </Button>
                   </div>
                 )}
@@ -78,7 +95,7 @@ export default function Home() {
       </header>
 
       {/* Hero Section */}
-      <section className="bg-gradient-to-b from-white to-background pt-12 pb-16 md:pt-20 md:pb-24">
+      <section className="bg-gradient-to-b from-white to-background dark:from-card dark:to-background pt-12 pb-16 md:pt-20 md:pb-24 transition-colors">
         <div className="container mx-auto px-4">
           <div className="max-w-2xl mx-auto text-center space-y-6">
             <div className="space-y-4">
@@ -94,7 +111,7 @@ export default function Home() {
               <div className="flex justify-center flex-col items-center gap-4">
                 <Dialog>
                   <DialogTrigger asChild>
-                    <Button variant="outline" size="sm" className="gap-2 shadow-sm border-primary/20 text-primary hover:text-primary hover:bg-primary/5">
+                    <Button variant="outline" size="sm" className="gap-2 shadow-sm border-primary/20 text-primary hover:text-primary hover:bg-primary/5 dark:bg-card dark:text-foreground">
                       <History className="w-4 h-4" />
                       View Order History
                     </Button>
@@ -136,7 +153,7 @@ export default function Home() {
       </section>
 
       {/* Features Grid */}
-      <section id="features" className="py-16 md:py-24 bg-white">
+      <section id="features" className="py-16 md:py-24 bg-white dark:bg-card transition-colors">
         <div className="container mx-auto px-4">
           <div className="text-center max-w-3xl mx-auto mb-12 md:mb-16 space-y-4">
             <h2 className="text-2xl md:text-3xl font-bold tracking-tight sm:text-4xl">
@@ -147,7 +164,7 @@ export default function Home() {
             </p>
           </div>
           <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-6 md:gap-8">
-            <div className="p-6 md:p-8 rounded-2xl border bg-background/50 hover:border-primary/50 transition-all space-y-4 shadow-sm">
+            <div className="p-6 md:p-8 rounded-2xl border bg-background/50 dark:bg-background/20 hover:border-primary/50 transition-all space-y-4 shadow-sm">
               <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center mb-4">
                 <MessageSquare className="w-6 h-6 text-primary" />
               </div>
@@ -156,7 +173,7 @@ export default function Home() {
                 Best-in-class support team available round the clock to solve your queries instantly via WhatsApp.
               </p>
             </div>
-            <div className="p-6 md:p-8 rounded-2xl border bg-background/50 hover:border-primary/50 transition-all space-y-4 shadow-sm">
+            <div className="p-6 md:p-8 rounded-2xl border bg-background/50 dark:bg-background/20 hover:border-primary/50 transition-all space-y-4 shadow-sm">
               <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center mb-4">
                 <ShieldCheck className="w-6 h-6 text-primary" />
               </div>
@@ -165,7 +182,7 @@ export default function Home() {
                 Your credentials and orders are protected with bank-grade encryption and secure authentication.
               </p>
             </div>
-            <div className="p-6 md:p-8 rounded-2xl border bg-background/50 hover:border-primary/50 transition-all space-y-4 shadow-sm sm:col-span-2 md:col-span-1">
+            <div className="p-6 md:p-8 rounded-2xl border bg-background/50 dark:bg-background/20 hover:border-primary/50 transition-all space-y-4 shadow-sm sm:col-span-2 md:col-span-1">
               <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center mb-4">
                 <Zap className="w-6 h-6 text-primary" />
               </div>
@@ -178,7 +195,7 @@ export default function Home() {
         </div>
       </section>
 
-      <footer className="mt-auto py-8 md:py-12 border-t bg-white">
+      <footer className="mt-auto py-8 md:py-12 border-t bg-white dark:bg-card transition-colors">
         <div className="container mx-auto px-4 text-center space-y-4">
           <div className="flex items-center justify-center gap-2">
             <Zap className="w-6 h-6 text-primary" />
