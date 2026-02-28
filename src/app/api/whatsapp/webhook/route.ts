@@ -15,25 +15,15 @@ export async function POST(req: Request) {
     const value = changes?.value;
     const message = value?.messages?.[0];
 
-    // If it's just a status update or empty change, ignore
     if (!message) {
       return NextResponse.json({ success: true });
     }
 
     const phoneNumber = message.from;
     const messageText = message.text?.body || '';
-    
-    // ADMIN NUMBER: User requested 9116053238. For Meta API, we use country code (91) + number.
     const adminNumber = '919116053238'; 
 
-    // Log user message to Firestore for history
-    await addDoc(collection(firestore, 'chatSessions', phoneNumber, 'messages'), {
-      text: messageText,
-      sender: 'user',
-      timestamp: serverTimestamp(),
-    });
-
-    // Retrieve session from Firestore
+    // Retrieve session
     const sessionRef = doc(firestore, 'botSessions', phoneNumber);
     const sessionSnap = await getDoc(sessionRef);
     
@@ -56,42 +46,32 @@ export async function POST(req: Request) {
       updatedAt: Date.now(),
     };
 
-    // Save session back to Firestore
     await setDoc(sessionRef, updatedSession);
-
-    // Log bot reply to Firestore
-    await addDoc(collection(firestore, 'chatSessions', phoneNumber, 'messages'), {
-      text: reply,
-      sender: 'bot',
-      timestamp: serverTimestamp(),
-    });
 
     const accessToken = process.env.WHATSAPP_ACCESS_TOKEN;
     const phoneNumberId = process.env.WHATSAPP_PHONE_NUMBER_ID;
 
-    if (accessToken && phoneNumberId) {
-      // 1. Send reply back to user (if not a demo/preview call)
-      if (phoneNumber !== 'demo_user') {
-        await fetch(`https://graph.facebook.com/v17.0/${phoneNumberId}/messages`, {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${accessToken}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            messaging_product: 'whatsapp',
-            to: phoneNumber,
-            type: 'text',
-            text: { body: reply },
-          }),
-        });
-      }
+    // IF ORDER PLACED: Write to ALL_ORDERS and Notify Admin
+    if (updatedSession.state === 'ORDER_PLACED' && updatedSession.data?.orderId) {
+      const { orderId, utrId, targetLink, serviceName, quantity, price } = updatedSession.data;
+      
+      const orderData = {
+        id: orderId,
+        phoneNumber,
+        serviceName,
+        quantity,
+        price,
+        targetLink,
+        utrId,
+        status: 'PROCESSING',
+        createdAt: serverTimestamp(),
+      };
 
-      // 2. Notify ADMIN if order is placed
-      // We check if the state JUST transitioned to ORDER_PLACED
-      if (updatedSession.state === 'ORDER_PLACED' && updatedSession.data && updatedSession.data.orderId) {
-        const { orderId, utrId, targetLink, serviceName, quantity, price } = updatedSession.data;
-        
+      // Save to global master list for the tracker
+      await setDoc(doc(firestore, 'all_orders', orderId), orderData);
+
+      // Notify Admin via WhatsApp
+      if (accessToken && phoneNumberId) {
         const adminMsg = `🚀 *Naya Order Aaya Hai!*
 
 📦 *Order ID:* ${orderId}
@@ -99,11 +79,8 @@ export async function POST(req: Request) {
 🔗 *Link:* ${targetLink}
 🛠️ *Service:* ${serviceName}
 📊 *Qty:* ${quantity}
-💰 *Amount:* ₹${price}
+💰 *Amount:* ₹${price}`;
 
-*Kripya payment aur link check karke panel me process karein.*`;
-
-        // Send to Admin
         await fetch(`https://graph.facebook.com/v17.0/${phoneNumberId}/messages`, {
           method: 'POST',
           headers: {
@@ -120,12 +97,24 @@ export async function POST(req: Request) {
       }
     }
 
-    return NextResponse.json({ 
-      success: true, 
-      reply, 
-      state: updatedSession.state,
-      orderData: updatedSession.data 
-    });
+    // Send reply to user
+    if (accessToken && phoneNumberId && phoneNumber !== 'demo_user') {
+      await fetch(`https://graph.facebook.com/v17.0/${phoneNumberId}/messages`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          messaging_product: 'whatsapp',
+          to: phoneNumber,
+          type: 'text',
+          text: { body: reply },
+        }),
+      });
+    }
+
+    return NextResponse.json({ success: true, reply });
   } catch (error) {
     console.error('Webhook Error:', error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
@@ -134,15 +123,9 @@ export async function POST(req: Request) {
 
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
-  const mode = searchParams.get('hub.mode');
-  const token = searchParams.get('hub.verify_token');
-  const challenge = searchParams.get('hub.challenge');
-
   const verifyToken = process.env.WHATSAPP_VERIFY_TOKEN || 'instaflow_secret_token';
-
-  if (mode === 'subscribe' && token === verifyToken) {
-    return new Response(challenge, { status: 200 });
+  if (searchParams.get('hub.mode') === 'subscribe' && searchParams.get('hub.verify_token') === verifyToken) {
+    return new Response(searchParams.get('hub.challenge'), { status: 200 });
   }
-  
   return new Response('Forbidden', { status: 403 });
 }

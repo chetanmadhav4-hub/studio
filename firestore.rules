@@ -2,57 +2,32 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-
-    // --- COLLECTION GROUP RULES ---
-    // These MUST be at the root level for collectionGroup() queries to work.
-    // Allow any authenticated user to read/list all orders for the Live Tracker.
-    match /{path=**}/orders/{orderId} {
-      allow read, list: if request.auth != null;
-    }
     
-    // Allow any authenticated user to read/list chat messages (for support history).
-    match /{path=**}/messages/{messageId} {
-      allow read, list: if request.auth != null;
+    // Global orders list for the tracker
+    match /all_orders/{orderId} {
+      allow read: if request.auth != null;
+      allow write: if true; 
     }
 
-    // --- USER PROFILE RULES ---
+    // User profile and sub-collections
     match /users/{userId} {
-      // Allow any authenticated user to see user profiles (for tracker/admin visibility).
       allow read: if request.auth != null;
-      // Only the user themselves can write to their profile.
       allow write: if request.auth != null && request.auth.uid == userId;
-
-      // Note: Sub-collection rules are already covered by the collectionGroup rule above,
-      // but we can add specific write permissions here if needed.
+      
       match /orders/{orderId} {
-        allow write: if request.auth != null && request.auth.uid == userId;
+        allow read, write: if request.auth != null && request.auth.uid == userId;
       }
     }
 
-    // --- USERNAME MAPPING ---
+    // Username mapping
     match /usernames/{username} {
       allow read: if true;
-      allow create: if request.auth != null && request.resource.data.uid == request.auth.uid;
-      allow update, delete: if request.auth != null && resource.data.uid == request.auth.uid;
+      allow write: if request.auth != null;
     }
 
-    // --- BOT SESSIONS ---
+    // Bot sessions
     match /botSessions/{sessionId} {
-      allow read, write: if true; 
-    }
-
-    // --- CHAT SESSIONS ---
-    match /chatSessions/{phoneNumber} {
       allow read, write: if true;
-      
-      match /messages/{messageId} {
-        allow read, write: if true;
-      }
-    }
-
-    // --- GLOBAL STATS ---
-    match /globalStats/{document} {
-      allow read: if request.auth != null;
     }
   }
 }
