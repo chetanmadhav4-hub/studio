@@ -1,14 +1,20 @@
-
 'use client';
 
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { BotPreview } from "@/components/bot-preview";
 import { OrderHistory } from "@/components/order-history";
-import { CheckCircle2, Zap, ShieldCheck, MessageSquare, LogOut, User } from "lucide-react";
+import { CheckCircle2, Zap, ShieldCheck, MessageSquare, LogOut, User, History } from "lucide-react";
 import { useUser, useAuth } from "@/firebase";
 import { signOut } from "firebase/auth";
 import { useRouter } from "next/navigation";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 export default function Home() {
   const { user, isUserLoading } = useUser();
@@ -71,10 +77,10 @@ export default function Home() {
         </div>
       </header>
 
-      {/* Hero Section - Centered on Bot Interaction */}
+      {/* Hero Section */}
       <section className="bg-gradient-to-b from-white to-background pt-12 pb-16 md:pt-20 md:pb-24">
         <div className="container mx-auto px-4">
-          <div className="max-w-2xl mx-auto text-center space-y-8">
+          <div className="max-w-2xl mx-auto text-center space-y-6">
             <div className="space-y-4">
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-foreground leading-tight">
                 Welcome to <span className="text-primary">InstaFlow</span>
@@ -85,13 +91,29 @@ export default function Home() {
             </div>
 
             {user ? (
-              <div className="w-full max-w-[420px] mx-auto">
-                <OrderHistory />
+              <div className="flex justify-center">
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button variant="outline" size="sm" className="gap-2 shadow-sm border-primary/20 text-primary hover:text-primary hover:bg-primary/5">
+                      <History className="w-4 h-4" />
+                      View Order History
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="max-w-[95vw] md:max-w-md max-h-[85vh] overflow-y-auto">
+                    <DialogHeader>
+                      <DialogTitle className="flex items-center gap-2">
+                        <History className="w-5 h-5 text-primary" />
+                        My Orders
+                      </DialogTitle>
+                    </DialogHeader>
+                    <OrderHistory />
+                  </DialogContent>
+                </Dialog>
               </div>
             ) : null}
 
             {/* Chat Interaction Area */}
-            <div className="w-full max-w-[420px] mx-auto mt-8 transition-all">
+            <div className="w-full max-w-[420px] mx-auto mt-4 transition-all">
               <BotPreview />
             </div>
 

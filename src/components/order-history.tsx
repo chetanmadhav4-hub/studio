@@ -1,11 +1,9 @@
-
 'use client';
 
 import { useMemoFirebase, useCollection, useUser, useFirestore } from '@/firebase';
 import { collection, query, orderBy, limit } from 'firebase/firestore';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { ShoppingBag, Clock, ExternalLink } from 'lucide-react';
+import { ShoppingBag, Clock } from 'lucide-react';
 
 export function OrderHistory() {
   const { user } = useUser();
@@ -16,7 +14,7 @@ export function OrderHistory() {
     return query(
       collection(db, 'users', user.uid, 'orders'),
       orderBy('createdAt', 'desc'),
-      limit(5)
+      limit(20)
     );
   }, [db, user]);
 
@@ -25,47 +23,51 @@ export function OrderHistory() {
   if (!user) return null;
 
   return (
-    <Card className="w-full bg-white/50 backdrop-blur-sm border-dashed border-2">
-      <CardHeader className="pb-2">
-        <CardTitle className="text-sm font-bold flex items-center gap-2">
-          <ShoppingBag className="w-4 h-4 text-primary" />
-          Recent Orders History
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        {isLoading ? (
-          <div className="flex justify-center py-4">
-            <Clock className="w-5 h-5 animate-spin text-muted-foreground" />
-          </div>
-        ) : orders && orders.length > 0 ? (
-          <div className="space-y-3">
-            {orders.map((order) => (
-              <div key={order.id} className="flex items-center justify-between p-2 rounded-lg bg-white border shadow-sm">
-                <div className="space-y-1">
-                  <p className="text-xs font-bold text-primary">{order.serviceName}</p>
-                  <div className="flex items-center gap-2 text-[10px] text-muted-foreground">
-                    <span>Qty: {order.quantity}</span>
-                    <span>•</span>
-                    <span>₹{order.price}</span>
-                  </div>
-                </div>
-                <div className="text-right space-y-1">
-                  <Badge variant="secondary" className="text-[9px] px-1.5 py-0">
-                    {order.id}
-                  </Badge>
-                  <p className="text-[9px] text-muted-foreground">
-                    {new Date(order.createdAt?.seconds * 1000).toLocaleDateString()}
-                  </p>
+    <div className="w-full py-4">
+      {isLoading ? (
+        <div className="flex justify-center py-8">
+          <Clock className="w-6 h-6 animate-spin text-primary" />
+        </div>
+      ) : orders && orders.length > 0 ? (
+        <div className="space-y-4">
+          {orders.map((order) => (
+            <div key={order.id} className="flex items-center justify-between p-4 rounded-xl bg-white border shadow-sm hover:shadow-md transition-shadow">
+              <div className="space-y-1">
+                <p className="text-sm font-bold text-primary">{order.serviceName}</p>
+                <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                  <span>Qty: {order.quantity}</span>
+                  <span>•</span>
+                  <span className="font-semibold text-foreground">₹{order.price}</span>
                 </div>
               </div>
-            ))}
+              <div className="text-right space-y-1">
+                <Badge variant="secondary" className="text-[10px] font-mono px-2 py-0.5">
+                  {order.id}
+                </Badge>
+                <p className="text-[10px] text-muted-foreground">
+                  {order.createdAt?.seconds 
+                    ? new Date(order.createdAt.seconds * 1000).toLocaleDateString('en-IN', {
+                        day: 'numeric',
+                        month: 'short',
+                        year: 'numeric'
+                      })
+                    : 'Just now'
+                  }
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="text-center py-12 space-y-3">
+          <div className="w-12 h-12 bg-muted rounded-full flex items-center justify-center mx-auto">
+            <ShoppingBag className="w-6 h-6 text-muted-foreground" />
           </div>
-        ) : (
-          <p className="text-xs text-center text-muted-foreground py-4">
-            No orders found yet. Start chatting with the bot!
+          <p className="text-sm text-muted-foreground">
+            Aapne abhi tak koi order nahi lagaya hai.
           </p>
-        )}
-      </CardContent>
-    </Card>
+        </div>
+      )}
+    </div>
   );
 }
