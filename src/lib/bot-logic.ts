@@ -30,23 +30,8 @@ export async function processBotMessage(
 ): Promise<{ reply: string; nextState: Partial<UserSession> }> {
   const normalizedMsg = messageText.trim().toLowerCase();
 
-  // 1. GLOBAL COMMANDS: Reset to Menu
-  if (normalizedMsg === 'hi' || normalizedMsg === 'start' || normalizedMsg === 'menu') {
-    let menu = "👋 *Welcome to InstaFlow Bot!*\n\nAsli automation ka maza lein. 🚀\n\nNiche di gayi list mein se koi bhi service select karein:\n\n";
-    Object.entries(SERVICES_CONFIG).forEach(([_, service]) => {
-      menu += `OPTION: ${service.name}\n`;
-    });
-    
-    return {
-      reply: menu,
-      nextState: {
-        state: 'AWAITING_SERVICE_SELECTION',
-        data: {},
-      },
-    };
-  }
-
-  // 2. GLOBAL SERVICE INTERRUPTION: If user clicks a service button at ANY time
+  // 1. GLOBAL SERVICE INTERRUPTION & MENU
+  // If user clicks a service button at ANY time, reset to that service flow
   let interceptedServiceKey = '';
   Object.entries(SERVICES_CONFIG).forEach(([key, service]) => {
     if (normalizedMsg === service.name.toLowerCase()) {
@@ -65,10 +50,25 @@ export async function processBotMessage(
     };
   }
 
-  // 3. STATE-BASED LOGIC
+  // Handle Global Menu command
+  if (normalizedMsg === 'hi' || normalizedMsg === 'start' || normalizedMsg === 'menu') {
+    let menu = "👋 *Welcome to InstaFlow Bot!*\n\nAsli automation ka maza lein. 🚀\n\nNiche di gayi list mein se koi bhi service select karein:\n\n";
+    Object.entries(SERVICES_CONFIG).forEach(([_, service]) => {
+      menu += `OPTION: ${service.name}\n`;
+    });
+    
+    return {
+      reply: menu,
+      nextState: {
+        state: 'AWAITING_SERVICE_SELECTION',
+        data: {},
+      },
+    };
+  }
+
+  // 2. STATE-BASED LOGIC
   switch (session.state) {
     case 'AWAITING_SERVICE_SELECTION': {
-      // This is now handled by the global interception logic above
       return {
         reply: "⚠️ Kripya niche diye gaye buttons mein se ek select karein.",
         nextState: { state: 'AWAITING_SERVICE_SELECTION' },
@@ -94,7 +94,7 @@ export async function processBotMessage(
 
       const price = calculatePrice(quantity, service.pricePer1000);
       return {
-        reply: `✅ Aapne *${quantity} ${service.name}* select kiye hain.\n💰 Total price: *₹${price}*\n\nOPTION: YES, PAY NOW\nOPTION: MENU`,
+        reply: `✅ Aapne *${quantity} ${service.name}* select kiye hain.\n💰 Total price: *₹${price}*\n\nAage badhne ke liye 'YES, PAY NOW' par click karein.`,
         nextState: {
           state: 'AWAITING_PAYMENT_CONFIRMATION',
           data: { ...session.data, quantity, price },
@@ -111,7 +111,7 @@ export async function processBotMessage(
         const upiId = 'smmxpressbot@slc';
         const accountName = 'CHETAN KUMAR MEGHWAL';
         
-        // Use the goqr.me API to generate a real scanable QR for the exact amount
+        // Dynamic QR generation
         const upiPayload = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(accountName)}&am=${price}&cu=INR`;
         const qrImageUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(upiPayload)}`;
 
@@ -122,14 +122,17 @@ export async function processBotMessage(
           paymentLink: upiPayload,
         });
 
+        // Removed OPTION: MENU from here as requested
         return {
-          reply: `${instructions.message}\n\n👤 *Account:* ${accountName}\n🆔 *UPI ID:* ${upiId}\n💰 *Amount:* ₹${price}\n\n📸 *SCAN TO PAY ₹${price} FOR ${serviceName}:*\n${qrImageUrl}\n\n✅ Payment ke baad, apna *Instagram Link* bhejein order start karne ke liye.\n\nOPTION: MENU`,
+          reply: `${instructions.message}\n\n👤 *Account:* ${accountName}\n🆔 *UPI ID:* ${upiId}\n💰 *Amount:* ₹${price}\n\n📸 *SCAN TO PAY ₹${price} FOR ${serviceName}:*\n${qrImageUrl}\n\n✅ Payment ke baad, apna *Instagram Link* bhejein order start karne ke liye.`,
           nextState: {
             state: 'AWAITING_LINK',
             data: { ...session.data },
           },
         };
       }
+      
+      // If user is here but clicks nothing or types something else, remind them
       return {
         reply: "⚠️ Aage badhne ke liye kripya niche diye gaye buttons ka istemal karein.\n\nOPTION: YES, PAY NOW\nOPTION: MENU",
         nextState: { state: 'AWAITING_PAYMENT_CONFIRMATION' },
@@ -137,7 +140,7 @@ export async function processBotMessage(
     }
 
     case 'AWAITING_LINK': {
-      // If it's not a service button (checked globally) and it is a valid link:
+      // If it's a valid link:
       if (isValidInstagramUrl(messageText)) {
         const targetLink = messageText;
         const orderId = `INSTA-${Math.floor(100000 + Math.random() * 900000)}`;
@@ -160,7 +163,7 @@ export async function processBotMessage(
         };
       }
 
-      // If it's not a link and not a service (already checked), show error
+      // If it's not a link and not a service button (already checked globally), show error
       const error = await generateContextualErrorMessage({
         errorType: 'INVALID_URL',
         details: `User provided: ${messageText}. Needs to be a valid Instagram link.`,
