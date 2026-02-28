@@ -1,338 +1,40 @@
+
 {
   "entities": {
     "UserProfile": {
-      "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "UserProfile",
+      "description": "Stores user profile information and links username to UID.",
       "type": "object",
-      "description": "Stores essential information about a WhatsApp user interacting with the bot.",
       "properties": {
-        "id": {
-          "type": "string",
-          "description": "Unique identifier for the UserProfile entity, typically the user's WhatsApp phone number."
-        },
-        "whatsappNumber": {
-          "type": "string",
-          "description": "The user's WhatsApp phone number, stored as a string."
-        },
-        "createdAt": {
-          "type": "string",
-          "description": "Timestamp when the user profile was first created.",
-          "format": "date-time"
-        },
-        "updatedAt": {
-          "type": "string",
-          "description": "Timestamp of the last update to the user profile.",
-          "format": "date-time"
-        }
+        "uid": { "type": "string" },
+        "username": { "type": "string" },
+        "email": { "type": "string", "format": "email" },
+        "createdAt": { "type": "string", "format": "date-time" }
       },
-      "required": [
-        "id",
-        "whatsappNumber",
-        "createdAt",
-        "updatedAt"
-      ]
+      "required": ["uid", "username", "email", "createdAt"]
     },
-    "UserSession": {
-      "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "UserSession",
+    "UsernameMap": {
+      "title": "UsernameMap",
+      "description": "A lookup table to ensure username uniqueness and map username to email.",
       "type": "object",
-      "description": "Manages the current state and temporary data of an ongoing conversation with a specific WhatsApp user.",
       "properties": {
-        "id": {
-          "type": "string",
-          "description": "Unique identifier for the UserSession entity."
-        },
-        "userId": {
-          "type": "string",
-          "description": "Reference to the UserProfile entity's unique ID (WhatsApp number). (Relationship: UserProfile 1:N UserSession)"
-        },
-        "currentState": {
-          "type": "string",
-          "description": "The current step or state in the chatbot's conversational flow (e.g., 'SERVICE_SELECTION', 'QUANTITY_INPUT', 'AWAITING_PAYMENT_CONFIRMATION')."
-        },
-        "serviceType": {
-          "type": "string",
-          "description": "The type of SMM service selected by the user, e.g., 'Instagram Followers'."
-        },
-        "quantity": {
-          "type": "number",
-          "description": "The quantity requested by the user for the selected service (minimum 100 for followers)."
-        },
-        "price": {
-          "type": "number",
-          "description": "The calculated price for the selected service and quantity."
-        },
-        "instagramProfileLink": {
-          "type": "string",
-          "description": "The Instagram profile link provided by the user.",
-          "format": "uri"
-        },
-        "orderId": {
-          "type": "string",
-          "description": "Reference to the associated Order entity once an order has been created. (Relationship: Order 1:1 UserSession)"
-        },
-        "paymentId": {
-          "type": "string",
-          "description": "Reference to the associated Payment entity once a payment has been initiated. (Relationship: Payment 1:1 UserSession)"
-        },
-        "createdAt": {
-          "type": "string",
-          "description": "Timestamp when the session was created.",
-          "format": "date-time"
-        },
-        "updatedAt": {
-          "type": "string",
-          "description": "Timestamp of the last update to the session.",
-          "format": "date-time"
-        }
+        "email": { "type": "string" },
+        "uid": { "type": "string" }
       },
-      "required": [
-        "id",
-        "userId",
-        "currentState",
-        "createdAt",
-        "updatedAt"
-      ]
-    },
-    "Order": {
-      "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "Order",
-      "type": "object",
-      "description": "Stores details about a confirmed SMM service order placed by a user.",
-      "properties": {
-        "id": {
-          "type": "string",
-          "description": "Unique identifier for the Order entity."
-        },
-        "userId": {
-          "type": "string",
-          "description": "Reference to the UserProfile entity's unique ID (WhatsApp number). (Relationship: UserProfile 1:N Order)"
-        },
-        "paymentId": {
-          "type": "string",
-          "description": "Reference to the associated Payment entity. (Relationship: Payment 1:1 Order)"
-        },
-        "serviceType": {
-          "type": "string",
-          "description": "The type of SMM service ordered, e.g., 'Instagram Followers'."
-        },
-        "quantity": {
-          "type": "number",
-          "description": "The quantity ordered for the service."
-        },
-        "calculatedPrice": {
-          "type": "number",
-          "description": "The final price charged for this order."
-        },
-        "instagramProfileLink": {
-          "type": "string",
-          "description": "The user's Instagram profile URL for the order.",
-          "format": "uri"
-        },
-        "smmPanelServiceId": {
-          "type": "string",
-          "description": "The specific service ID used with the external SMM panel API for this order."
-        },
-        "smmPanelOrderId": {
-          "type": "string",
-          "description": "The order ID returned by the external SMM panel API after successful placement."
-        },
-        "orderStatus": {
-          "type": "string",
-          "description": "The current status of the order (e.g., 'PENDING_PAYMENT', 'PAYMENT_RECEIVED', 'SMM_PROCESSING', 'SMM_COMPLETED', 'FAILED')."
-        },
-        "smmPanelOrderStartTime": {
-          "type": "string",
-          "description": "Optional: The estimated start time for the order from the SMM panel, if provided.",
-          "format": "date-time"
-        },
-        "createdAt": {
-          "type": "string",
-          "description": "Timestamp when the order was created.",
-          "format": "date-time"
-        },
-        "updatedAt": {
-          "type": "string",
-          "description": "Timestamp of the last update to the order.",
-          "format": "date-time"
-        }
-      },
-      "required": [
-        "id",
-        "userId",
-        "paymentId",
-        "serviceType",
-        "quantity",
-        "calculatedPrice",
-        "instagramProfileLink",
-        "smmPanelServiceId",
-        "orderStatus",
-        "createdAt",
-        "updatedAt"
-      ]
-    },
-    "Payment": {
-      "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "Payment",
-      "type": "object",
-      "description": "Records details of a payment transaction associated with an order.",
-      "properties": {
-        "id": {
-          "type": "string",
-          "description": "Unique identifier for the Payment entity."
-        },
-        "orderId": {
-          "type": "string",
-          "description": "Reference to the associated Order entity. (Relationship: Order 1:1 Payment)"
-        },
-        "userId": {
-          "type": "string",
-          "description": "Reference to the UserProfile entity's unique ID (WhatsApp number). (Relationship: UserProfile 1:N Payment)"
-        },
-        "amount": {
-          "type": "number",
-          "description": "The monetary amount of the payment."
-        },
-        "currency": {
-          "type": "string",
-          "description": "The currency of the payment, e.g., 'INR'."
-        },
-        "paymentGateway": {
-          "type": "string",
-          "description": "The payment gateway used (e.g., 'Razorpay', 'Cashfree', 'UPI')."
-        },
-        "paymentLink": {
-          "type": "string",
-          "description": "The dynamic payment link generated for the user.",
-          "format": "uri"
-        },
-        "paymentGatewayReferenceId": {
-          "type": "string",
-          "description": "The transaction ID or reference provided by the payment gateway."
-        },
-        "paymentStatus": {
-          "type": "string",
-          "description": "The current status of the payment (e.g., 'PENDING', 'SUCCESS', 'FAILED', 'REFUNDED')."
-        },
-        "paymentSuccessWebhookReceivedAt": {
-          "type": "string",
-          "description": "Timestamp when the payment success webhook was received from the gateway.",
-          "format": "date-time"
-        },
-        "paymentFailureReason": {
-          "type": "string",
-          "description": "Optional: A description of why the payment failed, if applicable."
-        },
-        "createdAt": {
-          "type": "string",
-          "description": "Timestamp when the payment record was created.",
-          "format": "date-time"
-        },
-        "updatedAt": {
-          "type": "string",
-          "description": "Timestamp of the last update to the payment record.",
-          "format": "date-time"
-        }
-      },
-      "required": [
-        "id",
-        "orderId",
-        "userId",
-        "amount",
-        "currency",
-        "paymentGateway",
-        "paymentLink",
-        "paymentStatus",
-        "createdAt",
-        "updatedAt"
-      ]
+      "required": ["email", "uid"]
     }
   },
   "auth": {
-    "providers": [
-      "password",
-      "anonymous"
-    ]
+    "providers": ["password"]
   },
   "firestore": {
-    "structure": [
-      {
-        "path": "/users/{userId}",
-        "definition": {
-          "entityName": "UserProfile",
-          "schema": {
-            "$ref": "#/backend/entities/UserProfile"
-          },
-          "description": "Stores essential information about a WhatsApp user. The `userId` wildcard represents the user's WhatsApp number, which serves as the Firebase authentication UID. This path is for individual user profiles.",
-          "params": [
-            {
-              "name": "userId",
-              "description": "The unique identifier for the user, corresponding to their WhatsApp phone number and Firebase authentication UID."
-            }
-          ]
-        }
-      },
-      {
-        "path": "/users/{userId}/userSessions/{sessionId}",
-        "definition": {
-          "entityName": "UserSession",
-          "schema": {
-            "$ref": "#/backend/entities/UserSession"
-          },
-          "description": "Manages the current state and temporary data of an ongoing conversational session with a specific WhatsApp user. Includes denormalized 'userId' for authorization independence, allowing direct comparison with `request.auth.uid`.",
-          "params": [
-            {
-              "name": "userId",
-              "description": "The unique identifier for the user (WhatsApp number/Firebase UID) who owns this session."
-            },
-            {
-              "name": "sessionId",
-              "description": "The unique identifier for a specific user session."
-            }
-          ]
-        }
-      },
-      {
-        "path": "/users/{userId}/orders/{orderId}",
-        "definition": {
-          "entityName": "Order",
-          "schema": {
-            "$ref": "#/backend/entities/Order"
-          },
-          "description": "Stores details about a confirmed SMM service order placed by a user. Includes denormalized 'userId' for authorization independence, allowing direct comparison with `request.auth.uid`.",
-          "params": [
-            {
-              "name": "userId",
-              "description": "The unique identifier for the user (WhatsApp number/Firebase UID) who placed this order."
-            },
-            {
-              "name": "orderId",
-              "description": "The unique identifier for a specific SMM order."
-            }
-          ]
-        }
-      },
-      {
-        "path": "/users/{userId}/payments/{paymentId}",
-        "definition": {
-          "entityName": "Payment",
-          "schema": {
-            "$ref": "#/backend/entities/Payment"
-          },
-          "description": "Records details of a payment transaction associated with an order and a user. Includes denormalized 'userId' for authorization independence, allowing direct comparison with `request.auth.uid`.",
-          "params": [
-            {
-              "name": "userId",
-              "description": "The unique identifier for the user (WhatsApp number/Firebase UID) associated with this payment."
-            },
-            {
-              "name": "paymentId",
-              "description": "The unique identifier for a specific payment transaction."
-            }
-          ]
-        }
-      }
-    ],
-    "reasoning": "The Firestore data structure is designed to support a WhatsApp-based SMM automation bot, prioritizing security, scalability, and debuggability. All data related to a user, including their profile, conversational sessions, orders, and payments, is organized under a top-level `/users/{userId}` collection. This pattern leverages path-based authorization, where `userId` directly corresponds to the user's authenticated ID (their WhatsApp number, acting as `request.auth.uid`).\n\nAuthorization Independence is achieved by denormalizing the `userId` into every document within subcollections (`UserSession`, `Order`, `Payment`). This means that security rules can evaluate access requests by directly comparing `request.auth.uid` with `resource.data.userId` or the `userId` wildcard in the path, without needing to perform expensive and dependency-creating `get()` operations on parent documents. For example, to read a `UserSession` document at `/users/{userId}/userSessions/{sessionId}`, the rule only needs to check that `request.auth.uid == userId` and optionally `resource.data.userId == userId` for an extra layer of consistency.\n\nQuery Authorization Patterns (QAPs) for secure `list` operations are naturally supported by this hierarchical structure. When a user queries for their sessions, orders, or payments, the client-side query will target `/users/{request.auth.uid}/userSessions`, `/users/{request.auth.uid}/orders`, or `/users/{request.auth.uid}/payments`. The Firestore security rules can then easily enforce that the `userId` wildcard in the path matches `request.auth.uid`, ensuring that users can only list their own data. This design avoids the pitfalls of rules acting as filters, as the queries are inherently scoped to the authorized user's data.\n\nStructural Segregation is applied by ensuring that all documents within a given subcollection (e.g., all `UserSession` documents under a specific user) share the same security posture: they are private to that user. There is no mixing of public and private data, simplifying rule logic significantly. Access Modeling consistently uses path-based ownership for all private, user-owned data. Explicit state modeling is used for fields like `currentState`, `orderStatus`, and `paymentStatus`, and predictable schema with consistent naming conventions further enhances clarity and debuggability."
+    "/users/{uid}": {
+      "schema": { "$ref": "#/backend/entities/UserProfile" },
+      "description": "Individual user profiles."
+    },
+    "/usernames/{username}": {
+      "schema": { "$ref": "#/backend/entities/UsernameMap" },
+      "description": "Ensures username uniqueness and provides email lookup for login."
+    }
   }
 }

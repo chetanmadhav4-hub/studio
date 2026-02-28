@@ -1,7 +1,8 @@
+
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { BotPreview } from "@/components/bot-preview";
-import { CheckCircle2, MessageSquare, Zap, ShieldCheck } from "lucide-react";
+import { CheckCircle2, Zap, ShieldCheck, MessageSquare } from "lucide-react";
 
 export default function Home() {
   return (
@@ -18,13 +19,17 @@ export default function Home() {
           <nav className="hidden md:flex items-center gap-8 text-sm font-medium">
             <Link href="#features" className="hover:text-primary transition-colors">Features</Link>
             <Link href="#how-it-works" className="hover:text-primary transition-colors">How it Works</Link>
-            <Link href="#pricing" className="hover:text-primary transition-colors">Pricing</Link>
           </nav>
-          <Link href="/dashboard">
-            <Button className="bg-primary text-white hover:bg-primary/90">
-              Go to Dashboard
-            </Button>
-          </Link>
+          <div className="flex items-center gap-3">
+            <Link href="/login">
+              <Button variant="ghost">Login</Button>
+            </Link>
+            <Link href="/signup">
+              <Button className="bg-primary text-white hover:bg-primary/90">
+                Sign Up
+              </Button>
+            </Link>
+          </div>
         </div>
       </header>
 
@@ -37,20 +42,24 @@ export default function Home() {
                 Automate Your SMM Orders via <span className="text-primary">WhatsApp</span>
               </h1>
               <p className="text-xl text-muted-foreground max-w-2xl mx-auto lg:mx-0">
-                The fastest way for your customers to buy Instagram followers. Automated flow, dynamic payments, and instant SMM panel integration.
+                Join thousands of users who grow their social media presence automatically. Secure login, instant payments, and 24/7 delivery.
               </p>
               <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
-                <Button size="lg" className="h-12 px-8 text-lg bg-primary">
-                  Get Started for Free
-                </Button>
-                <Button size="lg" variant="outline" className="h-12 px-8 text-lg border-primary text-primary">
-                  View Demo Bot
-                </Button>
+                <Link href="/signup">
+                  <Button size="lg" className="h-12 px-8 text-lg bg-primary">
+                    Create Account
+                  </Button>
+                </Link>
+                <Link href="/login">
+                  <Button size="lg" variant="outline" className="h-12 px-8 text-lg border-primary text-primary">
+                    Login to Portal
+                  </Button>
+                </Link>
               </div>
               <div className="flex items-center justify-center lg:justify-start gap-6 pt-4">
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
                   <CheckCircle2 className="w-4 h-4 text-accent" />
-                  Instant Setup
+                  Instant Activation
                 </div>
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
                   <CheckCircle2 className="w-4 h-4 text-accent" />
@@ -63,11 +72,7 @@ export default function Home() {
               </div>
             </div>
             <div className="flex-1 w-full max-w-md">
-              <div className="relative">
-                <div className="absolute -top-10 -right-10 w-40 h-40 bg-accent/20 rounded-full blur-3xl" />
-                <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-primary/20 rounded-full blur-3xl" />
-                <BotPreview />
-              </div>
+              <BotPreview />
             </div>
           </div>
         </div>
@@ -81,7 +86,7 @@ export default function Home() {
               Powerful Automation, Simple Interface
             </h2>
             <p className="text-lg text-muted-foreground">
-              We've built everything you need to scale your SMM business without manual intervention.
+              Everything you need to scale your SMM business without manual intervention.
             </p>
           </div>
           <div className="grid md:grid-cols-3 gap-8">
@@ -89,18 +94,18 @@ export default function Home() {
               <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center mb-4">
                 <MessageSquare className="w-6 h-6 text-primary" />
               </div>
-              <h3 className="text-xl font-semibold">WhatsApp Chatbot</h3>
+              <h3 className="text-xl font-semibold">WhatsApp Bot</h3>
               <p className="text-muted-foreground leading-relaxed">
-                Seamlessly guide users from service selection to payment with our intuitive conversation flow.
+                Connect your business number and automate orders directly via chat.
               </p>
             </div>
             <div className="p-8 rounded-2xl border bg-background/50 hover:border-primary/50 transition-all space-y-4">
               <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center mb-4">
                 <ShieldCheck className="w-6 h-6 text-primary" />
               </div>
-              <h3 className="text-xl font-semibold">Secure Payments</h3>
+              <h3 className="text-xl font-semibold">Secure Access</h3>
               <p className="text-muted-foreground leading-relaxed">
-                Dynamic payment link generation with automatic webhook confirmation and status tracking.
+                Your credentials and orders are protected with bank-grade encryption.
               </p>
             </div>
             <div className="p-8 rounded-2xl border bg-background/50 hover:border-primary/50 transition-all space-y-4">
@@ -109,14 +114,13 @@ export default function Home() {
               </div>
               <h3 className="text-xl font-semibold">Instant Fulfillment</h3>
               <p className="text-muted-foreground leading-relaxed">
-                Automatically place orders on your favorite SMM panels the moment payment is confirmed.
+                Orders are processed the moment payment is confirmed.
               </p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Footer */}
       <footer className="mt-auto py-12 border-t bg-white">
         <div className="container mx-auto px-4 text-center space-y-6">
           <div className="flex items-center justify-center gap-2">
