@@ -74,7 +74,7 @@ export function useCollection<T = any>(
         setIsLoading(false);
       },
       (error: FirestoreError) => {
-        // More robust path extraction for common SDK internal structures
+        // Robust path extraction for common SDK internal structures
         let path = 'collection-group-query';
         
         try {
@@ -82,9 +82,10 @@ export function useCollection<T = any>(
             path = (memoizedTargetRefOrQuery as CollectionReference).path;
           } else {
             const internal = memoizedTargetRefOrQuery as any;
+            // Try to find the collection name for collection group queries or standard queries
             path = internal._query?.path?.canonicalString?.() || 
                    internal.path || 
-                   'collection-group-query';
+                   (internal._query?.collectionGroup ? `collection-group:${internal._query.collectionGroup}` : 'collection-group-query');
           }
         } catch (e) {
           console.warn("Could not determine firestore path for error reporting", e);

@@ -19,7 +19,24 @@ service cloud.firestore {
       return resource != null && isOwner(userId);
     }
 
-    // --- Collection Rules ---
+    // --- Collection Group Rules ---
+    // These must be at the top level to work for collectionGroup() queries.
+
+    /**
+     * @description Allows any signed-in user to perform collection group queries on 'orders'.
+     */
+    match /{path=**}/orders/{orderId} {
+      allow list, get: if isSignedIn();
+    }
+    
+    /**
+     * @description Allows admin to see all chat messages via collection group.
+     */
+    match /{path=**}/messages/{messageId} {
+      allow list, get: if isSignedIn();
+    }
+
+    // --- Specific Collection Rules ---
 
     /**
      * @description Rules for User Profiles.
@@ -49,7 +66,7 @@ service cloud.firestore {
      * @description Rules for Bot Sessions.
      */
     match /botSessions/{sessionId} {
-      allow read, write: if true; // Webhook needs access
+      allow read, write: if true; // Webhook and Admin need access
     }
 
     /**
@@ -65,23 +82,6 @@ service cloud.firestore {
      */
     match /globalStats/{document} {
       allow read: if isSignedIn();
-    }
-
-    // --- Collection Group Rules ---
-    // These must be at the top level to work for collectionGroup() queries.
-
-    /**
-     * @description Allows any signed-in user to perform collection group queries on 'orders'.
-     */
-    match /{path=**}/orders/{orderId} {
-      allow list, get: if isSignedIn();
-    }
-    
-    /**
-     * @description Allows admin to see all chat messages via collection group.
-     */
-    match /{path=**}/messages/{messageId} {
-      allow list, get: if isSignedIn();
     }
   }
 }
