@@ -159,13 +159,13 @@ export function BotPreview() {
   };
 
   return (
-    <Card className="w-full h-[600px] flex flex-col bg-[#E5DDD5] dark:bg-zinc-950 shadow-xl rounded-2xl overflow-hidden border-none">
-      <CardHeader className="bg-[#075E54] text-white py-3 px-4 flex flex-row items-center justify-between shadow-md shrink-0">
+    <Card className="w-full h-[600px] flex flex-col bg-[#E5DDD5] dark:bg-zinc-950 shadow-xl rounded-2xl overflow-hidden border-none transition-all">
+      <CardHeader className="bg-[#075E54] dark:bg-zinc-900 text-white py-3 px-4 flex flex-row items-center justify-between shadow-md shrink-0">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
             <Bot className="w-6 h-6" />
           </div>
-          <div>
+          <div className="text-left">
             <CardTitle className="text-sm md:text-base font-bold text-white">InstaFlow Bot</CardTitle>
             <p className="text-[10px] text-emerald-100 font-medium">Online</p>
           </div>

@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { BotPreview } from "@/components/bot-preview";
 import { OrderHistory } from "@/components/order-history";
 import { NotificationBell } from "@/components/notification-bell";
+import { AdminNotificationBell } from "@/components/admin-notification-bell";
 import { CheckCircle2, Zap, History, Moon, Sun, LayoutGrid } from "lucide-react";
 import { useUser } from "@/firebase";
 import {
@@ -46,7 +47,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen flex flex-col bg-background transition-colors duration-300">
-      <header className="border-b bg-white dark:bg-card sticky top-0 z-50 transition-colors">
+      <header className="border-b bg-white dark:bg-zinc-950 sticky top-0 z-50 transition-colors">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
@@ -61,7 +62,7 @@ export default function Home() {
                 {!user ? (
                   <>
                     <Link href="/login">
-                      <Button variant="ghost" size="sm" className="text-sm">Login</Button>
+                      <Button variant="ghost" size="sm" className="text-sm dark:text-zinc-300">Login</Button>
                     </Link>
                     <Link href="/signup">
                       <Button size="sm" className="bg-primary text-white hover:bg-primary/90 text-sm">
@@ -74,17 +75,20 @@ export default function Home() {
                     <Button 
                       variant="ghost" 
                       size="sm"
-                      className="h-9 w-9 p-0 rounded-full hover:bg-accent"
+                      className="h-9 w-9 p-0 rounded-full hover:bg-accent dark:hover:bg-zinc-800"
                       onClick={toggleTheme}
                     >
                       {isDark ? <Sun className="w-5 h-5 text-amber-500" /> : <Moon className="w-5 h-5 text-primary" />}
                     </Button>
 
                     <NotificationBell />
+                    
+                    {/* ONLY SHOW ADMIN BELL TO ADMIN */}
+                    {user.email === ADMIN_EMAIL && <AdminNotificationBell />}
 
                     {/* ONLY SHOW TRACKER BUTTON TO ADMIN */}
                     {user.email === ADMIN_EMAIL && (
-                      <Link href="/orders-feed">
+                      <Link href="/orders-feed" className="hidden sm:block">
                         <Button className="bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-bold px-3 h-8 gap-1.5 shadow-sm rounded-lg transition-all active:scale-95 ml-1">
                           <LayoutGrid className="w-3.5 h-3.5" />
                           LIVE TRACKER
@@ -94,7 +98,7 @@ export default function Home() {
 
                     <Link href="/profile">
                       <Button variant="ghost" size="sm" className="gap-2 text-sm p-1 ml-1">
-                        <Avatar className="w-7 h-7 border">
+                        <Avatar className="w-7 h-7 border dark:border-zinc-800">
                           <AvatarFallback className="text-[10px] bg-primary text-white">
                             {user.email?.charAt(0).toUpperCase()}
                           </AvatarFallback>
@@ -109,14 +113,14 @@ export default function Home() {
         </div>
       </header>
 
-      <section className="bg-gradient-to-b from-white to-background dark:from-card dark:to-background pt-8 pb-12 md:pt-16 md:pb-20 transition-colors">
+      <section className="bg-gradient-to-b from-white to-background dark:from-zinc-950 dark:to-background pt-8 pb-12 md:pt-16 md:pb-20 transition-colors">
         <div className="container mx-auto px-4">
           <div className="max-w-2xl mx-auto text-center space-y-6">
             <div className="space-y-4">
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-foreground leading-tight">
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-foreground dark:text-zinc-100 leading-tight">
                 Welcome to <span className="text-primary">InstaFlow</span>
               </h1>
-              <p className="text-base md:text-lg text-muted-foreground max-w-xl mx-auto">
+              <p className="text-base md:text-lg text-muted-foreground dark:text-zinc-400 max-w-xl mx-auto">
                 Join thousands of users who grow their social media presence automatically.
               </p>
             </div>
@@ -148,11 +152,11 @@ export default function Home() {
             </div>
 
             <div className="hidden sm:flex items-center justify-center gap-8 pt-8 opacity-60">
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <div className="flex items-center gap-2 text-sm text-muted-foreground dark:text-zinc-400">
                 <CheckCircle2 className="w-4 h-4 text-emerald-500" />
                 Instant Delivery
               </div>
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <div className="flex items-center gap-2 text-sm text-muted-foreground dark:text-zinc-400">
                 <CheckCircle2 className="w-4 h-4 text-emerald-500" />
                 24/7 Automation
               </div>
@@ -161,13 +165,13 @@ export default function Home() {
         </div>
       </section>
 
-      <footer className="mt-auto py-8 border-t bg-white dark:bg-card transition-colors">
+      <footer className="mt-auto py-8 border-t dark:border-zinc-800 bg-white dark:bg-zinc-950 transition-colors">
         <div className="container mx-auto px-4 text-center space-y-2">
           <div className="flex items-center justify-center gap-2">
             <Zap className="w-5 h-5 text-primary" />
             <span className="font-bold text-base tracking-tight text-primary">InstaFlow Bot</span>
           </div>
-          <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold">
+          <p className="text-[10px] text-muted-foreground dark:text-zinc-500 uppercase tracking-widest font-bold">
             © 2024 InstaFlow Automation
           </p>
         </div>
