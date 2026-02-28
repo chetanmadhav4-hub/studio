@@ -3,7 +3,8 @@ import {
   ShoppingBag, 
   Users,
   LogOut,
-  Zap
+  Zap,
+  LayoutDashboard
 } from "lucide-react";
 import { SidebarProvider, Sidebar, SidebarContent, SidebarHeader, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
 
@@ -24,18 +25,18 @@ export default function DashboardLayout({
         <SidebarContent className="p-4">
           <SidebarMenu>
             <SidebarMenuItem>
-              <SidebarMenuButton asChild tooltip="Orders">
+              <SidebarMenuButton asChild tooltip="All Orders">
                 <Link href="/dashboard/orders" className="flex items-center gap-3">
                   <ShoppingBag className="w-4 h-4" />
-                  <span className="font-semibold">All Orders</span>
+                  <span className="font-semibold">Manage Orders</span>
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
             <SidebarMenuItem>
-              <SidebarMenuButton asChild tooltip="Users">
+              <SidebarMenuButton asChild tooltip="Registered Users">
                 <Link href="/dashboard/users" className="flex items-center gap-3">
                   <Users className="w-4 h-4" />
-                  <span className="font-semibold">All Users</span>
+                  <span className="font-semibold">Registered Users</span>
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
@@ -46,7 +47,7 @@ export default function DashboardLayout({
               <SidebarMenuButton asChild className="text-destructive hover:text-destructive">
                 <Link href="/" className="flex items-center gap-3">
                   <LogOut className="w-4 h-4" />
-                  <span>Logout</span>
+                  <span>Exit Admin</span>
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
@@ -57,15 +58,18 @@ export default function DashboardLayout({
         <header className="h-16 border-b bg-white flex items-center px-6 justify-between">
           <div className="flex items-center gap-4">
             <SidebarTrigger />
-            <h1 className="text-lg font-semibold">Admin Panel</h1>
+            <h1 className="text-lg font-semibold flex items-center gap-2">
+              <LayoutDashboard className="w-5 h-5 text-primary" />
+              Admin Panel
+            </h1>
           </div>
           <div className="flex items-center gap-4">
             <div className="px-3 py-1 bg-primary/10 text-primary text-[10px] font-bold rounded-full border border-primary/20 uppercase tracking-wider">
-              Admin Access
+              Super Admin Access
             </div>
           </div>
         </header>
-        <main className="p-6 overflow-auto">
+        <main className="p-6 overflow-auto bg-[#F8F9FC] min-h-[calc(100vh-4rem)]">
           {children}
         </main>
       </SidebarInset>
