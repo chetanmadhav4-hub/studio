@@ -19,7 +19,6 @@ import {
   XCircle, 
   Clock,
   User as UserIcon,
-  AlertTriangle,
   Phone
 } from "lucide-react";
 import { useState } from "react";
@@ -69,24 +68,25 @@ export default function SimpleOrdersFeed() {
       if (!targetSessionId) throw new Error("Target session ID missing on order.");
       
       const sessionRef = doc(db, 'botSessions', targetSessionId);
+      const shortId = order.id.slice(-6);
 
       if (action === 'APPROVE') {
-        const approveMsg = `✅ *ORDER APPROVED:* Aapka Order #${order.id.slice(-6)} approve ho gaya hai! Kaam jaldi shuru ho jayega. Stay tuned! 🚀`;
+        const approveMsg = `✅ *ORDER APPROVED:* Order #${shortId} approve ho gaya hai! Kaam jaldi shuru ho jayega. 🚀`;
         
-        // 1. WhatsApp Notification (if it's a real phone number)
+        // 1. WhatsApp Notification
         if (targetSessionId.length > 10) {
           await sendAdminActionNotification(targetSessionId, approveMsg);
         }
 
-        // 2. Real-time Bot UI Notification (Private to this user)
+        // 2. Private Notification Bell Update
         await updateDoc(sessionRef, { 
           adminNotification: approveMsg,
           lastNotificationAt: serverTimestamp() 
         });
       } else {
-        const rejectMsg = `❌ *ORDER REJECTED:* Aapka Order #${order.id.slice(-6)} reject kar diya gaya hai.\n\n⚠️ *Reason:* Invalid Instagram Link ya Galat UTR ID. Kripya sahi details ke saath fir se try karein.`;
+        const rejectMsg = `❌ *ORDER REJECTED:* Order #${shortId} reject kar diya gaya hai. ⚠️ Reason: Invalid Link ya Galat UTR ID.`;
         
-        // Real-time Bot UI Notification (No WhatsApp for rejection, private to this user)
+        // 2. Private Notification Bell Update (No WhatsApp for rejection)
         await updateDoc(sessionRef, { 
           adminNotification: rejectMsg,
           lastNotificationAt: serverTimestamp() 
@@ -95,7 +95,7 @@ export default function SimpleOrdersFeed() {
 
       toast({
         title: action === 'APPROVE' ? "Order Approved!" : "Order Rejected",
-        description: action === 'APPROVE' ? "User notified via WhatsApp & Bot." : "Rejection reason sent to user's chat.",
+        description: action === 'APPROVE' ? "User notified via WhatsApp & Bell." : "Reason sent to user's notifications.",
       });
     } catch (e: any) {
       console.error(e);
@@ -234,7 +234,6 @@ function OrderCard({ order, onCopy, onAction, copiedId, isProcessing, showAction
         </div>
       </CardHeader>
       <CardContent className="p-4 space-y-4">
-        {/* User Identity Section */}
         <div className="flex items-center gap-2 mb-1 p-2 bg-slate-50 rounded-lg border border-slate-100">
           <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
             <UserIcon className="w-4 h-4 text-primary" />

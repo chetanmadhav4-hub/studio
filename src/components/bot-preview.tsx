@@ -7,11 +7,27 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useUser, useFirestore, useDoc, useMemoFirebase } from "@/firebase";
-import { doc, serverTimestamp } from "firebase/firestore";
-import { Send, Bot, MousePointer2, ExternalLink, LogIn, CheckCircle2, Link, Hash, BellRing, User as UserIcon } from "lucide-react";
+import { doc, updateDoc } from "firebase/firestore";
+import { 
+  Send, 
+  Bot, 
+  MousePointer2, 
+  ExternalLink, 
+  LogIn, 
+  Bell, 
+  X,
+  CheckCircle2,
+  AlertCircle
+} from "lucide-react";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import Link from "next/link";
 
 interface ChatMessage {
-  role: "user" | "bot" | "admin_alert";
+  role: "user" | "bot";
   text: string;
 }
 
@@ -27,11 +43,11 @@ export function BotPreview() {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [formLink, setFormLink] = useState("");
   const [formUtr, setFormUtr] = useState("");
+  const [hasNewNotification, setHasNewNotification] = useState(false);
 
-  // IMPORTANT: Listen to the PRIVATE session of the logged-in user
+  // Listen to the PRIVATE session of the logged-in user
   const sessionRef = useMemoFirebase(() => {
     if (!db || !user) return null;
-    // For web preview, we use the user's UID as the unique session ID
     return doc(db, 'botSessions', user.uid);
   }, [db, user]);
   
@@ -39,11 +55,7 @@ export function BotPreview() {
 
   useEffect(() => {
     if (session?.adminNotification) {
-      const lastMsg = messages[messages.length - 1];
-      // Only add if it's a new notification to avoid duplicates
-      if (lastMsg.text !== session.adminNotification) {
-        setMessages((prev) => [...prev, { role: "admin_alert", text: session.adminNotification }]);
-      }
+      setHasNewNotification(true);
     }
   }, [session?.adminNotification, session?.lastNotificationAt]);
 
@@ -108,22 +120,14 @@ export function BotPreview() {
     }
   };
 
-  const renderMessageContent = (text: string, role: string) => {
-    if (role === "admin_alert") {
-      const isRejection = text.includes("REJECTED");
-      return (
-        <div className={`p-3 rounded-xl border-2 shadow-lg space-y-2 animate-in slide-in-from-bottom-2 duration-500 ${isRejection ? 'bg-red-50 border-red-200' : 'bg-emerald-50 border-emerald-200'}`}>
-          <div className="flex items-center gap-2 mb-1">
-            <div className={`w-8 h-8 rounded-full flex items-center justify-center ${isRejection ? 'bg-red-100 text-red-600' : 'bg-emerald-100 text-emerald-600'}`}>
-              <BellRing className="w-4 h-4" />
-            </div>
-            <span className={`text-[11px] font-bold uppercase tracking-wider ${isRejection ? 'text-red-700' : 'text-emerald-700'}`}>Admin Update (Only for You)</span>
-          </div>
-          <p className={`text-xs md:text-sm font-medium leading-relaxed ${isRejection ? 'text-red-900' : 'text-emerald-900'}`}>{text.replace(/\*/g, '')}</p>
-        </div>
-      );
+  const clearNotification = async () => {
+    setHasNewNotification(false);
+    if (sessionRef) {
+      updateDoc(sessionRef, { adminNotification: null });
     }
+  };
 
+  const renderMessageContent = (text: string, role: string) => {
     const urlRegex = /(https?:\/\/[^\s]+)/g;
     const upiRegex = /upi:\/\/pay\S+/;
     const formTag = "[PAYMENT_FORM]";
@@ -189,19 +193,67 @@ export function BotPreview() {
 
   return (
     <Card className="w-full h-[600px] flex flex-col bg-[#E5DDD5] dark:bg-zinc-950 shadow-xl rounded-2xl overflow-hidden border-none">
-      <CardHeader className="bg-[#075E54] text-white py-3 px-4 flex flex-row items-center gap-3 shadow-md shrink-0">
-        <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
-          <Bot className="w-6 h-6" />
+      <CardHeader className="bg-[#075E54] text-white py-3 px-4 flex flex-row items-center justify-between shadow-md shrink-0">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
+            <Bot className="w-6 h-6" />
+          </div>
+          <div>
+            <CardTitle className="text-sm md:text-base font-bold">InstaFlow Bot</CardTitle>
+            <p className="text-[10px] text-emerald-100 font-medium">Online</p>
+          </div>
         </div>
-        <div>
-          <CardTitle className="text-sm md:text-base font-bold">InstaFlow Bot</CardTitle>
-          <p className="text-[10px] text-emerald-100 font-medium">Online</p>
-        </div>
+
+        {user && (
+          <Popover onOpenChange={(open) => !open && session?.adminNotification && clearNotification()}>
+            <PopoverTrigger asChild>
+              <Button variant="ghost" size="icon" className="relative text-white hover:bg-white/10 rounded-full">
+                <Bell className="w-6 h-6" />
+                {hasNewNotification && (
+                  <span className="absolute top-2 right-2 w-3 h-3 bg-red-500 rounded-full border-2 border-[#075E54] animate-pulse" />
+                )}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-72 p-0 rounded-xl overflow-hidden shadow-2xl border-none">
+              <div className="bg-[#075E54] p-3 text-white flex items-center justify-between">
+                <h4 className="text-xs font-bold uppercase tracking-wider">Notifications</h4>
+                <Button variant="ghost" size="icon" className="h-6 w-6 text-white/70" onClick={clearNotification}>
+                  <X className="w-4 h-4" />
+                </Button>
+              </div>
+              <div className="p-4 bg-white dark:bg-zinc-900 max-h-60 overflow-y-auto">
+                {session?.adminNotification ? (
+                  <div className={`p-3 rounded-xl border shadow-sm space-y-2 ${session.adminNotification.includes('REJECTED') ? 'bg-red-50 border-red-100' : 'bg-emerald-50 border-emerald-100'}`}>
+                    <div className="flex items-center gap-2">
+                      {session.adminNotification.includes('REJECTED') ? (
+                        <AlertCircle className="w-4 h-4 text-red-500" />
+                      ) : (
+                        <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+                      )}
+                      <span className={`text-[10px] font-bold uppercase ${session.adminNotification.includes('REJECTED') ? 'text-red-700' : 'text-emerald-700'}`}>
+                        Order Update
+                      </span>
+                    </div>
+                    <p className="text-xs font-medium leading-relaxed text-slate-700 dark:text-slate-300">
+                      {session.adminNotification.replace(/\*/g, '')}
+                    </p>
+                  </div>
+                ) : (
+                  <div className="py-8 text-center space-y-2">
+                    <Bell className="w-8 h-8 text-slate-200 mx-auto" />
+                    <p className="text-xs text-slate-400 font-medium">No new notifications</p>
+                  </div>
+                )}
+              </div>
+            </PopoverContent>
+          </Popover>
+        )}
       </CardHeader>
+      
       <CardContent ref={scrollRef} className="flex-1 overflow-y-auto p-4 space-y-4 bg-[url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png')] bg-repeat">
         {messages.map((msg, i) => (
           <div key={i} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
-            <div className={`max-w-[85%] rounded-2xl px-3 py-2 text-sm shadow-sm ${msg.role === "user" ? "bg-[#DCF8C6] rounded-tr-none" : "bg-white rounded-tl-none"} ${msg.role === "admin_alert" ? "p-0 bg-transparent border-none shadow-none" : ""}`}>
+            <div className={`max-w-[85%] rounded-2xl px-3 py-2 text-sm shadow-sm ${msg.role === "user" ? "bg-[#DCF8C6] rounded-tr-none" : "bg-white rounded-tl-none"}`}>
               {renderMessageContent(msg.text, msg.role)}
             </div>
           </div>
