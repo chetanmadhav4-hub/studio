@@ -11,6 +11,14 @@ import { updatePassword, signOut, EmailAuthProvider, reauthenticateWithCredentia
 import { doc, getDoc } from 'firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
 import { Zap, Loader2, LogOut, ShieldEllipsis, MessageSquare, ScrollText, ArrowLeft } from 'lucide-react';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import Link from 'next/link';
 
 export default function ProfilePage() {
@@ -58,7 +66,6 @@ export default function ProfilePage() {
 
     setLoading(true);
     try {
-      // Re-authenticate user before changing password (required by Firebase)
       const credential = EmailAuthProvider.credential(user.email!, currentPassword);
       await reauthenticateWithCredential(user, credential);
       
@@ -180,20 +187,52 @@ export default function ProfilePage() {
         </Card>
 
         <div className="grid sm:grid-cols-2 gap-4">
-          <Card className="border-none shadow-sm hover:shadow-md transition-shadow cursor-pointer">
-            <CardHeader className="p-4">
-              <CardTitle className="text-base flex items-center gap-2">
-                <ScrollText className="w-4 h-4 text-primary" />
-                Terms & Conditions
-              </CardTitle>
-              <CardDescription className="text-xs">Review our usage policies.</CardDescription>
-            </CardHeader>
-            <CardContent className="p-4 pt-0">
-              <p className="text-[10px] text-muted-foreground line-clamp-2">
-                By using InstaFlow, you agree to our terms of service regarding SMM panel automation and payments...
-              </p>
-            </CardContent>
-          </Card>
+          <Dialog>
+            <DialogTrigger asChild>
+              <Card className="border-none shadow-sm hover:shadow-md transition-shadow cursor-pointer">
+                <CardHeader className="p-4">
+                  <CardTitle className="text-base flex items-center gap-2">
+                    <ScrollText className="w-4 h-4 text-primary" />
+                    Terms & Conditions
+                  </CardTitle>
+                  <CardDescription className="text-xs">Review our usage policies.</CardDescription>
+                </CardHeader>
+                <CardContent className="p-4 pt-0">
+                  <p className="text-[10px] text-muted-foreground line-clamp-2">
+                    By using InstaFlow, you agree to our terms of service regarding SMM panel automation and payments...
+                  </p>
+                </CardContent>
+              </Card>
+            </DialogTrigger>
+            <DialogContent className="max-w-[90vw] md:max-w-md h-[80vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle>Terms & Conditions</DialogTitle>
+                <DialogDescription>Please read carefully before using our services.</DialogDescription>
+              </DialogHeader>
+              <div className="space-y-4 text-sm text-foreground/80 py-4">
+                <section className="space-y-2">
+                  <h4 className="font-bold text-primary">1. Service Usage</h4>
+                  <p>InstaFlow is an automation tool for social media services. We are not affiliated with Instagram or any social media platform.</p>
+                </section>
+                <section className="space-y-2">
+                  <h4 className="font-bold text-primary">2. Account Safety</h4>
+                  <p>We do not ask for your Instagram password. You should only provide profile or post links. Ensure your account is PUBLIC before ordering.</p>
+                </section>
+                <section className="space-y-2">
+                  <h4 className="font-bold text-primary">3. Refund Policy</h4>
+                  <p>Once an order is placed and the payment is confirmed, no refunds will be processed as the order is instantly sent to the SMM panel.</p>
+                </section>
+                <section className="space-y-2">
+                  <h4 className="font-bold text-primary">4. Delivery Time</h4>
+                  <p>Estimated start times (0-30 mins) are indicative. Some services may take up to 24 hours depending on the server load.</p>
+                </section>
+                <section className="space-y-2">
+                  <h4 className="font-bold text-primary">5. Payments</h4>
+                  <p>All payments must be made to the official UPI ID mentioned in the bot. Screenshots must be provided for manual verification if required.</p>
+                </section>
+              </div>
+            </DialogContent>
+          </Dialog>
 
           <a 
             href="https://wa.me/+919876543210?text=Hi, I need support with InstaFlow Bot." 
