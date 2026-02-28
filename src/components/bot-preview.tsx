@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Send, Bot, MousePointer2 } from "lucide-react";
+import { Send, Bot, MousePointer2, ExternalLink } from "lucide-react";
 
 interface ChatMessage {
   role: "user" | "bot";
@@ -73,9 +73,15 @@ export function BotPreview() {
 
   const renderMessageContent = (text: string) => {
     const urlRegex = /(https?:\/\/[^\s]+)/g;
+    const upiRegex = /(upi:\/\/pay[^\s]+)/g;
+    
+    // Extract UPI link if present in the whole message
+    const upiMatch = text.match(upiRegex);
+    const upiLink = upiMatch ? upiMatch[0] : null;
+
     const lines = text.split("\n");
     const optionLines = lines.filter(line => line.startsWith("OPTION: "));
-    const otherLines = lines.filter(line => !line.startsWith("OPTION: "));
+    const otherLines = lines.filter(line => !line.startsWith("OPTION: ") && !line.includes("upi://pay"));
 
     const content = otherLines.map((line, idx) => {
       const matches = line.match(urlRegex);
@@ -100,9 +106,19 @@ export function BotPreview() {
                   alt="QR Code" 
                   className="rounded-lg w-full h-auto block"
                 />
-                <div className="text-[10px] text-center mt-3 text-[#075E54] font-bold tracking-widest uppercase bg-[#E7F3F1] py-1 rounded">
-                  Scan to Pay Now
-                </div>
+                {upiLink ? (
+                  <a 
+                    href={upiLink}
+                    className="mt-3 flex items-center justify-center gap-2 bg-[#00A884] hover:bg-[#008F6F] text-white py-2.5 rounded-lg text-xs font-bold tracking-wide uppercase shadow-sm transition-all active:scale-95 no-underline"
+                  >
+                    <ExternalLink className="w-3.5 h-3.5" />
+                    Pay via UPI App
+                  </a>
+                ) : (
+                  <div className="text-[10px] text-center mt-3 text-[#075E54] font-bold tracking-widest uppercase bg-[#E7F3F1] py-1.5 rounded">
+                    Scan to Pay Now
+                  </div>
+                )}
               </div>
             </div>
           );
