@@ -99,20 +99,18 @@ export function BotPreview() {
         
         // If order is placed, save it to user's history in Firestore
         if (data.state === 'ORDER_PLACED' && user) {
-          // Note: The session state and data are returned from our webhook mock
-          // We can reconstruct the order from the session data or just extract parts
           const orderId = `INSTA-${Math.floor(100000 + Math.random() * 900000)}`;
           
           setDocumentNonBlocking(
             doc(db, 'users', user.uid, 'orders', orderId),
             {
               id: orderId,
-              serviceName: "Instagram Order", // Simplified for demo
+              serviceName: "Instagram Order", 
               quantity: 0, 
               price: 0,
               status: "PROCESSING",
               createdAt: serverTimestamp(),
-              targetLink: messageToSend, // Usually the last message in AWAITING_LINK state is the link
+              targetLink: messageToSend,
             },
             { merge: true }
           );
@@ -251,7 +249,7 @@ export function BotPreview() {
         </div>
       )}
       
-      <Card className={`w-full h-[520px] md:h-[620px] flex flex-col bg-[#E5DDD5] shadow-xl rounded-2xl overflow-hidden border-none ring-1 ring-black/5 transition-all ${!user ? 'opacity-40 grayscale-[20%]' : ''}`}>
+      <Card className={`w-full h-[580px] md:h-[680px] flex flex-col bg-[#E5DDD5] shadow-xl rounded-2xl overflow-hidden border-none ring-1 ring-black/5 transition-all ${!user ? 'opacity-40 grayscale-[20%]' : ''}`}>
         <CardHeader className="bg-[#075E54] text-white py-3 px-4 flex flex-row items-center gap-3 shrink-0 shadow-md relative z-10">
           <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-white/20 flex items-center justify-center border border-white/10 overflow-hidden">
             <Bot className="w-5 h-5 md:w-6 md:h-6 text-white" />
