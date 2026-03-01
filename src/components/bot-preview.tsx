@@ -143,7 +143,6 @@ export function BotPreview({ isAppMode = false }: BotPreviewProps) {
   };
 
   const renderMessageContent = (text: string) => {
-    // URL detection for images
     const urlRegex = /(https?:\/\/[^\s]+)/g;
     const upiRegex = /^upi:\/\/pay\S+$/;
     const formTag = "[PAYMENT_FORM]";
@@ -170,15 +169,15 @@ export function BotPreview({ isAppMode = false }: BotPreviewProps) {
       const matches = line.match(urlRegex);
       if (matches) {
         const imageUrl = matches[0];
-        // Ensure image URL is treated as image, not link
-        const isImageUrl = imageUrl.includes("picsum.photos") || imageUrl.includes("api.qrserver.com") || imageUrl.match(/\.(jpeg|jpg|gif|png|webp|svg)/i);
+        // Strictly identify image placeholders and render them
+        const isImageUrl = imageUrl.includes("picsum.photos") || imageUrl.match(/\.(jpeg|jpg|gif|png|webp|svg)/i);
         
         if (isImageUrl) {
           const textBeforeUrl = line.replace(imageUrl, "").trim();
           return (
             <div key={idx} className="my-3 flex flex-col gap-2">
               {textBeforeUrl && <div className="leading-relaxed font-black text-slate-900 dark:text-zinc-100 whitespace-pre-wrap">{textBeforeUrl.replace(/\*/g, '')}</div>}
-              <div className="bg-white p-2.5 rounded-2xl border shadow-xl max-w-[240px] mx-auto text-center transform hover:scale-[1.02] transition-transform">
+              <div className="bg-white p-2.5 rounded-2xl border shadow-xl max-w-[240px] mx-auto text-center transform hover:scale-[1.02] transition-transform overflow-hidden">
                 <img src={imageUrl} alt="Payment QR" className="rounded-xl w-full h-auto" />
                 {upiLink && (
                   <a href={upiLink} className="mt-4 flex items-center justify-center gap-2 bg-[#00A884] text-white py-3 rounded-xl text-[12px] font-black uppercase no-underline shadow-md active:scale-95 transition-all">
