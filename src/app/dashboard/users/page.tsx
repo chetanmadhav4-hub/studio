@@ -1,8 +1,9 @@
 
 'use client';
 
-import { useCollection, useFirestore, useMemoFirebase, useUser } from "@/firebase";
+import { useCollection, useFirestore, useMemoFirebase, useUser, useAuth } from "@/firebase";
 import { collection, query, orderBy } from "firebase/firestore";
+import { sendPasswordResetEmail } from "firebase/auth";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Table,
@@ -13,15 +14,21 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Loader2, User, Mail, Calendar, Hash, AlertCircle } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Loader2, User, Mail, Calendar, Hash, AlertCircle, KeyRound, Check } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useToast } from "@/hooks/use-toast";
 
 export default function AdminUsersPage() {
   const { user, isUserLoading } = useUser();
+  const auth = useAuth();
   const db = useFirestore();
   const router = useRouter();
+  const { toast } = useToast();
+  const [resettingId, setResettingId] = useState<string | null>(null);
+  
   const ADMIN_EMAIL = 'chetanmadhav4@gmail.com';
 
   useEffect(() => {
@@ -36,6 +43,26 @@ export default function AdminUsersPage() {
   }, [db, user?.email]);
 
   const { data: users, isLoading, error } = useCollection(usersQuery);
+
+  const handleSendResetLink = async (email: string, uid: string) => {
+    if (resettingId) return;
+    setResettingId(uid);
+    try {
+      await sendPasswordResetEmail(auth, email);
+      toast({
+        title: "Reset Link Sent!",
+        description: `Password reset email sent to ${email}.`,
+      });
+    } catch (e: any) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: e.message || "Failed to send reset link.",
+      });
+    } finally {
+      setTimeout(() => setResettingId(null), 2000);
+    }
+  };
 
   if (isUserLoading) {
     return (
@@ -79,12 +106,13 @@ export default function AdminUsersPage() {
               </div>
             ) : (
               <div className="overflow-x-auto touch-pan-x custom-scrollbar">
-                <div className="min-w-[900px] p-2">
+                <div className="min-w-[1000px] p-2">
                   <Table>
                     <TableHeader className="bg-slate-50 dark:bg-zinc-800/50">
                       <TableRow className="border-b dark:border-zinc-800 hover:bg-transparent">
                         <TableHead className="font-black text-[10px] text-slate-400 dark:text-zinc-400 uppercase tracking-wider">USER PROFILE</TableHead>
                         <TableHead className="font-black text-[10px] text-slate-400 dark:text-zinc-400 uppercase tracking-wider">CONTACT INFO</TableHead>
+                        <TableHead className="font-black text-[10px] text-slate-400 dark:text-zinc-400 uppercase tracking-wider">SECURITY</TableHead>
                         <TableHead className="font-black text-[10px] text-slate-400 dark:text-zinc-400 uppercase tracking-wider">USER ID</TableHead>
                         <TableHead className="text-right font-black text-[10px] text-slate-400 dark:text-zinc-400 uppercase tracking-wider">JOINED DATE</TableHead>
                       </TableRow>
@@ -113,6 +141,18 @@ export default function AdminUsersPage() {
                               </div>
                             </TableCell>
                             <TableCell>
+                              <Button 
+                                variant="outline" 
+                                size="sm" 
+                                className="h-8 text-[9px] font-black uppercase tracking-widest gap-2 rounded-xl dark:border-zinc-700 dark:text-zinc-50"
+                                onClick={() => handleSendResetLink(u.email, u.id)}
+                                disabled={resettingId === u.id}
+                              >
+                                {resettingId === u.id ? <Check className="w-3 h-3 text-emerald-500" /> : <KeyRound className="w-3 h-3" />}
+                                Send Reset Email
+                              </Button>
+                            </TableCell>
+                            <TableCell>
                                 <span className="text-[10px] font-mono font-black text-slate-400 dark:text-zinc-500 uppercase tracking-widest">{u.id}</span>
                             </TableCell>
                             <TableCell className="text-right">
@@ -131,7 +171,7 @@ export default function AdminUsersPage() {
                         ))
                       ) : (
                         <TableRow>
-                          <TableCell colSpan={4} className="text-center py-24 text-slate-400 font-black uppercase tracking-widest italic">
+                          <TableCell colSpan={5} className="text-center py-24 text-slate-400 font-black uppercase tracking-widest italic">
                             No users registered yet.
                           </TableCell>
                         </TableRow>
