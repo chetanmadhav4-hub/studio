@@ -144,60 +144,62 @@ export default function Home() {
         <div className="w-full max-w-[440px] h-full bg-white dark:bg-zinc-900 relative flex flex-col shadow-2xl sm:border dark:border-zinc-800 overflow-hidden">
           
           {isAdmin ? (
-            <div className="p-6 sm:p-8 space-y-6 sm:space-y-8 overflow-y-auto h-full scrollbar-hide bg-[#F8F9FC] dark:bg-zinc-950">
-              <div className="space-y-2 mb-3 pt-3">
-                <h1 className="text-3xl sm:text-4xl font-black text-slate-900 dark:text-white uppercase tracking-tighter">Admin Panel</h1>
-                <p className="text-[12px] sm:text-[13px] text-primary dark:text-accent font-black uppercase tracking-widest italic opacity-85">Management Hub v2.5</p>
-              </div>
+            <div className="flex-1 flex flex-col bg-[#F8F9FC] dark:bg-zinc-950 overflow-hidden">
+              <div className="p-6 sm:p-8 space-y-6 sm:space-y-8 overflow-y-auto overscroll-contain touch-pan-y h-full custom-scrollbar pb-24">
+                <div className="space-y-2 mb-3 pt-3">
+                  <h1 className="text-3xl sm:text-4xl font-black text-slate-900 dark:text-white uppercase tracking-tighter">Admin Panel</h1>
+                  <p className="text-[12px] sm:text-[13px] text-primary dark:text-accent font-black uppercase tracking-widest italic opacity-85">Management Hub</p>
+                </div>
 
-              <div className="grid gap-5 sm:gap-6 pb-16">
-                <Link href="/orders-feed" className="block w-full">
-                  <Card className="hover:scale-[1.03] active:scale-95 transition-all border-none shadow-2xl bg-emerald-600 dark:bg-emerald-800 text-white overflow-hidden h-36 sm:h-40 flex items-center cursor-pointer relative group">
-                    <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity" />
-                    <CardHeader className="p-7 sm:p-8 flex flex-row items-center gap-6 sm:gap-8 w-full space-y-0">
-                      <div className="w-16 h-16 bg-white/20 rounded-[1.8rem] flex items-center justify-center shrink-0 border border-white/20 shadow-inner">
-                        <LayoutGrid className="w-8 h-8 text-white" />
-                      </div>
-                      <div className="text-left">
-                        <CardTitle className="text-2xl font-black uppercase tracking-tight text-white">Live Tracker</CardTitle>
-                        <CardDescription className="text-emerald-50 text-[11px] font-black opacity-85 uppercase tracking-widest mt-2">Approve & Reject Orders</CardDescription>
-                      </div>
-                      <ArrowRight className="w-7 h-7 ml-auto opacity-50 group-hover:translate-x-2 transition-transform" />
-                    </CardHeader>
-                  </Card>
-                </Link>
+                <div className="grid gap-5 sm:gap-6">
+                  <Link href="/orders-feed" className="block w-full">
+                    <Card className="hover:scale-[1.03] active:scale-95 transition-all border-none shadow-2xl bg-emerald-600 dark:bg-emerald-800 text-white overflow-hidden h-36 sm:h-40 flex items-center cursor-pointer relative group">
+                      <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+                      <CardHeader className="p-7 sm:p-8 flex flex-row items-center gap-6 sm:gap-8 w-full space-y-0">
+                        <div className="w-16 h-16 bg-white/20 rounded-[1.8rem] flex items-center justify-center shrink-0 border border-white/20 shadow-inner">
+                          <LayoutGrid className="w-8 h-8 text-white" />
+                        </div>
+                        <div className="text-left">
+                          <CardTitle className="text-2xl font-black uppercase tracking-tight text-white">Live Tracker</CardTitle>
+                          <CardDescription className="text-emerald-50 text-[11px] font-black opacity-85 uppercase tracking-widest mt-2">Approve & Reject Orders</CardDescription>
+                        </div>
+                        <ArrowRight className="w-7 h-7 ml-auto opacity-50 group-hover:translate-x-2 transition-transform" />
+                      </CardHeader>
+                    </Card>
+                  </Link>
 
-                <Link href="/dashboard/broadcast" className="block w-full">
-                  <Card className="hover:scale-[1.03] active:scale-95 transition-all border-none shadow-2xl bg-primary dark:bg-primary/80 text-white overflow-hidden h-36 sm:h-40 flex items-center cursor-pointer relative group">
-                    <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity" />
-                    <CardHeader className="p-7 sm:p-8 flex flex-row items-center gap-6 sm:gap-8 w-full space-y-0">
-                      <div className="w-16 h-16 bg-white/20 rounded-[1.8rem] flex items-center justify-center shrink-0 border border-white/20 shadow-inner">
-                        <Megaphone className="w-8 h-8 text-white" />
-                      </div>
-                      <div className="text-left">
-                        <CardTitle className="text-2xl font-black uppercase tracking-tight text-white">Broadcast Msg</CardTitle>
-                        <CardDescription className="text-blue-50 text-[11px] font-black opacity-85 uppercase tracking-widest mt-2">Real-time Announcements</CardDescription>
-                      </div>
-                      <ArrowRight className="w-7 h-7 ml-auto opacity-50 group-hover:translate-x-2 transition-transform" />
-                    </CardHeader>
-                  </Card>
-                </Link>
+                  <Link href="/dashboard/broadcast" className="block w-full">
+                    <Card className="hover:scale-[1.03] active:scale-95 transition-all border-none shadow-2xl bg-primary dark:bg-primary/80 text-white overflow-hidden h-36 sm:h-40 flex items-center cursor-pointer relative group">
+                      <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+                      <CardHeader className="p-7 sm:p-8 flex flex-row items-center gap-6 sm:gap-8 w-full space-y-0">
+                        <div className="w-16 h-16 bg-white/20 rounded-[1.8rem] flex items-center justify-center shrink-0 border border-white/20 shadow-inner">
+                          <Megaphone className="w-8 h-8 text-white" />
+                        </div>
+                        <div className="text-left">
+                          <CardTitle className="text-2xl font-black uppercase tracking-tight text-white">Broadcast Msg</CardTitle>
+                          <CardDescription className="text-blue-50 text-[11px] font-black opacity-85 uppercase tracking-widest mt-2">Real-time Announcements</CardDescription>
+                        </div>
+                        <ArrowRight className="w-7 h-7 ml-auto opacity-50 group-hover:translate-x-2 transition-transform" />
+                      </CardHeader>
+                    </Card>
+                  </Link>
 
-                <Link href="/dashboard/users" className="block w-full">
-                  <Card className="hover:scale-[1.03] active:scale-95 transition-all border-none shadow-2xl bg-zinc-800 dark:bg-zinc-900 text-white overflow-hidden h-36 sm:h-40 flex items-center border dark:border-zinc-700 cursor-pointer relative group">
-                    <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity" />
-                    <CardHeader className="p-7 sm:p-8 flex flex-row items-center gap-6 sm:gap-8 w-full space-y-0">
-                      <div className="w-16 h-16 bg-white/20 rounded-[1.8rem] flex items-center justify-center shrink-0 border border-white/20 shadow-inner">
-                        <Users className="w-8 h-8 text-white" />
-                      </div>
-                      <div className="text-left">
-                        <CardTitle className="text-2xl font-black uppercase tracking-tight text-white">All Users</CardTitle>
-                        <CardDescription className="text-zinc-300 text-[11px] font-black opacity-85 uppercase tracking-widest mt-2">Database & Contact List</CardDescription>
-                      </div>
-                      <ArrowRight className="w-7 h-7 ml-auto opacity-50 group-hover:translate-x-2 transition-transform" />
-                    </CardHeader>
-                  </Card>
-                </Link>
+                  <Link href="/dashboard/users" className="block w-full">
+                    <Card className="hover:scale-[1.03] active:scale-95 transition-all border-none shadow-2xl bg-zinc-800 dark:bg-zinc-900 text-white overflow-hidden h-36 sm:h-40 flex items-center border dark:border-zinc-700 cursor-pointer relative group">
+                      <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+                      <CardHeader className="p-7 sm:p-8 flex flex-row items-center gap-6 sm:gap-8 w-full space-y-0">
+                        <div className="w-16 h-16 bg-white/20 rounded-[1.8rem] flex items-center justify-center shrink-0 border border-white/20 shadow-inner">
+                          <Users className="w-8 h-8 text-white" />
+                        </div>
+                        <div className="text-left">
+                          <CardTitle className="text-2xl font-black uppercase tracking-tight text-white">All Users</CardTitle>
+                          <CardDescription className="text-zinc-300 text-[11px] font-black opacity-85 uppercase tracking-widest mt-2">Database & Contact List</CardDescription>
+                        </div>
+                        <ArrowRight className="w-7 h-7 ml-auto opacity-50 group-hover:translate-x-2 transition-transform" />
+                      </CardHeader>
+                    </Card>
+                  </Link>
+                </div>
               </div>
             </div>
           ) : (
