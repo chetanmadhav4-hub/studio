@@ -46,7 +46,7 @@ export async function processBotMessage(
 ): Promise<{ reply: string; nextState: Partial<UserSession> }> {
   const normalizedMsg = messageText.trim().toLowerCase();
   
-  // Using the static PhonePe QR from placeholder (Your provided image)
+  // Using the static PhonePe QR from placeholder
   const staticQr = PlaceHolderImages.find(img => img.id === 'phonepe-static-qr')?.imageUrl || '';
 
   if (normalizedMsg.startsWith('submit_payment:')) {
@@ -115,7 +115,7 @@ export async function processBotMessage(
     };
   }
 
-  if (normalizedMsg === 'hi' || normalizedMsg === 'start' || normalizedMsg === 'menu') {
+  if (normalizedMsg === 'hi' || normalizedMsg === 'start' || normalizedMsg === 'menu' || normalizedMsg === 'yes, proceed') {
     let menu = "👋 *Welcome to InstaFlow Bot!*\n\nNiche di gayi list mein se koi bhi service select karein:\n\n";
     Object.entries(SERVICES_CONFIG).forEach(([key, service]) => {
       menu += `OPTION: ${key}. ${service.name}\n`;
@@ -152,14 +152,13 @@ export async function processBotMessage(
       }
 
       const price = calculatePrice(quantity, service.pricePer1000);
-      const upiId = 'cc732535@ybl'; // UPDATED UPI ID
+      const upiId = 'cc732535@ybl'; 
       const accountName = 'CHETAN KUMAR MEGHWAL';
       
-      // UPI Link with NO pre-filled amount for Manual Payment
       const upiPayload = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(accountName)}&cu=INR`;
 
       return {
-        reply: `✅ Aapne *${quantity} ${service.name}* select kiye hain.\n💰 Total price: *₹${price}*\n\n📲 *Scan This QR to Pay Manual Amount*\n\n👤 *Account:* ${accountName}\n🆔 *UPI ID:* ${upiId}\n💰 *Amount:* ₹${price}\n\n${staticQr}\n\n${upiPayload}\n\n✅ Payment ke baad, apna Instagram Link and UTR ID niche fill karein:\n\n[PAYMENT_FORM]`,
+        reply: `✅ Aapne *${quantity} ${service.name}* select kiye hain.\n💰 Total price: *₹${price}*\n\n📲 *Scan This QR to Pay Manual Amount*\n\n👤 *Account:* ${accountName}\n🆔 *UPI ID:* ${upiId}\n💰 *Amount:* ₹${price}\n\n${staticQr}\n\n${upiPayload}\n\n✅ Payment ke baad, apna Instagram Link and UTR ID niche fill karein:\n\n[PAYMENT_FORM]\n\nOPTION: YES, PROCEED\nOPTION: MENU`,
         nextState: {
           state: 'AWAITING_PAYMENT_DETAILS',
           data: { ...session.data, quantity, price },
@@ -169,7 +168,7 @@ export async function processBotMessage(
 
     case 'AWAITING_PAYMENT_DETAILS': {
       return {
-        reply: "⚠️ Kripya QR code ke niche diye gaye box mein details bhar kar Submit karein.\n\n[PAYMENT_FORM]",
+        reply: "⚠️ Kripya QR code ke niche diye gaye box mein details bhar kar Submit karein.\n\n[PAYMENT_FORM]\n\nOPTION: MENU",
         nextState: { state: 'AWAITING_PAYMENT_DETAILS' },
       };
     }

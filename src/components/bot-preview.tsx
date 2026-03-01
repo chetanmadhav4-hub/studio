@@ -169,7 +169,6 @@ export function BotPreview({ isAppMode = false }: BotPreviewProps) {
       const matches = line.match(urlRegex);
       if (matches) {
         const imageUrl = matches[0];
-        // Identify image URLs (placeholders or actual images)
         const isImageUrl = imageUrl.includes("picsum.photos") || imageUrl.match(/\.(jpeg|jpg|gif|png|webp|svg)/i);
         
         if (isImageUrl) {
