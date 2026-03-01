@@ -12,7 +12,7 @@ import { useAuth, useFirestore } from '@/firebase';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
-import { Zap, Loader2 } from 'lucide-react';
+import { Zap, Loader2, ArrowLeft } from 'lucide-react';
 
 export default function LoginPage() {
   const [identifier, setIdentifier] = useState(''); 
@@ -49,40 +49,39 @@ export default function LoginPage() {
           setLoading(false);
           toast({
             variant: "destructive",
-            title: "Error",
-            description: "Username not found. Please check or use your email.",
+            title: "Not Found",
+            description: "Username not registered. Please check or use your email.",
           });
           return;
         }
         
         const data = usernameSnap.data();
         if (!data || !data.email) {
-          throw new Error('Could not find email associated with this username.');
+          throw new Error('Email mapping missing for this user.');
         }
         loginEmail = data.email;
       }
 
-      // Final validation before Firebase Auth call
+      // Final validation
       if (!loginEmail || !loginEmail.includes('@')) {
-        throw new Error('Invalid email format detected.');
+        throw new Error('Please enter a valid email or registered username.');
       }
 
       // Sign in with Firebase Auth
       await signInWithEmailAndPassword(auth, loginEmail, password);
 
       toast({
-        title: "Logged In!",
-        description: "Welcome to InstaFlow.",
+        title: "Welcome Back!",
+        description: "Login successful. Redirecting...",
       });
       
       router.push('/');
     } catch (error: any) {
       console.error('Login Error:', error);
       let message = "Invalid credentials. Please try again.";
-      if (error.code === 'auth/invalid-email') message = "Email format is incorrect.";
+      if (error.code === 'auth/invalid-credential') message = "Wrong email/username or password.";
       if (error.code === 'auth/user-not-found') message = "Account not found.";
       if (error.code === 'auth/wrong-password') message = "Incorrect password.";
-      if (error.code === 'auth/invalid-credential') message = "Invalid credentials.";
       
       toast({
         variant: "destructive",
@@ -95,59 +94,70 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background p-4">
-      <Card className="w-full max-w-md shadow-xl border-none ring-1 ring-black/5">
-        <CardHeader className="space-y-1 text-center">
+    <div className="min-h-[100dvh] flex flex-col items-center justify-center bg-background p-4 sm:p-6 transition-colors duration-300">
+      <Link href="/" className="absolute top-8 left-6 hidden sm:flex items-center gap-2 text-sm font-black uppercase tracking-widest text-muted-foreground hover:text-primary transition-colors">
+        <ArrowLeft className="w-4 h-4" /> Back Home
+      </Link>
+
+      <Card className="w-full max-w-md shadow-2xl border-none ring-1 ring-black/5 rounded-[2.5rem] overflow-hidden bg-white dark:bg-zinc-900">
+        <CardHeader className="space-y-2 text-center pt-10 pb-6">
           <div className="flex justify-center mb-4">
-            <div className="w-12 h-12 bg-primary rounded-xl flex items-center justify-center">
-              <Zap className="w-8 h-8 text-white" />
+            <div className="w-16 h-16 bg-primary rounded-[1.5rem] flex items-center justify-center shadow-xl shadow-primary/20 animate-in zoom-in duration-500">
+              <Zap className="w-9 h-9 text-white" />
             </div>
           </div>
-          <CardTitle className="text-2xl font-bold">Welcome Back</CardTitle>
-          <CardDescription>
-            Enter your username or email to access your account
-          </CardDescription>
+          <CardTitle className="text-3xl font-black uppercase tracking-tighter dark:text-zinc-50">InstaFlow Login</CardTitle>
+          <CardDescription className="text-xs font-bold uppercase tracking-widest opacity-70">Enter your credentials to continue</CardDescription>
         </CardHeader>
         <form onSubmit={handleLogin}>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-5 px-8">
             <div className="space-y-2">
-              <Label htmlFor="identifier">Username or Email</Label>
+              <Label htmlFor="identifier" className="text-[10px] font-black uppercase tracking-widest ml-1">Username or Email</Label>
               <Input 
                 id="identifier" 
-                placeholder="johndoe or name@example.com" 
+                placeholder="Ex: johndoe or name@example.com" 
                 required 
+                className="h-12 text-sm font-bold bg-slate-50 dark:bg-zinc-800 border-none rounded-2xl focus:ring-2 focus:ring-primary/20 dark:text-zinc-100"
                 value={identifier}
                 onChange={(e) => setIdentifier(e.target.value)}
               />
             </div>
             <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <Label htmlFor="password">Password</Label>
-                <Link href="#" className="text-xs text-primary hover:underline">Forgot Password?</Link>
+              <div className="flex items-center justify-between ml-1">
+                <Label htmlFor="password" className="text-[10px] font-black uppercase tracking-widest">Password</Label>
+                <Link href="#" className="text-[10px] font-black uppercase tracking-widest text-primary hover:underline">Forgot?</Link>
               </div>
               <Input 
                 id="password" 
                 type="password" 
+                placeholder="••••••••"
                 required 
+                className="h-12 text-sm font-bold bg-slate-50 dark:bg-zinc-800 border-none rounded-2xl focus:ring-2 focus:ring-primary/20 dark:text-zinc-100"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
             </div>
           </CardContent>
-          <CardFooter className="flex flex-col gap-4">
-            <Button className="w-full h-11" type="submit" disabled={loading}>
-              {loading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
-              Login
+          <CardFooter className="flex flex-col gap-4 pb-10 px-8">
+            <Button className="w-full h-14 rounded-2xl font-black uppercase tracking-wider text-sm shadow-xl shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all" type="submit" disabled={loading}>
+              {loading ? <Loader2 className="w-5 h-5 animate-spin mr-2" /> : null}
+              Access Dashboard
             </Button>
-            <p className="text-sm text-center text-muted-foreground">
-              Don't have an account?{' '}
-              <Link href="/signup" className="text-primary hover:underline font-medium">
-                Sign Up
+            <div className="flex flex-col items-center gap-1 mt-2">
+              <p className="text-[11px] font-bold text-muted-foreground uppercase tracking-tight">
+                Don't have an account?
+              </p>
+              <Link href="/signup" className="text-xs text-primary hover:underline font-black uppercase tracking-widest">
+                Create Free Account
               </Link>
-            </p>
+            </div>
           </CardFooter>
         </form>
       </Card>
+      
+      <p className="mt-8 text-[9px] font-black text-muted-foreground uppercase tracking-[0.5em] opacity-40">
+        InstaFlow Security Engine v2.5
+      </p>
     </div>
   );
 }

@@ -169,16 +169,14 @@ export function BotPreview({ isAppMode = false }: BotPreviewProps) {
       );
     });
 
-    // Manual QR URL (No pre-filled amount to avoid limit error)
-    const upiUri = `upi://pay?pa=smmxpressbot@slc&pn=InstaFlow%20Bot&cu=INR`;
-    const staticQrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=600x600&data=${encodeURIComponent(upiUri)}`;
+    const staticQrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=600x600&data=upi://pay?pa=smmxpressbot@slc%26pn=InstaFlow%20Bot%26cu=INR`;
 
     return (
       <div className="flex flex-col gap-1.5">
         <div className="text-[13px] flex flex-col">{content}</div>
         
         {hasQR && (
-          <div className="mt-4 flex flex-col items-center gap-3 w-full">
+          <div className="mt-4 flex flex-col items-center gap-3 w-full animate-in fade-in slide-in-from-bottom-2">
             <div className="relative w-64 aspect-square rounded-[2rem] overflow-hidden border-4 border-white shadow-2xl bg-white">
               <Image 
                 src={staticQrUrl} 
@@ -266,7 +264,7 @@ export function BotPreview({ isAppMode = false }: BotPreviewProps) {
       "relative w-full flex flex-col bg-[#E5DDD5] dark:bg-zinc-950 overflow-hidden",
       isAppMode ? "h-full" : "max-w-[440px] h-[600px] mx-auto rounded-[2.5rem] border-[8px] border-zinc-800 dark:border-zinc-700 p-1 shadow-2xl"
     )}>
-      <div className="bg-[#075E54] dark:bg-zinc-900 text-white pt-[calc(env(safe-area-inset-top,24px)+12px)] pb-4 px-5 flex items-center gap-3 shrink-0 shadow-md z-20">
+      <div className="bg-[#075E54] dark:bg-zinc-900 text-white pt-[calc(env(safe-area-inset-top,24px)+12px)] pb-4 px-5 flex items-center gap-3 shrink-0 shadow-md z-30">
         <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center border-2 border-white/10 shadow-inner">
           <Bot className="w-6 h-6" />
         </div>
@@ -309,16 +307,15 @@ export function BotPreview({ isAppMode = false }: BotPreviewProps) {
         )}
       </div>
 
-      <div className="p-3 bg-[#F0F2F5] dark:bg-zinc-900 flex gap-2 border-t dark:border-zinc-800 shrink-0 shadow-2xl z-20 pb-[calc(env(safe-area-inset-bottom,12px)+16px)]">
+      <div className="p-3 bg-[#F0F2F5] dark:bg-zinc-900 flex gap-2 border-t dark:border-zinc-800 shrink-0 shadow-2xl z-30 pb-[calc(env(safe-area-inset-bottom,12px)+16px)]">
         <Input 
           value={input} 
           onChange={(e) => setInput(e.target.value)} 
           onKeyDown={(e) => e.key === "Enter" && handleSend()} 
-          placeholder={user ? "Type a message..." : "Login to use Bot"} 
-          disabled={!user} 
+          placeholder="Type a message... (Hi)" 
           className="bg-white dark:bg-zinc-800 dark:text-zinc-50 dark:border-zinc-700 rounded-2xl h-12 px-5 text-sm font-black placeholder:text-slate-400 dark:placeholder:text-zinc-500 shadow-inner" 
         />
-        <Button onClick={() => handleSend()} disabled={loading || !user} size="icon" className="rounded-full bg-[#00A884] hover:bg-[#008F6F] h-12 w-12 shrink-0 shadow-2xl active:scale-90 transition-all">
+        <Button onClick={() => handleSend()} disabled={loading} size="icon" className="rounded-full bg-[#00A884] hover:bg-[#008F6F] h-12 w-12 shrink-0 shadow-2xl active:scale-90 transition-all">
           <Send className="w-5 h-5 text-white" />
         </Button>
       </div>
