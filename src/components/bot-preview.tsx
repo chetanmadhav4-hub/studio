@@ -183,7 +183,8 @@ export function BotPreview({ isAppMode = false }: BotPreviewProps) {
         }
       }
       if (line.trim() === "") return <div key={idx} className="h-1" />;
-      return <div key={idx} className="leading-relaxed mb-1 text-slate-800 dark:text-zinc-100 font-semibold">{line.replace(/\*/g, '')}</div>;
+      // CLEAN UP: Remove asterisks for display and ensure text contrast in dark mode
+      return <div key={idx} className="leading-relaxed mb-1 text-slate-800 dark:text-zinc-200 font-semibold">{line.replace(/\*/g, '')}</div>;
     });
 
     return (

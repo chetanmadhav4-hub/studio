@@ -57,8 +57,8 @@ export async function processBotMessage(
     const targetLink = link.trim();
     const utrId = utr.trim();
 
-    // CUSTOM WHATSAPP PAYLOAD AS REQUESTED: Order ID, Service, UTR ID, Quantity
-    const whatsappAdminPayload = `Order ID: ${orderId}\nService: ${serviceName}\nUTR ID: ${utrId}\nQuantity: ${quantity}`;
+    // UPDATED WHATSAPP PAYLOAD: Link, Service, UTR ID, Quantity (REMOVED Order ID as requested)
+    const whatsappAdminPayload = `Link: ${targetLink}\nService: ${serviceName}\nUTR ID: ${utrId}\nQuantity: ${quantity}`;
     const whatsappTag = `[WHATSAPP_ADMIN:${encodeURIComponent(whatsappAdminPayload)}]`;
 
     try {
