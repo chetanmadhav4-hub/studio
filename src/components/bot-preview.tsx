@@ -182,13 +182,13 @@ export function BotPreview({ isAppMode = false }: BotPreviewProps) {
           );
         }
       }
-      if (line.trim() === "") return <div key={idx} className="h-1" />;
-      return <div key={idx} className="leading-relaxed mb-1 text-slate-800 dark:text-zinc-100 font-bold whitespace-pre-wrap">{line.replace(/\*/g, '')}</div>;
+      if (line.trim() === "" && idx !== otherLines.length - 1) return <div key={idx} className="h-2" />;
+      return <div key={idx} className="leading-relaxed text-slate-800 dark:text-zinc-100 font-bold whitespace-pre-wrap">{line.replace(/\*/g, '')}</div>;
     });
 
     return (
       <div className="flex flex-col gap-1">
-        <div className="text-[13px]">{content}</div>
+        <div className="text-[13px] flex flex-col">{content}</div>
         
         {whatsappMatch && (
           <div className="mt-4 space-y-2">
@@ -300,7 +300,7 @@ export function BotPreview({ isAppMode = false }: BotPreviewProps) {
         )}
       </div>
 
-      <div className="p-3 bg-[#F0F2F5] dark:bg-zinc-900 flex gap-2 border-t dark:border-zinc-800 shrink-0 shadow-lg z-20 pb-safe-offset-2">
+      <div className="p-3 bg-[#F0F2F5] dark:bg-zinc-900 flex gap-2 border-t dark:border-zinc-800 shrink-0 shadow-lg z-20">
         <Input 
           value={input} 
           onChange={(e) => setInput(e.target.value)} 
