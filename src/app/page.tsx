@@ -145,9 +145,9 @@ export default function Home() {
           
           {isAdmin ? (
             <div className="flex-1 flex flex-col bg-[#F8F9FC] dark:bg-zinc-950 overflow-hidden">
-              <div className="p-6 sm:p-8 space-y-6 sm:space-y-8 overflow-y-auto overscroll-contain touch-pan-y h-full custom-scrollbar pb-24">
+              <div className="flex-1 overflow-y-auto overscroll-contain touch-pan-y h-full custom-scrollbar p-6 sm:p-8 pb-24 space-y-6 sm:space-y-8">
                 <div className="space-y-2 mb-3 pt-3">
-                  <h1 className="text-3xl sm:text-4xl font-black text-slate-900 dark:text-white uppercase tracking-tighter">Admin Panel</h1>
+                  <h1 className="text-3xl sm:text-4xl font-black text-slate-900 dark:text-zinc-50 uppercase tracking-tighter">Admin Panel</h1>
                   <p className="text-[12px] sm:text-[13px] text-primary dark:text-accent font-black uppercase tracking-widest italic opacity-85">Management Hub</p>
                 </div>
 
