@@ -94,8 +94,10 @@ export async function processBotMessage(
 
   let interceptedServiceKey = '';
   Object.entries(SERVICES_CONFIG).forEach(([key, service]) => {
-    if (normalizedMsg.includes(service.name.toLowerCase()) || (normalizedMsg.length < 3 && (normalizedMsg === key || normalizedMsg === `${key}.`))) {
-      interceptedServiceKey = key;
+    if (normalizedMsg.includes(service.name.toLowerCase()) || (normalizedMsg.length < 3 && (normalizedMsg === key || normalizedMsg === `${key || ''}`.replace('.','')))) {
+      if (normalizedMsg === key || normalizedMsg === `${key}.`) {
+         interceptedServiceKey = key;
+      }
     }
   });
 
@@ -110,7 +112,7 @@ export async function processBotMessage(
     };
   }
 
-  if (normalizedMsg === 'hi' || normalizedMsg === 'start' || normalizedMsg === 'menu' || normalizedMsg === 'yes, proceed') {
+  if (normalizedMsg === 'hi' || normalizedMsg === 'start' || normalizedMsg === 'menu') {
     let menu = "👋 *Welcome to InstaFlow Bot!*\n\nNiche di gayi list mein se koi bhi service select karein:\n\n";
     Object.entries(SERVICES_CONFIG).forEach(([key, service]) => {
       menu += `OPTION: ${key}. ${service.name}\n`;
@@ -162,10 +164,16 @@ export async function processBotMessage(
     }
 
     case 'AWAITING_PAYMENT_DETAILS': {
-      return {
-        reply: "✅ Payment ke baad, apna Instagram Link and UTR ID niche fill karein:\n\n[PAYMENT_FORM]\n\nOPTION: MENU",
-        nextState: { state: 'AWAITING_PAYMENT_DETAILS' },
-      };
+       if (normalizedMsg === 'yes, proceed') {
+         return {
+           reply: "✅ Payment ke baad, apna Instagram Link and UTR ID niche fill karein:\n\n[PAYMENT_FORM]\n\nOPTION: MENU",
+           nextState: { state: 'AWAITING_PAYMENT_DETAILS' },
+         };
+       }
+       return {
+         reply: "⚠️ Kripya 'YES, PROCEED' button par click karein payment ke baad.",
+         nextState: { state: 'AWAITING_PAYMENT_DETAILS' }
+       };
     }
 
     default:
@@ -175,3 +183,4 @@ export async function processBotMessage(
       };
   }
 }
+

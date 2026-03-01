@@ -177,7 +177,7 @@ export function BotPreview({ isAppMode = false }: BotPreviewProps) {
             <div key={idx} className="my-4 flex flex-col gap-3">
               {textBeforeUrl && <div className="leading-relaxed font-black text-slate-900 dark:text-zinc-100 whitespace-pre-wrap">{textBeforeUrl.replace(/\*/g, '')}</div>}
               <div className="bg-white p-3 rounded-[2rem] border-2 border-primary/10 shadow-2xl max-w-[260px] mx-auto text-center transform hover:scale-[1.02] transition-transform overflow-hidden">
-                <img src={imageUrl} alt="QR Code" className="rounded-[1.5rem] w-full h-auto" />
+                <img src={imageUrl} alt="Payment Method" className="rounded-[1.5rem] w-full h-auto" />
                 {upiLink && (
                   <a href={upiLink} className="mt-5 flex items-center justify-center gap-2 bg-[#00A884] text-white py-3.5 rounded-2xl text-[12px] font-black uppercase no-underline shadow-xl active:scale-95 transition-all">
                     <Check className="w-4 h-4" /> Pay via UPI App
@@ -268,7 +268,7 @@ export function BotPreview({ isAppMode = false }: BotPreviewProps) {
 
   return (
     <div className={cn(
-      "relative w-full h-full flex flex-col bg-[#E5DDD5] dark:bg-zinc-950 overflow-hidden",
+      "relative w-full h-[100dvh] flex flex-col bg-[#E5DDD5] dark:bg-zinc-950 overflow-hidden",
       !isAppMode && "max-w-[340px] h-full mx-auto rounded-[2.5rem] border-[8px] border-zinc-800 dark:border-zinc-700 p-1 shadow-2xl"
     )}>
       {/* Header with status bar safety */}
