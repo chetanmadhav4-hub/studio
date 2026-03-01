@@ -143,7 +143,7 @@ export function BotPreview({ isAppMode = false }: BotPreviewProps) {
   };
 
   const renderMessageContent = (text: string) => {
-    // Improved regex to pick up image URLs correctly
+    // URL detection for images
     const urlRegex = /(https?:\/\/[^\s]+)/g;
     const upiRegex = /^upi:\/\/pay\S+$/;
     const formTag = "[PAYMENT_FORM]";
@@ -170,14 +170,14 @@ export function BotPreview({ isAppMode = false }: BotPreviewProps) {
       const matches = line.match(urlRegex);
       if (matches) {
         const imageUrl = matches[0];
-        // Ensure it's treated as an image
+        // Detect if it's an image (including placeholder seeds)
         const isImageUrl = imageUrl.includes("picsum.photos") || imageUrl.includes("api.qrserver.com") || imageUrl.match(/\.(jpeg|jpg|gif|png|webp|svg)/i);
         
         if (isImageUrl) {
           const textBeforeUrl = line.replace(imageUrl, "").trim();
           return (
             <div key={idx} className="my-3 flex flex-col gap-2">
-              {textBeforeUrl && <div className="leading-relaxed font-bold text-slate-900 dark:text-zinc-50 whitespace-pre-wrap">{textBeforeUrl.replace(/\*/g, '')}</div>}
+              {textBeforeUrl && <div className="leading-relaxed font-black text-slate-900 dark:text-zinc-100 whitespace-pre-wrap">{textBeforeUrl.replace(/\*/g, '')}</div>}
               <div className="bg-white p-2.5 rounded-2xl border shadow-xl max-w-[240px] mx-auto text-center transform hover:scale-[1.02] transition-transform">
                 <img src={imageUrl} alt="Payment QR" className="rounded-xl w-full h-auto" />
                 {upiLink && (
@@ -191,7 +191,7 @@ export function BotPreview({ isAppMode = false }: BotPreviewProps) {
         }
       }
       if (line.trim() === "" && idx !== otherLines.length - 1) return <div key={idx} className="h-2" />;
-      return <div key={idx} className="leading-relaxed text-slate-900 dark:text-zinc-100 font-bold whitespace-pre-wrap">{line.replace(/\*/g, '')}</div>;
+      return <div key={idx} className="leading-relaxed text-slate-900 dark:text-zinc-100 font-black whitespace-pre-wrap">{line.replace(/\*/g, '')}</div>;
     });
 
     return (
@@ -215,16 +215,16 @@ export function BotPreview({ isAppMode = false }: BotPreviewProps) {
         )}
 
         {hasForm && (
-          <div className="mt-4 p-4 bg-slate-100 dark:bg-zinc-900/80 rounded-[1.8rem] border-2 border-primary/20 shadow-lg space-y-3">
+          <div className="mt-4 p-4 bg-slate-100 dark:bg-zinc-800 rounded-[1.8rem] border-2 border-primary/20 shadow-lg space-y-3">
             <Input 
               placeholder="Instagram Profile/Post Link" 
-              className="h-11 text-[11px] font-bold dark:bg-zinc-800 dark:border-zinc-700 dark:text-zinc-50 rounded-xl focus:ring-primary" 
+              className="h-11 text-[11px] font-black dark:bg-zinc-900 dark:border-zinc-700 dark:text-zinc-50 rounded-xl focus:ring-primary placeholder:text-zinc-400" 
               value={formLink} 
               onChange={(e) => setFormLink(e.target.value)} 
             />
             <Input 
               placeholder="12-Digit Payment UTR ID" 
-              className="h-11 text-[11px] font-bold dark:bg-zinc-800 dark:border-zinc-700 dark:text-zinc-50 rounded-xl focus:ring-primary" 
+              className="h-11 text-[11px] font-black dark:bg-zinc-900 dark:border-zinc-700 dark:text-zinc-50 rounded-xl focus:ring-primary placeholder:text-zinc-400" 
               value={formUtr} 
               onChange={(e) => setFormUtr(e.target.value)} 
               maxLength={12} 
@@ -243,7 +243,7 @@ export function BotPreview({ isAppMode = false }: BotPreviewProps) {
         {optionLines.map((optLine, i) => {
           const optionText = optLine.replace("OPTION: ", "").trim();
           return (
-            <button key={i} onClick={() => handleSend(optionText)} className="mt-2 w-full py-3.5 px-4 font-black text-[11px] rounded-xl border-2 bg-white dark:bg-zinc-900 text-primary dark:text-accent border-primary/10 hover:border-primary/40 hover:bg-primary/5 transition-all flex items-center justify-center gap-2 shadow-sm active:scale-95 uppercase tracking-tight">
+            <button key={i} onClick={() => handleSend(optionText)} className="mt-2 w-full py-3.5 px-4 font-black text-[11px] rounded-xl border-2 bg-white dark:bg-zinc-800 text-primary dark:text-accent border-primary/10 hover:border-primary/40 hover:bg-primary/5 transition-all flex items-center justify-center gap-2 shadow-sm active:scale-95 uppercase tracking-tight">
               <MousePointer2 className="w-4 h-4" /> {optionText}
             </button>
           );
@@ -265,21 +265,21 @@ export function BotPreview({ isAppMode = false }: BotPreviewProps) {
       "relative w-full h-full flex flex-col bg-[#E5DDD5] dark:bg-zinc-950 overflow-hidden",
       !isAppMode && "max-w-[340px] h-full mx-auto rounded-[2.5rem] border-[8px] border-zinc-800 dark:border-zinc-700 p-1 shadow-2xl"
     )}>
-      {/* Header with notch padding - SAFE AREA FIX */}
-      <div className="bg-[#075E54] dark:bg-zinc-900 text-white pt-[calc(env(safe-area-inset-top,24px)+8px)] pb-3 px-4 flex items-center gap-3 shrink-0 shadow-md z-20">
-        <div className="w-9 h-9 rounded-full bg-white/20 flex items-center justify-center border-2 border-white/10">
-          <Bot className="w-5 h-5" />
+      {/* Header with safe area padding */}
+      <div className="bg-[#075E54] dark:bg-zinc-900 text-white pt-[calc(env(safe-area-inset-top,24px)+12px)] pb-4 px-5 flex items-center gap-3 shrink-0 shadow-md z-20">
+        <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center border-2 border-white/10 shadow-inner">
+          <Bot className="w-6 h-6" />
         </div>
         <div className="text-left flex-1">
-          <h2 className="text-sm font-black text-white leading-none">InstaFlow Bot</h2>
-          <div className="flex items-center gap-1 mt-0.5">
-            <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse"></span>
-            <p className="text-[10px] text-emerald-100 font-bold">Online & Working</p>
+          <h2 className="text-sm font-black text-white leading-none uppercase tracking-tight">InstaFlow Bot</h2>
+          <div className="flex items-center gap-1.5 mt-1">
+            <span className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse shadow-[0_0_8px_rgba(52,211,153,0.8)]"></span>
+            <p className="text-[10px] text-emerald-100 font-black uppercase tracking-widest">Active Server</p>
           </div>
         </div>
         {!isAppMode && (
           <Link href="/login">
-            <Button variant="ghost" size="icon" className="text-white hover:bg-white/10">
+            <Button variant="ghost" size="icon" className="text-white hover:bg-white/10 rounded-full">
               <LogIn className="w-5 h-5" />
             </Button>
           </Link>
@@ -293,32 +293,32 @@ export function BotPreview({ isAppMode = false }: BotPreviewProps) {
               "max-w-[85%] rounded-2xl px-4 py-3 text-xs shadow-md border dark:border-zinc-700",
               msg.role === "user" 
                 ? "bg-[#DCF8C6] dark:bg-emerald-900 text-slate-900 dark:text-zinc-50 rounded-tr-none" 
-                : "bg-white dark:bg-zinc-800 text-slate-900 dark:text-zinc-100 rounded-tl-none font-medium"
+                : "bg-white dark:bg-zinc-800 text-slate-900 dark:text-zinc-100 rounded-tl-none font-bold"
             )}>
               {renderMessageContent(msg.text)}
-              <div className="text-[9px] mt-1 text-right opacity-40 font-bold uppercase dark:text-zinc-400">
+              <div className="text-[9px] mt-2 text-right opacity-50 font-black uppercase dark:text-zinc-400">
                 {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
               </div>
             </div>
           </div>
         ))}
         {loading && (
-          <div className="flex items-center gap-2 text-[10px] font-black italic opacity-60 dark:text-zinc-200 animate-pulse bg-white/50 dark:bg-zinc-800/50 w-fit px-3 py-1.5 rounded-full">
+          <div className="flex items-center gap-2 text-[10px] font-black italic opacity-60 dark:text-zinc-200 animate-pulse bg-white/50 dark:bg-zinc-800/50 w-fit px-4 py-2 rounded-full shadow-sm">
             <Bot className="w-4 h-4" /> Bot is thinking...
           </div>
         )}
       </div>
 
-      <div className="p-3 bg-[#F0F2F5] dark:bg-zinc-900 flex gap-2 border-t dark:border-zinc-800 shrink-0 shadow-lg z-20 pb-[calc(env(safe-area-inset-bottom,12px)+8px)]">
+      <div className="p-3 bg-[#F0F2F5] dark:bg-zinc-900 flex gap-2 border-t dark:border-zinc-800 shrink-0 shadow-lg z-20 pb-[calc(env(safe-area-inset-bottom,12px)+12px)]">
         <Input 
           value={input} 
           onChange={(e) => setInput(e.target.value)} 
           onKeyDown={(e) => e.key === "Enter" && handleSend()} 
           placeholder={user ? "Type a message..." : "Login to use Bot"} 
           disabled={!user} 
-          className="bg-white dark:bg-zinc-800 dark:text-zinc-50 dark:border-zinc-700 rounded-2xl h-11 px-4 text-sm font-bold placeholder:text-slate-400 dark:placeholder:text-zinc-500" 
+          className="bg-white dark:bg-zinc-800 dark:text-zinc-50 dark:border-zinc-700 rounded-2xl h-11 px-4 text-sm font-black placeholder:text-slate-400 dark:placeholder:text-zinc-500 shadow-inner" 
         />
-        <Button onClick={() => handleSend()} disabled={loading || !user} size="icon" className="rounded-full bg-[#00A884] hover:bg-[#008F6F] h-11 w-11 shrink-0 shadow-lg active:scale-90 transition-all">
+        <Button onClick={() => handleSend()} disabled={loading || !user} size="icon" className="rounded-full bg-[#00A884] hover:bg-[#008F6F] h-11 w-11 shrink-0 shadow-xl active:scale-90 transition-all">
           <Send className="w-5 h-5 text-white" />
         </Button>
       </div>

@@ -1,7 +1,6 @@
 
 import { BotState, UserSession } from './bot-types';
 import { aiGeneratedOrderConfirmation } from '@/ai/flows/ai-generated-order-confirmation';
-import { generateContextualErrorMessage } from '@/ai/flows/ai-generated-contextual-error-messages';
 import { PlaceHolderImages } from './placeholder-images';
 
 export const SERVICES_CONFIG: Record<string, { name: string; pricePer1000: number; min: number }> = {
@@ -25,6 +24,20 @@ export function isValidInstagramUrl(url: string): boolean {
 export function isValidUtr(utr: string): boolean {
   const regex = /^\d{12}$/;
   return regex.test(utr.trim());
+}
+
+/**
+ * Formats the order confirmation message with strict multi-line spacing.
+ */
+function formatOrderConfirmation(details: any): string {
+  return `🎉 *Woohoo! Your InstaFlow order successfully created!*
+
+- *Order ID:* ${details.orderId}
+- *Service:* ${details.serviceName}
+- *Quantity:* ${details.quantity}
+- *Amount:* ₹${details.price}
+- *Start Time:* 0-30 minutes
+- *Target Link:* ${details.targetLink}`;
 }
 
 export async function processBotMessage(
@@ -62,45 +75,25 @@ export async function processBotMessage(
     const whatsappAdminPayload = `Link: ${targetLink}\nService: ${serviceName}\nUTR ID: ${utrId}\nQuantity: ${quantity}`;
     const whatsappTag = `[WHATSAPP_ADMIN:${encodeURIComponent(whatsappAdminPayload)}]`;
 
-    try {
-      const confirmation = await aiGeneratedOrderConfirmation({
-        orderId,
-        quantity,
-        serviceName,
-        instagramProfileLink: targetLink,
-        price,
-        startTime: '0-30 minutes',
-      });
-      
-      const finalMsg = confirmation.message.trim() + "\n\n" + 
-                       "Send Order Details to Admin and conform your order\n\n" + 
-                       whatsappTag + "\n\n" +
-                       "OPTION: MENU";
-      
-      return {
-        reply: finalMsg,
-        nextState: { 
-          state: 'ORDER_PLACED', 
-          data: { ...session.data, orderId, targetLink, utrId } 
-        }
-      };
-    } catch (e) {
-      const fallbackMsg = `🎉 *Woohoo! Your InstaFlow order successfully created!*\n\n` +
-                          `- *Order ID:* ${orderId}\n` +
-                          `- *Service:* ${serviceName}\n` +
-                          `- *Quantity:* ${quantity}\n` +
-                          `- *Amount:* ₹${price}\n` +
-                          `- *Start Time:* 0-30 minutes\n` +
-                          `- *Target Link:* ${targetLink}`;
-
-      return {
-        reply: fallbackMsg + "\n\n" + "Send Order Details to Admin and conform your order\n\n" + whatsappTag + "\n\n" + "OPTION: MENU",
-        nextState: { 
-          state: 'ORDER_PLACED', 
-          data: { ...session.data, orderId, targetLink, utrId } 
-        }
-      };
-    }
+    // Always use hardcoded formatted message to avoid AI block/clumping issues
+    const finalMsg = formatOrderConfirmation({
+      orderId,
+      quantity,
+      serviceName,
+      targetLink,
+      price
+    }) + "\n\n" + 
+    "Send Order Details to Admin and conform your order\n\n" + 
+    whatsappTag + "\n\n" +
+    "OPTION: MENU";
+    
+    return {
+      reply: finalMsg,
+      nextState: { 
+        state: 'ORDER_PLACED', 
+        data: { ...session.data, orderId, targetLink, utrId } 
+      }
+    };
   }
 
   let interceptedServiceKey = '';
@@ -151,51 +144,24 @@ export async function processBotMessage(
       const service = SERVICES_CONFIG[serviceId];
 
       if (isNaN(quantity) || quantity < service.min) {
-        let errorMessage = `⚠️ Kripya sahi quantity enter karein. *${service.name}* ke liye minimum *${service.min}* chahiye.`;
-        try {
-          const errorRes = await generateContextualErrorMessage({
-            errorType: 'INVALID_QUANTITY',
-            details: `User input: ${messageText}. Minimum for ${service.name} is ${service.min}.`,
-            currentState: `Selecting quantity for ${service.name}`,
-          });
-          errorMessage = errorRes.errorMessage;
-        } catch (e) {}
-        
         return {
-          reply: errorMessage,
+          reply: `⚠️ Kripya sahi quantity enter karein. *${service.name}* ke liye minimum *${service.min}* chahiye.`,
           nextState: { state: 'AWAITING_QUANTITY' },
         };
       }
 
       const price = calculatePrice(quantity, service.pricePer1000);
+      const upiId = 'smmxpressbot@slc'; 
+      const accountName = 'CHETAN KUMAR MEGHWAL';
+      const upiPayload = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(accountName)}&cu=INR`;
+
+      // Jump directly to payment instructions + form for better user flow
       return {
-        reply: `✅ Aapne *${quantity} ${service.name}* select kiye hain.\n💰 Total price: *₹${price}*\n\nAage badhne ke liye confirm karein:\n\nOPTION: YES, PAY NOW\nOPTION: MENU`,
+        reply: `✅ Aapne *${quantity} ${service.name}* select kiye hain.\n💰 Total price: *₹${price}*\n\n📲 *Scan This QR to Pay Manual Amount*\n\n👤 *Account:* ${accountName}\n🆔 *UPI ID:* ${upiId}\n💰 *Amount:* ₹${price}\n\n${staticQr}\n\n${upiPayload}\n\n✅ Payment ke baad, apna Instagram Link and UTR ID niche fill karein:\n\n[PAYMENT_FORM]`,
         nextState: {
-          state: 'AWAITING_PAYMENT_CONFIRMATION',
+          state: 'AWAITING_PAYMENT_DETAILS',
           data: { ...session.data, quantity, price },
         },
-      };
-    }
-
-    case 'AWAITING_PAYMENT_CONFIRMATION': {
-      if (normalizedMsg.includes('yes') || normalizedMsg.includes('pay')) {
-        const price = session.data.price || 0;
-        const upiId = 'smmxpressbot@slc'; 
-        const accountName = 'CHETAN KUMAR MEGHWAL';
-        const upiPayload = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(accountName)}&cu=INR`;
-
-        // Explicitly include the image URL in the reply
-        return {
-          reply: `📲 *Scan This QR to Pay Manual Amount*\n\n👤 *Account:* ${accountName}\n🆔 *UPI ID:* ${upiId}\n💰 *Amount:* ₹${price}\n\n${staticQr}\n\n${upiPayload}\n\n✅ Payment ke baad, apna Instagram Link and UTR ID niche fill karein:\n\n[PAYMENT_FORM]`,
-          nextState: {
-            state: 'AWAITING_PAYMENT_DETAILS',
-            data: { ...session.data },
-          },
-        };
-      }
-      return {
-        reply: "⚠️ Aage badhne ke liye niche diye gaye buttons ka istemal karein.\n\nOPTION: YES, PAY NOW\nOPTION: MENU",
-        nextState: { state: 'AWAITING_PAYMENT_CONFIRMATION' },
       };
     }
 

@@ -71,7 +71,7 @@ export default function Home() {
             </div>
             <div className="flex-1 space-y-1 pr-6">
               <p className="text-[9px] font-black text-white/60 uppercase tracking-[0.2em]">Official Announcement</p>
-              <p className="text-xs sm:text-sm font-bold text-white dark:text-zinc-50 leading-snug">
+              <p className="text-xs sm:text-sm font-black text-white dark:text-zinc-50 leading-snug">
                 {broadcast.broadcastMessage}
               </p>
             </div>
@@ -86,34 +86,34 @@ export default function Home() {
       )}
 
       {/* APP HEADER - SAFE AREA FIXED */}
-      <header className="h-24 pt-[env(safe-area-inset-top,24px)] pb-3 border-b dark:border-zinc-800 bg-white dark:bg-zinc-900 flex items-center justify-between px-4 shrink-0 shadow-sm z-[100] relative">
-        <div className="flex items-center gap-2 mt-auto">
-          <div className="w-8 h-8 sm:w-10 sm:h-10 bg-primary rounded-xl flex items-center justify-center shadow-lg shadow-primary/30">
-            <Zap className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+      <header className="h-28 pt-[calc(env(safe-area-inset-top,24px)+4px)] pb-3 border-b dark:border-zinc-800 bg-white dark:bg-zinc-900 flex items-center justify-between px-5 shrink-0 shadow-sm z-[100] relative">
+        <div className="flex items-center gap-2.5 mt-auto pb-1">
+          <div className="w-10 h-10 sm:w-11 sm:h-11 bg-primary rounded-2xl flex items-center justify-center shadow-lg shadow-primary/30">
+            <Zap className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
           </div>
-          <span className="font-black text-base sm:text-lg tracking-tighter text-primary dark:text-accent uppercase italic">InstaFlow</span>
+          <span className="font-black text-lg sm:text-xl tracking-tighter text-primary dark:text-accent uppercase italic">InstaFlow</span>
         </div>
         
-        <div className="flex items-center gap-1.5 mt-auto">
+        <div className="flex items-center gap-2 mt-auto pb-1">
           {!isUserLoading ? (
             <>
               {!user ? (
-                <div className="flex items-center gap-1.5">
+                <div className="flex items-center gap-2">
                   <Link href="/login">
-                    <Button variant="ghost" size="sm" className="text-[10px] sm:text-xs h-9 font-bold dark:text-zinc-300">Login</Button>
+                    <Button variant="ghost" size="sm" className="text-[10px] sm:text-xs h-9 font-black uppercase dark:text-zinc-300">Login</Button>
                   </Link>
                   <Link href="/signup">
-                    <Button size="sm" className="bg-primary text-white hover:bg-primary/90 text-[10px] sm:text-xs h-9 font-black px-3 sm:px-4 rounded-xl shadow-md">
+                    <Button size="sm" className="bg-primary text-white hover:bg-primary/90 text-[10px] sm:text-xs h-9 font-black px-4 rounded-xl shadow-md uppercase">
                       Sign Up
                     </Button>
                   </Link>
                 </div>
               ) : (
-                <div className="flex items-center gap-1">
+                <div className="flex items-center gap-1.5">
                   <Button 
                     variant="ghost" 
                     size="sm"
-                    className="h-9 w-9 sm:h-10 sm:w-10 p-0 rounded-full hover:bg-accent/10 dark:hover:bg-zinc-800 transition-colors"
+                    className="h-10 w-10 p-0 rounded-full hover:bg-accent/10 dark:hover:bg-zinc-800 transition-colors"
                     onClick={toggleTheme}
                   >
                     {isDark ? <Sun className="w-5 h-5 text-amber-500" /> : <Moon className="w-5 h-5 text-primary" />}
@@ -122,7 +122,7 @@ export default function Home() {
                   <NotificationBell />
                   
                   <Link href="/profile">
-                    <Button variant="ghost" size="sm" className="p-0.5 rounded-full border-2 border-primary/20 ml-0.5">
+                    <Button variant="ghost" size="sm" className="p-0.5 rounded-full border-2 border-primary/20 ml-0.5 shadow-sm">
                       <Avatar className="w-8 h-8 sm:w-9 sm:h-9">
                         <AvatarFallback className="text-[10px] sm:text-[11px] bg-primary text-white font-black">
                           {user.email?.charAt(0).toUpperCase()}
@@ -134,7 +134,7 @@ export default function Home() {
               )}
             </>
           ) : (
-            <Loader2 className="w-5 h-5 animate-spin text-primary" />
+            <Loader2 className="w-6 h-6 animate-spin text-primary" />
           )}
         </div>
       </header>
@@ -144,54 +144,57 @@ export default function Home() {
         <div className="w-full max-w-[440px] h-full bg-white dark:bg-zinc-900 relative flex flex-col shadow-2xl sm:border dark:border-zinc-800 overflow-hidden">
           
           {isAdmin ? (
-            <div className="p-4 sm:p-6 space-y-4 sm:space-y-6 overflow-y-auto h-full scrollbar-hide bg-[#F8F9FC] dark:bg-zinc-950">
-              <div className="space-y-1 mb-2 pt-2">
-                <h1 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white uppercase tracking-tighter">Admin Panel</h1>
-                <p className="text-[10px] sm:text-[11px] text-primary dark:text-accent font-black uppercase tracking-widest italic opacity-80">Management Hub v2.0</p>
+            <div className="p-5 sm:p-7 space-y-5 sm:space-y-7 overflow-y-auto h-full scrollbar-hide bg-[#F8F9FC] dark:bg-zinc-950">
+              <div className="space-y-1.5 mb-2 pt-2">
+                <h1 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white uppercase tracking-tighter">Admin Panel</h1>
+                <p className="text-[11px] sm:text-[12px] text-primary dark:text-accent font-black uppercase tracking-widest italic opacity-80">Management Hub v2.5</p>
               </div>
 
-              <div className="grid gap-3 sm:gap-4 pb-10">
+              <div className="grid gap-4 sm:gap-5 pb-12">
                 <Link href="/orders-feed" className="block w-full">
-                  <Card className="hover:scale-[1.01] active:scale-95 transition-all border-none shadow-xl bg-emerald-600 dark:bg-emerald-800 text-white overflow-hidden h-28 sm:h-32 flex items-center cursor-pointer">
-                    <CardHeader className="p-4 sm:p-6 flex flex-row items-center gap-4 sm:gap-5 w-full space-y-0">
-                      <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center shrink-0 border border-white/20">
-                        <LayoutGrid className="w-6 h-6 text-white" />
+                  <Card className="hover:scale-[1.02] active:scale-95 transition-all border-none shadow-xl bg-emerald-600 dark:bg-emerald-800 text-white overflow-hidden h-32 sm:h-36 flex items-center cursor-pointer relative group">
+                    <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+                    <CardHeader className="p-6 sm:p-7 flex flex-row items-center gap-5 sm:gap-6 w-full space-y-0">
+                      <div className="w-14 h-14 bg-white/20 rounded-[1.5rem] flex items-center justify-center shrink-0 border border-white/20 shadow-inner">
+                        <LayoutGrid className="w-7 h-7 text-white" />
                       </div>
                       <div className="text-left">
-                        <CardTitle className="text-lg font-black uppercase tracking-tight text-white">Live Tracker</CardTitle>
-                        <CardDescription className="text-emerald-50 text-[9px] font-bold opacity-80 uppercase tracking-widest mt-1">Approve & Reject Orders</CardDescription>
+                        <CardTitle className="text-xl font-black uppercase tracking-tight text-white">Live Tracker</CardTitle>
+                        <CardDescription className="text-emerald-50 text-[10px] font-black opacity-80 uppercase tracking-widest mt-1.5">Approve & Reject Orders</CardDescription>
                       </div>
-                      <ArrowRight className="w-5 h-5 ml-auto opacity-40" />
+                      <ArrowRight className="w-6 h-6 ml-auto opacity-40 group-hover:translate-x-1 transition-transform" />
                     </CardHeader>
                   </Card>
                 </Link>
 
                 <Link href="/dashboard/broadcast" className="block w-full">
-                  <Card className="hover:scale-[1.01] active:scale-95 transition-all border-none shadow-xl bg-primary dark:bg-primary/80 text-white overflow-hidden h-28 sm:h-32 flex items-center cursor-pointer">
-                    <CardHeader className="p-4 sm:p-6 flex flex-row items-center gap-4 sm:gap-5 w-full space-y-0">
-                      <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center shrink-0 border border-white/20">
-                        <Megaphone className="w-6 h-6 text-white" />
+                  <Card className="hover:scale-[1.02] active:scale-95 transition-all border-none shadow-xl bg-primary dark:bg-primary/80 text-white overflow-hidden h-32 sm:h-36 flex items-center cursor-pointer relative group">
+                    <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+                    <CardHeader className="p-6 sm:p-7 flex flex-row items-center gap-5 sm:gap-6 w-full space-y-0">
+                      <div className="w-14 h-14 bg-white/20 rounded-[1.5rem] flex items-center justify-center shrink-0 border border-white/20 shadow-inner">
+                        <Megaphone className="w-7 h-7 text-white" />
                       </div>
                       <div className="text-left">
-                        <CardTitle className="text-lg font-black uppercase tracking-tight text-white">Broadcast Msg</CardTitle>
-                        <CardDescription className="text-blue-50 text-[9px] font-bold opacity-80 uppercase tracking-widest mt-1">Real-time Announcements</CardDescription>
+                        <CardTitle className="text-xl font-black uppercase tracking-tight text-white">Broadcast Msg</CardTitle>
+                        <CardDescription className="text-blue-50 text-[10px] font-black opacity-80 uppercase tracking-widest mt-1.5">Real-time Announcements</CardDescription>
                       </div>
-                      <ArrowRight className="w-5 h-5 ml-auto opacity-40" />
+                      <ArrowRight className="w-6 h-6 ml-auto opacity-40 group-hover:translate-x-1 transition-transform" />
                     </CardHeader>
                   </Card>
                 </Link>
 
                 <Link href="/dashboard/users" className="block w-full">
-                  <Card className="hover:scale-[1.01] active:scale-95 transition-all border-none shadow-xl bg-zinc-800 dark:bg-zinc-900 text-white overflow-hidden h-28 sm:h-32 flex items-center border dark:border-zinc-700 cursor-pointer">
-                    <CardHeader className="p-4 sm:p-6 flex flex-row items-center gap-4 sm:gap-5 w-full space-y-0">
-                      <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center shrink-0 border border-white/20">
-                        <Users className="w-6 h-6 text-white" />
+                  <Card className="hover:scale-[1.02] active:scale-95 transition-all border-none shadow-xl bg-zinc-800 dark:bg-zinc-900 text-white overflow-hidden h-32 sm:h-36 flex items-center border dark:border-zinc-700 cursor-pointer relative group">
+                    <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+                    <CardHeader className="p-6 sm:p-7 flex flex-row items-center gap-5 sm:gap-6 w-full space-y-0">
+                      <div className="w-14 h-14 bg-white/20 rounded-[1.5rem] flex items-center justify-center shrink-0 border border-white/20 shadow-inner">
+                        <Users className="w-7 h-7 text-white" />
                       </div>
                       <div className="text-left">
-                        <CardTitle className="text-lg font-black uppercase tracking-tight text-white">All Users</CardTitle>
-                        <CardDescription className="text-zinc-300 text-[9px] font-bold opacity-80 uppercase tracking-widest mt-1">Database & Contact List</CardDescription>
+                        <CardTitle className="text-xl font-black uppercase tracking-tight text-white">All Users</CardTitle>
+                        <CardDescription className="text-zinc-300 text-[10px] font-black opacity-80 uppercase tracking-widest mt-1.5">Database & Contact List</CardDescription>
                       </div>
-                      <ArrowRight className="w-5 h-5 ml-auto opacity-40" />
+                      <ArrowRight className="w-6 h-6 ml-auto opacity-40 group-hover:translate-x-1 transition-transform" />
                     </CardHeader>
                   </Card>
                 </Link>
@@ -201,18 +204,18 @@ export default function Home() {
             <div className="flex-1 flex flex-col h-full overflow-hidden bg-[#F0F2F5] dark:bg-zinc-950">
               {/* USER ACTION BAR */}
               {user && (
-                <div className="h-10 sm:h-12 bg-white dark:bg-zinc-900 border-b dark:border-zinc-800 flex items-center px-4 justify-between shrink-0 shadow-sm z-10">
-                  <span className="text-[9px] sm:text-[10px] font-black text-primary dark:text-accent uppercase tracking-[0.2em] italic">Automated Assistant</span>
+                <div className="h-11 sm:h-12 bg-white dark:bg-zinc-900 border-b dark:border-zinc-800 flex items-center px-5 justify-between shrink-0 shadow-sm z-10">
+                  <span className="text-[10px] sm:text-[11px] font-black text-primary dark:text-accent uppercase tracking-[0.25em] italic">Automated Assistant</span>
                   <Dialog>
                     <DialogTrigger asChild>
-                      <Button variant="ghost" size="sm" className="h-8 gap-1.5 text-[10px] sm:text-[11px] font-black hover:bg-primary/5 text-primary dark:text-accent uppercase tracking-wider">
-                        <History className="w-3.5 h-3.5" /> Recent Orders
+                      <Button variant="ghost" size="sm" className="h-9 gap-2 text-[10px] sm:text-[11px] font-black hover:bg-primary/5 text-primary dark:text-accent uppercase tracking-wider">
+                        <History className="w-4 h-4" /> Recent Orders
                       </Button>
                     </DialogTrigger>
-                    <DialogContent className="max-w-[95vw] sm:max-w-md max-h-[85vh] overflow-y-auto rounded-[2.5rem] dark:bg-zinc-950 border-none shadow-2xl p-6">
+                    <DialogContent className="max-w-[95vw] sm:max-w-md max-h-[85vh] overflow-y-auto rounded-[2.5rem] dark:bg-zinc-950 border-none shadow-2xl p-7">
                       <DialogHeader>
-                        <DialogTitle className="flex items-center gap-2 dark:text-zinc-50 text-base font-black uppercase tracking-tighter">
-                          <History className="w-5 h-5 text-primary" />
+                        <DialogTitle className="flex items-center gap-2.5 dark:text-zinc-50 text-lg font-black uppercase tracking-tighter">
+                          <History className="w-6 h-6 text-primary" />
                           Order History
                         </DialogTitle>
                       </DialogHeader>
@@ -232,9 +235,9 @@ export default function Home() {
       </main>
 
       {/* COMPACT APP FOOTER */}
-      <footer className="h-12 bg-white dark:bg-zinc-950 border-t dark:border-zinc-900 flex items-center justify-center shrink-0 z-[100] pb-[env(safe-area-inset-bottom,10px)]">
-        <p className="text-[7px] sm:text-[8px] text-muted-foreground dark:text-zinc-600 font-black uppercase tracking-[0.5em] opacity-50">
-          InstaFlow Engine v2.0 • Secure SMM
+      <footer className="h-14 bg-white dark:bg-zinc-950 border-t dark:border-zinc-900 flex items-center justify-center shrink-0 z-[100] pb-[calc(env(safe-area-inset-bottom,12px)+8px)]">
+        <p className="text-[8px] sm:text-[9px] text-muted-foreground dark:text-zinc-500 font-black uppercase tracking-[0.6em] opacity-40">
+          InstaFlow Engine v2.5 • Official Automation
         </p>
       </footer>
     </div>
