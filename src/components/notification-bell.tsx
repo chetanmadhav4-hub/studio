@@ -55,14 +55,14 @@ export function NotificationBell() {
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button variant="ghost" size="sm" className="relative h-9 w-9 p-0 rounded-full hover:bg-accent transition-colors">
-          <Bell className="w-5 h-5 text-foreground" />
+        <Button variant="ghost" size="sm" className="relative h-9 w-9 p-0 rounded-full hover:bg-accent transition-colors dark:bg-zinc-900 border dark:border-zinc-800">
+          <Bell className="w-5 h-5 text-foreground dark:text-zinc-100" />
           {hasNewNotification && (
             <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-background animate-pulse" />
           )}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-80 p-0 rounded-xl overflow-hidden shadow-2xl border-none mt-2" align="end">
+      <PopoverContent className="w-80 p-0 rounded-xl overflow-hidden shadow-2xl border-none mt-2 dark:bg-zinc-950" align="end">
         <div className="bg-primary p-3 text-white flex items-center justify-between">
           <h4 className="text-xs font-bold uppercase tracking-wider">Order Updates</h4>
           {session?.notifications && session.notifications.length > 0 && (
@@ -100,11 +100,11 @@ export function NotificationBell() {
                       {notif.message.includes('REJECTED') ? 'Action Needed' : 'Order Success'}
                     </span>
                   </div>
-                  <span className="text-[9px] text-slate-400 font-medium">
+                  <span className="text-[9px] text-slate-400 dark:text-zinc-500 font-medium">
                     {new Date(notif.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                   </span>
                 </div>
-                <p className="text-xs font-medium leading-relaxed text-slate-700 dark:text-slate-200">
+                <p className="text-xs font-medium leading-relaxed text-slate-700 dark:text-zinc-200">
                   {notif.message.replace(/\*/g, '')}
                 </p>
               </div>
@@ -112,7 +112,7 @@ export function NotificationBell() {
           ) : (
             <div className="py-12 text-center space-y-2">
               <Bell className="w-10 h-10 text-slate-100 dark:text-zinc-800 mx-auto" />
-              <p className="text-xs text-slate-400 font-medium italic">Sabhi clear hai. Koi naya update nahi!</p>
+              <p className="text-xs text-slate-400 dark:text-zinc-500 font-medium italic">Sabhi clear hai. Koi naya update nahi!</p>
             </div>
           )}
         </div>

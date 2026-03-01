@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect } from "react";
@@ -6,7 +7,6 @@ import { Button } from "@/components/ui/button";
 import { BotPreview } from "@/components/bot-preview";
 import { OrderHistory } from "@/components/order-history";
 import { NotificationBell } from "@/components/notification-bell";
-import { AdminNotificationBell } from "@/components/admin-notification-bell";
 import { CheckCircle2, Zap, History, Moon, Sun, LayoutGrid, Users, ArrowRight, Loader2 } from "lucide-react";
 import { useUser } from "@/firebase";
 import {
@@ -84,8 +84,6 @@ export default function Home() {
 
                     <NotificationBell />
                     
-                    {isAdmin && <AdminNotificationBell />}
-
                     <Link href="/profile">
                       <Button variant="ghost" size="sm" className="gap-2 text-sm p-1 ml-1">
                         <Avatar className="w-7 h-7 border dark:border-zinc-800">
@@ -124,7 +122,7 @@ export default function Home() {
                 <Link href="/orders-feed">
                   <Card className="hover:shadow-2xl transition-all cursor-pointer group border-primary/20 bg-white dark:bg-zinc-900 overflow-hidden relative">
                     <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:scale-110 transition-transform">
-                      <LayoutGrid className="w-24 h-24" />
+                      <LayoutGrid className="w-24 h-24 dark:text-zinc-700" />
                     </div>
                     <CardHeader className="text-left">
                       <div className="w-12 h-12 bg-emerald-600 rounded-xl flex items-center justify-center mb-4 shadow-lg shadow-emerald-200 dark:shadow-none">
@@ -144,7 +142,7 @@ export default function Home() {
                 <Link href="/dashboard/users">
                   <Card className="hover:shadow-2xl transition-all cursor-pointer group border-primary/20 bg-white dark:bg-zinc-900 overflow-hidden relative">
                     <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:scale-110 transition-transform">
-                      <Users className="w-24 h-24" />
+                      <Users className="w-24 h-24 dark:text-zinc-700" />
                     </div>
                     <CardHeader className="text-left">
                       <div className="w-12 h-12 bg-primary rounded-xl flex items-center justify-center mb-4 shadow-lg shadow-primary/20 dark:shadow-none">
