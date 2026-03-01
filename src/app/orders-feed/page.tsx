@@ -38,7 +38,7 @@ export default function SimpleOrdersFeed() {
   const ordersQuery = useMemoFirebase(() => {
     if (!db || !user || user.email !== ADMIN_EMAIL) return null;
     return query(collection(db, 'all_orders'), orderBy('createdAt', 'desc'), limit(100));
-  }, [db, user?.email]); // Re-run when email is available
+  }, [db, user?.email]);
 
   const { data: orders, isLoading } = useCollection(ordersQuery);
 

@@ -25,7 +25,7 @@ export function AdminNotificationBell() {
 
   // FIX: ONLY query if user is actually the admin to prevent permission errors
   const ordersQuery = useMemoFirebase(() => {
-    if (!db || user?.email !== ADMIN_EMAIL) return null;
+    if (!db || !user || user.email !== ADMIN_EMAIL) return null;
     return query(
       collection(db, 'all_orders'), 
       where('status', '==', 'PROCESSING'),
@@ -48,7 +48,7 @@ export function AdminNotificationBell() {
     }
   }, [newOrders, prevCount]);
 
-  if (user?.email !== ADMIN_EMAIL) return null;
+  if (!user || user.email !== ADMIN_EMAIL) return null;
 
   return (
     <Popover>
@@ -68,9 +68,9 @@ export function AdminNotificationBell() {
             <Zap className="w-4 h-4" />
             <h4 className="text-xs font-bold uppercase tracking-wider">New Order Alerts</h4>
           </div>
-          <Badge variant="secondary" className="bg-white/20 text-white text-[9px] border-none">
+          <div className="px-2 py-0.5 rounded-full bg-white/20 text-white text-[9px] font-bold border-none uppercase">
             ADMIN ONLY
-          </Badge>
+          </div>
         </div>
         <div className="p-4 bg-white dark:bg-zinc-900 max-h-80 overflow-y-auto space-y-3">
           {newOrders && newOrders.length > 0 ? (
@@ -114,13 +114,5 @@ export function AdminNotificationBell() {
         </div>
       </PopoverContent>
     </Popover>
-  );
-}
-
-function Badge({ children, variant, className }: any) {
-  return (
-    <span className={`px-2 py-0.5 rounded-full font-bold ${className}`}>
-      {children}
-    </span>
   );
 }

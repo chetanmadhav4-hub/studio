@@ -23,11 +23,11 @@ export default function AdminOrdersPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const ADMIN_EMAIL = 'chetanmadhav4@gmail.com';
 
-  // FIX: Gate query for collection group to avoid permission issues if not admin
+  // FIX: ONLY query if user is actually the admin to prevent permission issues
   const ordersQuery = useMemoFirebase(() => {
     if (!db || !user || user.email !== ADMIN_EMAIL) return null;
     return query(collection(db, 'all_orders'), orderBy('createdAt', 'desc'));
-  }, [db, user]);
+  }, [db, user?.email]);
 
   const { data: allOrders, isLoading, error } = useCollection(ordersQuery);
 

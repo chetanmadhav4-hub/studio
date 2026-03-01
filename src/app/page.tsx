@@ -129,7 +129,7 @@ export default function Home() {
                       <div className="w-12 h-12 bg-emerald-600 rounded-xl flex items-center justify-center mb-4 shadow-lg shadow-emerald-200 dark:shadow-none">
                         <LayoutGrid className="w-6 h-6 text-white" />
                       </div>
-                      <CardTitle className="text-2xl font-bold dark:text-white">LIVE TRACKER (ऑर्डर)</CardTitle>
+                      <CardTitle className="text-2xl font-bold dark:text-white uppercase">Live Tracker (ऑर्डर)</CardTitle>
                       <CardDescription className="dark:text-zinc-400">Manage pending orders, approve or reject payments instantly.</CardDescription>
                     </CardHeader>
                     <CardContent className="text-left">
@@ -149,7 +149,7 @@ export default function Home() {
                       <div className="w-12 h-12 bg-primary rounded-xl flex items-center justify-center mb-4 shadow-lg shadow-primary/20 dark:shadow-none">
                         <Users className="w-6 h-6 text-white" />
                       </div>
-                      <CardTitle className="text-2xl font-bold dark:text-white">REGISTERED USERS</CardTitle>
+                      <CardTitle className="text-2xl font-bold dark:text-white uppercase">Registered Users</CardTitle>
                       <CardDescription className="dark:text-zinc-400">View your growing community and manage user profiles.</CardDescription>
                     </CardHeader>
                     <CardContent className="text-left">
