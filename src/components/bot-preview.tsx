@@ -166,7 +166,7 @@ export function BotPreview({ isAppMode = false }: BotPreviewProps) {
     const content = otherLines.map((line, idx) => {
       if (line.trim() === "" && idx !== otherLines.length - 1) return <div key={idx} className="h-2" />;
       return (
-        <div key={idx} className="leading-relaxed text-slate-900 dark:text-zinc-100 font-black whitespace-pre-wrap">
+        <div key={idx} className="leading-relaxed text-slate-900 dark:text-zinc-50 font-black whitespace-pre-wrap">
           {line.replace(/\*/g, '')}
         </div>
       );
@@ -178,7 +178,10 @@ export function BotPreview({ isAppMode = false }: BotPreviewProps) {
         
         {upiLink && (
           <div className="mt-2">
-            <a href={upiLink} className="w-full flex items-center justify-center gap-2 bg-[#00A884] text-white py-4 rounded-2xl text-[13px] font-black uppercase no-underline shadow-xl active:scale-95 transition-all">
+            <a 
+              href={upiLink} 
+              className="w-full flex items-center justify-center gap-2 bg-[#00A884] text-white py-4 rounded-2xl text-[13px] font-black uppercase no-underline shadow-xl active:scale-95 transition-all"
+            >
               <Check className="w-5 h-5" /> Pay via UPI App
             </a>
           </div>
@@ -190,7 +193,7 @@ export function BotPreview({ isAppMode = false }: BotPreviewProps) {
               Send Order Details to Admin and conform your order
             </p>
             <a 
-              href={`https://wa.me/919116399517?text=${whatsappMatch[1]}`}
+              href={`https://wa.me/918239914751?text=${whatsappMatch[1]}`}
               target="_blank"
               rel="noopener noreferrer"
               className="w-full py-4 px-5 font-black text-[13px] rounded-2xl bg-[#25D366] text-white hover:bg-[#128C7E] transition-all flex items-center justify-center gap-2 shadow-2xl active:scale-95 no-underline uppercase tracking-tight"

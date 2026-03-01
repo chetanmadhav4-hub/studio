@@ -133,7 +133,7 @@ export async function processBotMessage(
   switch (session.state) {
     case 'AWAITING_SERVICE_SELECTION': {
       return {
-        reply: "⚠️ Kripya niche diye gaye list mein se ek service select karein.\n\nType 'MENU' to see all services.",
+        reply: "⚠️ Kripya niche diye gaye buttons mein se ek select karein.\n\nType 'MENU' to see all services.",
         nextState: { state: 'AWAITING_SERVICE_SELECTION' },
       };
     }
@@ -164,7 +164,8 @@ export async function processBotMessage(
 
     case 'AWAITING_PAYMENT_DETAILS': {
        if (normalizedMsg === 'yes, proceed' || normalizedMsg === '✅ yes, proceed') {
-         const upiId = 'chetanmrbest-1@okicici'; 
+         // NEW UPI ID as requested by user
+         const upiId = '8239914751@ybl'; 
          const accountName = 'CHETAN KUMAR MEGHWAL';
          const upiLink = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(accountName)}&cu=INR`;
 
