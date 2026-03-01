@@ -226,7 +226,7 @@ export default function Home() {
               )}
 
               {/* CHAT INTERFACE AREA */}
-              <div className="flex-1 relative overflow-hidden">
+              <div className="flex-1 relative flex flex-col overflow-hidden">
                 <BotPreview isAppMode={true} />
               </div>
             </div>

@@ -6,7 +6,8 @@ import {
   LogOut,
   Zap,
   LayoutDashboard,
-  Megaphone
+  Megaphone,
+  MessageSquare
 } from "lucide-react";
 import { SidebarProvider, Sidebar, SidebarContent, SidebarHeader, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
 
@@ -39,6 +40,14 @@ export default function DashboardLayout({
                 <Link href="/dashboard/users" className="flex items-center gap-3">
                   <Users className="w-4 h-4" />
                   <span className="font-semibold">Registered Users</span>
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
+              <SidebarMenuButton asChild tooltip="Live Chats">
+                <Link href="/dashboard/chat" className="flex items-center gap-3">
+                  <MessageSquare className="w-4 h-4" />
+                  <span className="font-semibold">Live Chats</span>
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
