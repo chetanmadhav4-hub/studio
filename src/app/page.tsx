@@ -71,7 +71,6 @@ export default function Home() {
             </div>
             <div className="flex-1 space-y-1.5 pr-7">
               <p className="text-[9px] font-black text-white/70 uppercase tracking-[0.25em]">Official Announcement</p>
-              {/* FIXED: added whitespace-pre-wrap to preserve line breaks and dark:text-zinc-50 for silver/white words */}
               <p className="text-sm font-black text-white dark:text-zinc-50 leading-snug whitespace-pre-wrap">
                 {broadcast.broadcastMessage}
               </p>
@@ -237,8 +236,8 @@ export default function Home() {
 
       {/* COMPACT APP FOOTER */}
       <footer className="h-16 bg-white dark:bg-zinc-950 border-t dark:border-zinc-900 flex items-center justify-center shrink-0 z-[100] pb-[calc(env(safe-area-inset-bottom,12px)+10px)]">
-        <p className="text-[9px] sm:text-[10px] text-muted-foreground dark:text-zinc-500 font-black uppercase tracking-[0.7em] opacity-50">
-          InstaFlow Engine v2.5 • Official Automation
+        <p className="text-[9px] sm:text-[10px] text-muted-foreground dark:text-zinc-500 font-black uppercase tracking-[0.4em] opacity-50">
+          instaflow create by chetan nagani
         </p>
       </footer>
     </div>

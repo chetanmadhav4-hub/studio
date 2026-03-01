@@ -155,8 +155,8 @@ export default function LoginPage() {
         </form>
       </Card>
       
-      <p className="mt-8 text-[9px] font-black text-muted-foreground uppercase tracking-[0.5em] opacity-40">
-        InstaFlow Security Engine v2.5
+      <p className="mt-8 text-[10px] font-black text-muted-foreground uppercase tracking-[0.4em] opacity-40">
+        instaflow create by chetan nagani
       </p>
     </div>
   );

@@ -104,82 +104,85 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="min-h-screen bg-background p-4 md:p-8">
+    <div className="h-full w-full overflow-y-auto bg-background p-4 md:p-8 pt-[calc(env(safe-area-inset-top,24px)+24px)] pb-12">
       <div className="max-w-2xl mx-auto space-y-6">
         <div className="flex items-center justify-between">
           <Link href="/">
-            <Button variant="ghost" className="gap-2">
+            <Button variant="ghost" className="gap-2 dark:text-zinc-50 font-bold uppercase tracking-wider text-xs">
               <ArrowLeft className="w-4 h-4" />
               Back to Home
             </Button>
           </Link>
           <div className="flex items-center gap-2">
             <Zap className="w-6 h-6 text-primary" />
-            <span className="font-bold text-xl text-primary">InstaFlow</span>
+            <span className="font-black text-xl text-primary uppercase italic">InstaFlow</span>
           </div>
         </div>
 
-        <Card className="border-none shadow-md">
-          <CardHeader>
-            <CardTitle>My Profile</CardTitle>
-            <CardDescription>View and manage your account settings.</CardDescription>
+        <Card className="border-none shadow-2xl rounded-[2rem] bg-white dark:bg-zinc-900 overflow-hidden">
+          <CardHeader className="bg-primary/5 dark:bg-primary/10">
+            <CardTitle className="font-black uppercase tracking-tight dark:text-zinc-50">My Profile</CardTitle>
+            <CardDescription className="font-bold text-[10px] uppercase tracking-widest opacity-70">Account Settings & Details</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-1">
-                <Label className="text-muted-foreground text-xs uppercase tracking-wider">Username</Label>
-                <p className="font-semibold text-lg">@{username}</p>
+          <CardContent className="space-y-6 p-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              <div className="space-y-1 p-4 bg-slate-50 dark:bg-zinc-800 rounded-2xl border dark:border-zinc-700">
+                <Label className="text-muted-foreground text-[9px] font-black uppercase tracking-[0.2em] block mb-1">Username</Label>
+                <p className="font-black text-lg text-primary dark:text-accent">@{username}</p>
               </div>
-              <div className="space-y-1">
-                <Label className="text-muted-foreground text-xs uppercase tracking-wider">Email Address</Label>
-                <p className="font-semibold">{user.email}</p>
+              <div className="space-y-1 p-4 bg-slate-50 dark:bg-zinc-800 rounded-2xl border dark:border-zinc-700">
+                <Label className="text-muted-foreground text-[9px] font-black uppercase tracking-[0.2em] block mb-1">Email Address</Label>
+                <p className="font-black text-sm text-slate-700 dark:text-zinc-200 truncate">{user.email}</p>
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="border-none shadow-md">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
+        <Card className="border-none shadow-2xl rounded-[2rem] bg-white dark:bg-zinc-900 overflow-hidden">
+          <CardHeader className="bg-primary/5 dark:bg-primary/10">
+            <CardTitle className="flex items-center gap-2 font-black uppercase tracking-tight dark:text-zinc-50 text-base">
               <ShieldEllipsis className="w-5 h-5 text-primary" />
-              Change Password
+              Security Settings
             </CardTitle>
           </CardHeader>
           <form onSubmit={handlePasswordChange}>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-4 p-8">
               <div className="space-y-2">
-                <Label htmlFor="current-password">Current Password</Label>
+                <Label className="text-[10px] font-black uppercase tracking-widest ml-1" htmlFor="current-password">Current Password</Label>
                 <Input 
                   id="current-password" 
                   type="password" 
                   required 
+                  className="h-12 bg-slate-50 dark:bg-zinc-800 border-none rounded-xl font-bold dark:text-zinc-50"
                   value={currentPassword}
                   onChange={(e) => setCurrentPassword(e.target.value)}
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="new-password">New Password</Label>
+                <Label className="text-[10px] font-black uppercase tracking-widest ml-1" htmlFor="new-password">New Password</Label>
                 <Input 
                   id="new-password" 
                   type="password" 
                   required 
+                  className="h-12 bg-slate-50 dark:bg-zinc-800 border-none rounded-xl font-bold dark:text-zinc-50"
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="confirm-password">Confirm New Password</Label>
+                <Label className="text-[10px] font-black uppercase tracking-widest ml-1" htmlFor="confirm-password">Confirm New Password</Label>
                 <Input 
                   id="confirm-password" 
                   type="password" 
                   required 
+                  className="h-12 bg-slate-50 dark:bg-zinc-800 border-none rounded-xl font-bold dark:text-zinc-50"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                 />
               </div>
             </CardContent>
-            <CardFooter>
-              <Button type="submit" disabled={loading} className="w-full">
+            <CardFooter className="p-8 pt-0">
+              <Button type="submit" disabled={loading} className="w-full h-12 font-black uppercase tracking-widest rounded-xl shadow-xl shadow-primary/20">
                 {loading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
                 Update Password
               </Button>
@@ -190,46 +193,41 @@ export default function ProfilePage() {
         <div className="grid sm:grid-cols-2 gap-4">
           <Dialog>
             <DialogTrigger asChild>
-              <Card className="border-none shadow-sm hover:shadow-md transition-shadow cursor-pointer">
-                <CardHeader className="p-4">
-                  <CardTitle className="text-base flex items-center gap-2">
+              <Card className="border-none shadow-xl hover:scale-[1.02] transition-transform cursor-pointer rounded-3xl bg-white dark:bg-zinc-900">
+                <CardHeader className="p-6">
+                  <CardTitle className="text-sm flex items-center gap-2 font-black uppercase tracking-tight dark:text-zinc-50">
                     <ScrollText className="w-4 h-4 text-primary" />
-                    Terms & Conditions
+                    Policies
                   </CardTitle>
-                  <CardDescription className="text-xs">Review our usage policies.</CardDescription>
+                  <CardDescription className="text-[9px] font-black uppercase tracking-widest">Usage Terms</CardDescription>
                 </CardHeader>
-                <CardContent className="p-4 pt-0">
-                  <p className="text-[10px] text-muted-foreground line-clamp-2">
-                    By using InstaFlow, you agree to our terms of service regarding SMM panel automation and payments...
-                  </p>
-                </CardContent>
               </Card>
             </DialogTrigger>
-            <DialogContent className="max-w-[90vw] md:max-w-md h-[80vh] overflow-y-auto">
+            <DialogContent className="max-w-[90vw] md:max-w-md h-[80vh] overflow-y-auto rounded-[2.5rem] dark:bg-zinc-950 border-none p-8">
               <DialogHeader>
-                <DialogTitle>Terms & Conditions</DialogTitle>
-                <DialogDescription>Please read carefully before using our services.</DialogDescription>
+                <DialogTitle className="font-black uppercase tracking-tighter text-xl">Terms & Conditions</DialogTitle>
+                <DialogDescription className="font-bold text-xs uppercase tracking-widest">InstaFlow Official Guidelines</DialogDescription>
               </DialogHeader>
-              <div className="space-y-4 text-sm text-foreground/80 py-4">
+              <div className="space-y-6 text-sm text-foreground/80 py-6">
                 <section className="space-y-2">
-                  <h4 className="font-bold text-primary">1. Service Usage</h4>
-                  <p>InstaFlow is an automation tool for social media services. We are not affiliated with Instagram or any social media platform.</p>
+                  <h4 className="font-black text-primary uppercase text-xs tracking-wider">1. Service Usage</h4>
+                  <p className="font-medium leading-relaxed dark:text-zinc-300">InstaFlow is an automation tool for social media services. We are not affiliated with Instagram or any social media platform.</p>
                 </section>
                 <section className="space-y-2">
-                  <h4 className="font-bold text-primary">2. Account Safety</h4>
-                  <p>We do not ask for your Instagram password. You should only provide profile or post links. Ensure your account is PUBLIC before ordering.</p>
+                  <h4 className="font-black text-primary uppercase text-xs tracking-wider">2. Account Safety</h4>
+                  <p className="font-medium leading-relaxed dark:text-zinc-300">We do not ask for your Instagram password. You should only provide profile or post links. Ensure your account is PUBLIC before ordering.</p>
                 </section>
                 <section className="space-y-2">
-                  <h4 className="font-bold text-primary">3. Refund Policy</h4>
-                  <p>Once an order is placed and the payment is confirmed, no refunds will be processed as the order is instantly sent to the SMM panel.</p>
+                  <h4 className="font-black text-primary uppercase text-xs tracking-wider">3. Refund Policy</h4>
+                  <p className="font-medium leading-relaxed dark:text-zinc-300">Once an order is placed and the payment is confirmed, no refunds will be processed as the order is instantly sent to the SMM panel.</p>
                 </section>
                 <section className="space-y-2">
-                  <h4 className="font-bold text-primary">4. Delivery Time</h4>
-                  <p>Estimated start times (0-30 mins) are indicative. Some services may take up to 24 hours depending on the server load.</p>
+                  <h4 className="font-black text-primary uppercase text-xs tracking-wider">4. Delivery Time</h4>
+                  <p className="font-medium leading-relaxed dark:text-zinc-300">Estimated start times (0-30 mins) are indicative. Some services may take up to 24 hours depending on the server load.</p>
                 </section>
                 <section className="space-y-2">
-                  <h4 className="font-bold text-primary">5. Payments</h4>
-                  <p>All payments must be made to the official UPI ID mentioned in the bot. Screenshots must be provided for manual verification if required.</p>
+                  <h4 className="font-black text-primary uppercase text-xs tracking-wider">5. Payments</h4>
+                  <p className="font-medium leading-relaxed dark:text-zinc-300">All payments must be made to the official UPI ID mentioned in the bot. Screenshots must be provided for manual verification if required.</p>
                 </section>
               </div>
             </DialogContent>
@@ -240,13 +238,13 @@ export default function ProfilePage() {
             target="_blank" 
             rel="noopener noreferrer"
           >
-            <Card className="border-none shadow-sm hover:shadow-md transition-shadow cursor-pointer h-full">
-              <CardHeader className="p-4">
-                <CardTitle className="text-base flex items-center gap-2">
-                  <MessageSquare className="w-4 h-4 text-primary" />
-                  Contact Support
+            <Card className="border-none shadow-xl hover:scale-[1.02] transition-transform cursor-pointer rounded-3xl bg-[#25D366] text-white">
+              <CardHeader className="p-6">
+                <CardTitle className="text-sm flex items-center gap-2 font-black uppercase tracking-tight">
+                  <MessageSquare className="w-4 h-4" />
+                  Live Help
                 </CardTitle>
-                <CardDescription className="text-xs">Get help from our team via WhatsApp.</CardDescription>
+                <CardDescription className="text-[9px] font-black uppercase tracking-widest text-white/80">Contact via WhatsApp</CardDescription>
               </CardHeader>
             </Card>
           </a>
@@ -254,15 +252,15 @@ export default function ProfilePage() {
 
         <Button 
           variant="destructive" 
-          className="w-full h-12 gap-2" 
+          className="w-full h-14 gap-2 rounded-2xl font-black uppercase tracking-widest shadow-2xl shadow-red-500/20 mb-8" 
           onClick={handleLogout}
         >
           <LogOut className="w-5 h-5" />
-          Logout from Account
+          Logout Account
         </Button>
 
-        <p className="text-center text-xs text-muted-foreground pt-4">
-          © 2024 InstaFlow Automation. All rights reserved.
+        <p className="text-center text-[10px] text-muted-foreground font-black uppercase tracking-[0.4em] pt-4 opacity-50">
+          instaflow create by chetan nagani
         </p>
       </div>
     </div>
