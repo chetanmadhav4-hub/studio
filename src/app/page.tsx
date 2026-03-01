@@ -7,8 +7,9 @@ import { Button } from "@/components/ui/button";
 import { BotPreview } from "@/components/bot-preview";
 import { OrderHistory } from "@/components/order-history";
 import { NotificationBell } from "@/components/notification-bell";
-import { Zap, History, Moon, Sun, LayoutGrid, Users, Loader2 } from "lucide-react";
-import { useUser } from "@/firebase";
+import { Zap, History, Moon, Sun, LayoutGrid, Users, Loader2, Megaphone, X } from "lucide-react";
+import { useUser, useFirestore, useDoc } from "@/firebase";
+import { doc } from "firebase/firestore";
 import {
   Dialog,
   DialogContent,
@@ -21,10 +22,15 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 
 export default function Home() {
   const { user, isUserLoading } = useUser();
+  const db = useFirestore();
   const [isDark, setIsDark] = useState(false);
+  const [isBroadcastDismissed, setIsBroadcastDismissed] = useState(false);
 
   const ADMIN_EMAIL = 'chetanmadhav4@gmail.com';
   const isAdmin = user && user.email === ADMIN_EMAIL;
+
+  const broadcastRef = doc(db, 'settings', 'broadcast');
+  const { data: broadcast } = useDoc(broadcastRef);
 
   useEffect(() => {
     const theme = localStorage.getItem("theme");
@@ -48,6 +54,30 @@ export default function Home() {
 
   return (
     <div className="h-screen w-full flex flex-col bg-background transition-colors duration-300 overflow-hidden">
+      {/* Real-time Broadcast Overlay */}
+      {broadcast?.isBroadcastActive && !isBroadcastDismissed && (
+        <div className="absolute top-16 left-1/2 -translate-x-1/2 w-[90%] max-w-[380px] z-[100] animate-in slide-in-from-top-4 duration-500">
+          <div className="bg-primary dark:bg-accent p-4 rounded-2xl shadow-2xl border-2 border-white/20 flex items-start gap-4 relative overflow-hidden group">
+            <div className="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2" />
+            <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center shrink-0">
+              <Megaphone className="w-5 h-5 text-white animate-bounce" />
+            </div>
+            <div className="flex-1 space-y-1 pr-4">
+              <p className="text-[10px] font-black text-white/70 uppercase tracking-widest">Official Update</p>
+              <p className="text-xs font-bold text-white dark:text-zinc-100 leading-relaxed">
+                {broadcast.broadcastMessage}
+              </p>
+            </div>
+            <button 
+              onClick={() => setIsBroadcastDismissed(true)}
+              className="absolute top-2 right-2 w-6 h-6 bg-black/10 hover:bg-black/20 rounded-full flex items-center justify-center transition-colors"
+            >
+              <X className="w-3 h-3 text-white" />
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Sleek App Header */}
       <header className="h-14 border-b bg-white dark:bg-zinc-950 flex items-center justify-between px-4 shrink-0 shadow-sm z-50">
         <div className="flex items-center gap-2">
@@ -126,14 +156,26 @@ export default function Home() {
                   </Card>
                 </Link>
 
-                <Link href="/dashboard/users">
+                <Link href="/dashboard/broadcast">
                   <Card className="hover:scale-[1.01] transition-all border-none shadow-lg bg-primary dark:bg-primary/80 text-white overflow-hidden group">
+                    <CardHeader className="p-5 text-left">
+                      <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center mb-3 group-hover:rotate-12 transition-transform">
+                        <Megaphone className="w-5 h-5 text-white" />
+                      </div>
+                      <CardTitle className="text-lg font-black uppercase tracking-tight text-white">Broadcast Msg</CardTitle>
+                      <CardDescription className="text-blue-50 text-[10px] font-bold opacity-80 uppercase">Edit Live Announcements</CardDescription>
+                    </CardHeader>
+                  </Card>
+                </Link>
+
+                <Link href="/dashboard/users">
+                  <Card className="hover:scale-[1.01] transition-all border-none shadow-lg bg-zinc-800 dark:bg-zinc-900 text-white overflow-hidden group">
                     <CardHeader className="p-5 text-left">
                       <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center mb-3 group-hover:rotate-12 transition-transform">
                         <Users className="w-5 h-5 text-white" />
                       </div>
                       <CardTitle className="text-lg font-black uppercase tracking-tight text-white">User Database</CardTitle>
-                      <CardDescription className="text-blue-50 text-[10px] font-bold opacity-80 uppercase">Registered User Profiles</CardDescription>
+                      <CardDescription className="text-zinc-300 text-[10px] font-bold opacity-80 uppercase">Registered User Profiles</CardDescription>
                     </CardHeader>
                   </Card>
                 </Link>

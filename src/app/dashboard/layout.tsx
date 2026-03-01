@@ -1,10 +1,12 @@
+
 import Link from "next/link";
 import { 
   ShoppingBag, 
   Users,
   LogOut,
   Zap,
-  LayoutDashboard
+  LayoutDashboard,
+  Megaphone
 } from "lucide-react";
 import { SidebarProvider, Sidebar, SidebarContent, SidebarHeader, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
 
@@ -37,6 +39,14 @@ export default function DashboardLayout({
                 <Link href="/dashboard/users" className="flex items-center gap-3">
                   <Users className="w-4 h-4" />
                   <span className="font-semibold">Registered Users</span>
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
+              <SidebarMenuButton asChild tooltip="Broadcast">
+                <Link href="/dashboard/broadcast" className="flex items-center gap-3">
+                  <Megaphone className="w-4 h-4" />
+                  <span className="font-semibold">Broadcast Admin</span>
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>

@@ -39,6 +39,16 @@
         "createdAt": { "type": "string", "format": "date-time" }
       },
       "required": ["id", "serviceName", "quantity", "price", "status", "createdAt"]
+    },
+    "AppSetting": {
+      "title": "AppSetting",
+      "description": "Global application settings like broadcast messages.",
+      "type": "object",
+      "properties": {
+        "broadcastMessage": { "type": "string" },
+        "isBroadcastActive": { "type": "boolean" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      }
     }
   },
   "auth": {
@@ -60,6 +70,10 @@
     "/all_orders/{orderId}": {
       "schema": { "$ref": "#/backend/entities/Order" },
       "description": "A master collection of all orders for the live tracker."
+    },
+    "/settings/broadcast": {
+      "schema": { "$ref": "#/backend/entities/AppSetting" },
+      "description": "Global broadcast message settings."
     }
   }
 }
