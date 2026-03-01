@@ -54,7 +54,7 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground overflow-hidden h-screen;
+    @apply bg-background text-foreground overflow-hidden h-[100dvh];
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
