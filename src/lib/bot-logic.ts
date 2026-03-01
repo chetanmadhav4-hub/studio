@@ -91,12 +91,12 @@ export async function processBotMessage(
     };
   }
 
+  // Handle service selection from any state if user sends "1", "2", etc.
   let interceptedServiceKey = '';
   Object.entries(SERVICES_CONFIG).forEach(([key, service]) => {
-    if (normalizedMsg.includes(service.name.toLowerCase()) || (normalizedMsg.length < 3 && (normalizedMsg === key || normalizedMsg === `${key || ''}`.replace('.','')))) {
-      if (normalizedMsg === key || normalizedMsg === `${key}.`) {
-         interceptedServiceKey = key;
-      }
+    const cleanMsg = normalizedMsg.replace('.', '');
+    if (cleanMsg === key || normalizedMsg === service.name.toLowerCase()) {
+      interceptedServiceKey = key;
     }
   });
 
