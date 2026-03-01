@@ -22,7 +22,6 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { processBotMessage } from "@/lib/bot-logic";
 import { UserSession } from "@/lib/bot-types";
-import { PlaceHolderImages } from "@/lib/placeholder-images";
 import Image from "next/image";
 
 interface ChatMessage {
@@ -47,8 +46,6 @@ export function BotPreview({ isAppMode = false }: BotPreviewProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [formLink, setFormLink] = useState("");
   const [formUtr, setFormUtr] = useState("");
-
-  const qrImage = PlaceHolderImages.find(img => img.id === 'slice-payment-qr');
 
   const sessionRef = useMemoFirebase(() => {
     if (!db || !user) return null;
@@ -172,28 +169,33 @@ export function BotPreview({ isAppMode = false }: BotPreviewProps) {
       );
     });
 
+    // Dynamic QR URL with Amount
+    const price = sessionData?.data?.price || 0;
+    const upiUri = `upi://pay?pa=smmxpressbot@slc&pn=InstaFlow%20Bot&am=${price}&cu=INR`;
+    const dynamicQrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=600x600&data=${encodeURIComponent(upiUri)}`;
+
     return (
       <div className="flex flex-col gap-1.5">
         <div className="text-[13px] flex flex-col">{content}</div>
         
-        {hasQR && qrImage && (
+        {hasQR && (
           <div className="mt-4 flex flex-col items-center gap-3 w-full">
             <div className="relative w-64 aspect-square rounded-[2rem] overflow-hidden border-4 border-white shadow-2xl bg-white">
               <Image 
-                src={qrImage.imageUrl} 
+                src={dynamicQrUrl} 
                 alt="Payment QR" 
                 fill 
                 className="object-contain p-2"
-                data-ai-hint={qrImage.imageHint}
                 unoptimized
               />
             </div>
             <div className="flex flex-col gap-2 w-full">
               <Button asChild variant="default" className="w-full h-12 rounded-2xl font-black uppercase text-[11px] tracking-widest gap-2 bg-primary text-white hover:bg-primary/90 shadow-xl active:scale-95 transition-all">
-                <a href={qrImage.imageUrl} download="InstaFlow_QR.png">
-                  <Download className="w-4 h-4" /> Download QR Code
+                <a href={dynamicQrUrl} target="_blank" rel="noopener noreferrer" download={`InstaFlow_Payment_₹${price}.png`}>
+                  <Download className="w-4 h-4" /> Download QR (₹{price})
                 </a>
               </Button>
+              <p className="text-[10px] text-center font-black text-slate-400 uppercase tracking-tight">Amount ₹{price} is pre-filled</p>
             </div>
           </div>
         )}
