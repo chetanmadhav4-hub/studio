@@ -143,7 +143,6 @@ export function BotPreview({ isAppMode = false }: BotPreviewProps) {
   };
 
   const renderMessageContent = (text: string) => {
-    const urlRegex = /(https?:\/\/[^\s]+)/g;
     const upiRegex = /^upi:\/\/pay\S+$/;
     const formTag = "[PAYMENT_FORM]";
     const whatsappTagRegex = /\[WHATSAPP_ADMIN:(.+?)\]/;
@@ -165,25 +164,12 @@ export function BotPreview({ isAppMode = false }: BotPreviewProps) {
     });
 
     const content = otherLines.map((line, idx) => {
-      const matches = line.match(urlRegex);
-      if (matches) {
-        const imageUrl = matches[0];
-        const isImageUrl = imageUrl.includes("picsum.photos") || imageUrl.match(/\.(jpeg|jpg|gif|png|webp|svg)/i);
-        
-        if (isImageUrl) {
-          const textBeforeUrl = line.replace(imageUrl, "").trim();
-          return (
-            <div key={idx} className="my-4 flex flex-col gap-3">
-              {textBeforeUrl && <div className="leading-relaxed font-black text-slate-900 dark:text-zinc-100 whitespace-pre-wrap">{textBeforeUrl.replace(/\*/g, '')}</div>}
-              <div className="bg-white p-3 rounded-[2rem] border-2 border-primary/10 shadow-2xl max-w-[260px] mx-auto text-center transform hover:scale-[1.02] transition-transform overflow-hidden">
-                <img src={imageUrl} alt="QR Code" className="rounded-[1.5rem] w-full h-auto" />
-              </div>
-            </div>
-          );
-        }
-      }
       if (line.trim() === "" && idx !== otherLines.length - 1) return <div key={idx} className="h-2" />;
-      return <div key={idx} className="leading-relaxed text-slate-900 dark:text-zinc-100 font-black whitespace-pre-wrap">{line.replace(/\*/g, '')}</div>;
+      return (
+        <div key={idx} className="leading-relaxed text-slate-900 dark:text-zinc-100 font-black whitespace-pre-wrap">
+          {line.replace(/\*/g, '')}
+        </div>
+      );
     });
 
     return (
@@ -263,7 +249,7 @@ export function BotPreview({ isAppMode = false }: BotPreviewProps) {
   return (
     <div className={cn(
       "relative w-full flex flex-col bg-[#E5DDD5] dark:bg-zinc-950 overflow-hidden",
-      isAppMode ? "h-full" : "max-w-[340px] h-[100dvh] mx-auto rounded-[2.5rem] border-[8px] border-zinc-800 dark:border-zinc-700 p-1 shadow-2xl"
+      isAppMode ? "h-full" : "max-w-[440px] h-[100dvh] mx-auto rounded-[2.5rem] border-[8px] border-zinc-800 dark:border-zinc-700 p-1 shadow-2xl"
     )}>
       <div className="bg-[#075E54] dark:bg-zinc-900 text-white pt-[calc(env(safe-area-inset-top,24px)+12px)] pb-4 px-5 flex items-center gap-3 shrink-0 shadow-md z-20">
         <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center border-2 border-white/10 shadow-inner">
