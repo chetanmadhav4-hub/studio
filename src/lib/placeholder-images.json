@@ -2,8 +2,8 @@
   "placeholderImages": [
     {
       "id": "slice-payment-qr",
-      "description": "Slice QR code for 8239914751@ybl generated dynamically.",
-      "imageUrl": "https://api.qrserver.com/v1/create-qr-code/?size=600x600&data=upi://pay?pa=8239914751@ybl&pn=InstaFlow%20Bot&cu=INR",
+      "description": "Slice QR code for smmxpressbot@slc generated dynamically.",
+      "imageUrl": "https://api.qrserver.com/v1/create-qr-code/?size=600x600&data=upi://pay?pa=smmxpressbot@slc&pn=InstaFlow%20Bot&cu=INR",
       "imageHint": "upi qr code payment"
     }
   ]

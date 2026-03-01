@@ -158,7 +158,7 @@ export async function processBotMessage(
     case 'AWAITING_PAYMENT_DETAILS': {
        if (normalizedMsg === 'yes, proceed' || normalizedMsg === '✅ yes, proceed') {
          return {
-           reply: `📸 *Payment QR Code*\n\nKripya niche diye gaye QR code ko scan ya save karke ₹${session.data.price} ka payment karein.\n\n[PAYMENT_QR]\n\nPayment ke baad 12-digit UTR ID niche form mein bharein:\n\n[PAYMENT_FORM]\n\nOPTION: 🏠 MAIN MENU`,
+           reply: `📸 *Payment QR Code*\n\nKripya niche diye gaye QR code ko scan ya save karke ₹${session.data.price} ka payment karein.\n\nUPI ID: *smmxpressbot@slc*\n\n[PAYMENT_QR]\n\nPayment ke baad 12-digit UTR ID niche form mein bharein:\n\n[PAYMENT_FORM]\n\nOPTION: 🏠 MAIN MENU`,
            nextState: { state: 'AWAITING_PAYMENT_DETAILS' },
          };
        }

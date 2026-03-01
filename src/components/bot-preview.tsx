@@ -188,7 +188,7 @@ export function BotPreview({ isAppMode = false }: BotPreviewProps) {
               />
             </div>
             <Button asChild variant="secondary" className="w-full h-11 rounded-xl font-black uppercase text-[10px] tracking-widest gap-2 bg-slate-100 hover:bg-slate-200">
-              <a href={qrImage.imageUrl} target="_blank" rel="noopener noreferrer">
+              <a href={qrImage.imageUrl} download="InstaFlow_QR.png">
                 <Download className="w-4 h-4" /> Save QR Code
               </a>
             </Button>
