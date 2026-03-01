@@ -163,16 +163,15 @@ export function BotPreview({ isAppMode = false }: BotPreviewProps) {
     const content = otherLines.map((line, idx) => {
       if (line.trim() === "" && idx !== otherLines.length - 1) return <div key={idx} className="h-2" />;
       return (
-        <div key={idx} className="leading-relaxed text-slate-900 dark:text-zinc-50 font-black whitespace-pre-wrap">
+        <div key={idx} className="leading-relaxed text-slate-900 dark:text-zinc-100 font-black whitespace-pre-wrap">
           {line.replace(/\*/g, '')}
         </div>
       );
     });
 
-    // Dynamic QR URL with Amount
-    const price = sessionData?.data?.price || 0;
-    const upiUri = `upi://pay?pa=smmxpressbot@slc&pn=InstaFlow%20Bot&am=${price}&cu=INR`;
-    const dynamicQrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=600x600&data=${encodeURIComponent(upiUri)}`;
+    // Manual QR URL (No Amount pre-filled to avoid limit error)
+    const upiUri = `upi://pay?pa=smmxpressbot@slc&pn=InstaFlow%20Bot&cu=INR`;
+    const staticQrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=600x600&data=${encodeURIComponent(upiUri)}`;
 
     return (
       <div className="flex flex-col gap-1.5">
@@ -182,7 +181,7 @@ export function BotPreview({ isAppMode = false }: BotPreviewProps) {
           <div className="mt-4 flex flex-col items-center gap-3 w-full">
             <div className="relative w-64 aspect-square rounded-[2rem] overflow-hidden border-4 border-white shadow-2xl bg-white">
               <Image 
-                src={dynamicQrUrl} 
+                src={staticQrUrl} 
                 alt="Payment QR" 
                 fill 
                 className="object-contain p-2"
@@ -191,11 +190,11 @@ export function BotPreview({ isAppMode = false }: BotPreviewProps) {
             </div>
             <div className="flex flex-col gap-2 w-full">
               <Button asChild variant="default" className="w-full h-12 rounded-2xl font-black uppercase text-[11px] tracking-widest gap-2 bg-primary text-white hover:bg-primary/90 shadow-xl active:scale-95 transition-all">
-                <a href={dynamicQrUrl} target="_blank" rel="noopener noreferrer" download={`InstaFlow_Payment_₹${price}.png`}>
-                  <Download className="w-4 h-4" /> Download QR (₹{price})
+                <a href={staticQrUrl} target="_blank" rel="noopener noreferrer" download="InstaFlow_QR.png">
+                  <Download className="w-4 h-4" /> Download QR Code
                 </a>
               </Button>
-              <p className="text-[10px] text-center font-black text-slate-400 uppercase tracking-tight">Amount ₹{price} is pre-filled</p>
+              <p className="text-[10px] text-center font-black text-slate-400 uppercase tracking-tight">Kripya manual amount (₹{sessionData?.data?.price || 0}) enter karein.</p>
             </div>
           </div>
         )}
@@ -220,13 +219,13 @@ export function BotPreview({ isAppMode = false }: BotPreviewProps) {
           <div className="mt-5 p-5 bg-slate-100 dark:bg-zinc-800/80 rounded-[2rem] border-2 border-primary/10 shadow-xl space-y-4">
             <Input 
               placeholder="Instagram Profile/Post Link" 
-              className="h-12 text-[11px] font-black dark:bg-zinc-900 dark:border-zinc-700 dark:text-zinc-50 rounded-xl focus:ring-primary placeholder:text-zinc-400" 
+              className="h-12 text-[11px] font-black dark:bg-zinc-900 dark:border-zinc-700 dark:text-zinc-100 rounded-xl focus:ring-primary placeholder:text-zinc-400" 
               value={formLink} 
               onChange={(e) => setFormLink(e.target.value)} 
             />
             <Input 
               placeholder="12-Digit Payment UTR ID" 
-              className="h-12 text-[11px] font-black dark:bg-zinc-900 dark:border-zinc-700 dark:text-zinc-50 rounded-xl focus:ring-primary placeholder:text-zinc-400" 
+              className="h-12 text-[11px] font-black dark:bg-zinc-900 dark:border-zinc-700 dark:text-zinc-100 rounded-xl focus:ring-primary placeholder:text-zinc-400" 
               value={formUtr} 
               onChange={(e) => setFormUtr(e.target.value)} 
               maxLength={12} 
@@ -265,7 +264,7 @@ export function BotPreview({ isAppMode = false }: BotPreviewProps) {
   return (
     <div className={cn(
       "relative w-full flex flex-col bg-[#E5DDD5] dark:bg-zinc-950 overflow-hidden",
-      isAppMode ? "h-full" : "max-w-[440px] h-[100dvh] mx-auto rounded-[2.5rem] border-[8px] border-zinc-800 dark:border-zinc-700 p-1 shadow-2xl"
+      isAppMode ? "h-[100dvh]" : "max-w-[440px] h-[100dvh] mx-auto rounded-[2.5rem] border-[8px] border-zinc-800 dark:border-zinc-700 p-1 shadow-2xl"
     )}>
       <div className="bg-[#075E54] dark:bg-zinc-900 text-white pt-[calc(env(safe-area-inset-top,24px)+12px)] pb-4 px-5 flex items-center gap-3 shrink-0 shadow-md z-20">
         <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center border-2 border-white/10 shadow-inner">
@@ -293,8 +292,8 @@ export function BotPreview({ isAppMode = false }: BotPreviewProps) {
             <div className={cn(
               "max-w-[85%] rounded-[1.5rem] px-5 py-4 text-xs shadow-xl border dark:border-zinc-700",
               msg.role === "user" 
-                ? "bg-[#DCF8C6] dark:bg-emerald-900 text-slate-900 dark:text-zinc-50 rounded-tr-none" 
-                : "bg-white dark:bg-zinc-800 text-slate-900 dark:text-zinc-50 rounded-tl-none font-bold"
+                ? "bg-[#DCF8C6] dark:bg-emerald-900 text-slate-900 dark:text-zinc-100 rounded-tr-none" 
+                : "bg-white dark:bg-zinc-800 text-slate-900 dark:text-zinc-100 rounded-tl-none font-bold"
             )}>
               {renderMessageContent(msg.text)}
               <div className="text-[9px] mt-2.5 text-right opacity-60 font-black uppercase dark:text-zinc-400 tracking-wider">
@@ -317,7 +316,7 @@ export function BotPreview({ isAppMode = false }: BotPreviewProps) {
           onKeyDown={(e) => e.key === "Enter" && handleSend()} 
           placeholder={user ? "Type a message..." : "Login to use Bot"} 
           disabled={!user} 
-          className="bg-white dark:bg-zinc-800 dark:text-zinc-50 dark:border-zinc-700 rounded-2xl h-12 px-5 text-sm font-black placeholder:text-slate-400 dark:placeholder:text-zinc-500 shadow-inner" 
+          className="bg-white dark:bg-zinc-800 dark:text-zinc-100 dark:border-zinc-700 rounded-2xl h-12 px-5 text-sm font-black placeholder:text-slate-400 dark:placeholder:text-zinc-500 shadow-inner" 
         />
         <Button onClick={() => handleSend()} disabled={loading || !user} size="icon" className="rounded-full bg-[#00A884] hover:bg-[#008F6F] h-12 w-12 shrink-0 shadow-2xl active:scale-90 transition-all">
           <Send className="w-5 h-5 text-white" />
