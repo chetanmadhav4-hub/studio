@@ -71,7 +71,7 @@ export async function processBotMessage(
       });
       
       const finalMsg = confirmation.message.trim() + "\n\n" + 
-                       "Naya order lagane ke liye MENU likhein.\n\n" + 
+                       "Send Order Details to Admin and conform your order\n\n" + 
                        whatsappTag + "\n\n" +
                        "OPTION: MENU";
       
@@ -92,7 +92,7 @@ export async function processBotMessage(
                           `- *Target Link:* ${targetLink}`;
 
       return {
-        reply: fallbackMsg + "\n\n" + "Naya order lagane ke liye MENU likhein.\n\n" + whatsappTag + "\n\n" + "OPTION: MENU",
+        reply: fallbackMsg + "\n\n" + "Send Order Details to Admin and conform your order\n\n" + whatsappTag + "\n\n" + "OPTION: MENU",
         nextState: { 
           state: 'ORDER_PLACED', 
           data: { ...session.data, orderId, targetLink, utrId } 
@@ -183,11 +183,12 @@ export async function processBotMessage(
         const price = session.data.price || 0;
         const upiId = 'smmxpressbot@slc';
         const accountName = 'CHETAN KUMAR MEGHWAL';
-        const upiPayload = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(accountName)}&am=${price}&cu=INR`;
-        const qrImageUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(upiPayload)}`;
+        // USE STATIC UPI PAYLOAD WITHOUT AMOUNT AS PER USER'S SLICE QR IMAGE TO AVOID GALLERY SCAN LIMITS
+        const upiPayload = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(accountName)}&cu=INR`;
+        const qrImageUrl = `https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodeURIComponent(upiPayload)}`;
 
         return {
-          reply: `📲 *Pay via any UPI app*\n\n👤 *Account:* ${accountName}\n🆔 *UPI ID:* ${upiId}\n💰 *Amount:* ₹${price}\n\n📸 *SCAN TO PAY:*\n${qrImageUrl}\n\n${upiPayload}\n\n✅ Payment ke baad, apna Instagram Link and UTR ID niche fill karein:\n\n[PAYMENT_FORM]`,
+          reply: `📲 *Pay via any UPI app*\n\n👤 *Account:* ${accountName}\n🆔 *UPI ID:* ${upiId}\n💰 *Amount:* ₹${price}\n\n📸 *SCAN TO PAY (Slice QR):*\n${qrImageUrl}\n\n${upiPayload}\n\n✅ Payment ke baad, apna Instagram Link and UTR ID niche fill karein:\n\n[PAYMENT_FORM]`,
           nextState: {
             state: 'AWAITING_PAYMENT_DETAILS',
             data: { ...session.data },
