@@ -2,10 +2,15 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     
+    // Helper function to check if user is the super admin
+    function isAdmin() {
+      return request.auth != null && request.auth.token.email == 'chetanmadhav4@gmail.com';
+    }
+
     // Master collection of orders for the admin tracker
     match /all_orders/{orderId} {
-      // Allow admin (Chetan) to read and manage everything
-      allow list, get, update, delete: if request.auth != null && request.auth.token.email == 'chetanmadhav4@gmail.com';
+      // Allow admin to read and manage everything (including list/query)
+      allow read, write: if isAdmin();
       // Allow creation for any authenticated user (the bot/user flow)
       allow create: if request.auth != null;
     }
@@ -13,11 +18,11 @@ service cloud.firestore {
     // User profile and sub-collections
     match /users/{userId} {
       // Admin or user themselves can read
-      allow read: if request.auth != null && (request.auth.uid == userId || request.auth.token.email == 'chetanmadhav4@gmail.com');
+      allow read: if request.auth != null && (request.auth.uid == userId || isAdmin());
       allow write: if request.auth != null && request.auth.uid == userId;
       
       match /orders/{orderId} {
-        allow read: if request.auth != null && (request.auth.uid == userId || request.auth.token.email == 'chetanmadhav4@gmail.com');
+        allow read: if request.auth != null && (request.auth.uid == userId || isAdmin());
         allow write: if request.auth != null && request.auth.uid == userId;
       }
     }
@@ -31,7 +36,7 @@ service cloud.firestore {
     // Bot sessions - needed for notifications and flow
     match /botSessions/{sessionId} {
       // Allow user to read/write their own session, admin can read/write all
-      allow read, write: if request.auth != null && (request.auth.uid == sessionId || request.auth.token.email == 'chetanmadhav4@gmail.com');
+      allow read, write: if request.auth != null && (request.auth.uid == sessionId || isAdmin());
     }
   }
 }
