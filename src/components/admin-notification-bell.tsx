@@ -23,6 +23,7 @@ export function AdminNotificationBell() {
   const db = useFirestore();
   const ADMIN_EMAIL = 'chetanmadhav4@gmail.com';
 
+  // FIX: ONLY query if user is actually the admin to prevent permission errors
   const ordersQuery = useMemoFirebase(() => {
     if (!db || user?.email !== ADMIN_EMAIL) return null;
     return query(
@@ -31,14 +32,14 @@ export function AdminNotificationBell() {
       orderBy('createdAt', 'desc'),
       limit(10)
     );
-  }, [db, user]);
+  }, [db, user?.email]);
 
   const { data: newOrders, isLoading } = useCollection(ordersQuery);
   const [prevCount, setPrevCount] = useState(0);
 
   useEffect(() => {
     if (newOrders && newOrders.length > prevCount) {
-      // Play a subtle notification sound (optional)
+      // Audio notification (subtle)
       const audio = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
       audio.play().catch(() => {});
       setPrevCount(newOrders.length);
@@ -83,7 +84,7 @@ export function AdminNotificationBell() {
                     <span className="text-[10px] font-bold text-primary dark:text-accent uppercase">
                       {order.serviceName}
                     </span>
-                    <span className="text-[9px] text-slate-400 font-medium">
+                    <span className="text-[9px] text-slate-400 dark:text-zinc-500 font-medium">
                       {order.createdAt?.seconds 
                         ? new Date(order.createdAt.seconds * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
                         : 'Just now'}
@@ -107,7 +108,7 @@ export function AdminNotificationBell() {
           ) : (
             <div className="py-12 text-center space-y-2">
               <ShoppingBag className="w-10 h-10 text-slate-100 dark:text-zinc-800 mx-auto" />
-              <p className="text-xs text-slate-400 font-medium italic">No new orders waiting.</p>
+              <p className="text-xs text-slate-400 dark:text-zinc-500 font-medium italic">No new orders waiting.</p>
             </div>
           )}
         </div>

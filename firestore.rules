@@ -5,9 +5,9 @@ service cloud.firestore {
     
     // Master collection of orders for the admin tracker
     match /all_orders/{orderId} {
-      // Allow admin to read and update
+      // Allow admin (Chetan) to read and manage everything
       allow read, update, delete: if request.auth != null && request.auth.token.email == 'chetanmadhav4@gmail.com';
-      // Allow creation for bot/webhook or anyone during order flow
+      // Allow creation for anyone during the order flow (bot/preview)
       allow create: if true;
     }
 
@@ -32,11 +32,6 @@ service cloud.firestore {
     // Bot sessions - needed for notifications and flow
     match /botSessions/{sessionId} {
       allow read, write: if true;
-    }
-    
-    // Support for collection group queries for the admin
-    match /{path=**}/orders/{orderId} {
-      allow read: if request.auth != null && request.auth.token.email == 'chetanmadhav4@gmail.com';
     }
   }
 }

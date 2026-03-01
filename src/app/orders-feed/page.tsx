@@ -34,11 +34,11 @@ export default function SimpleOrdersFeed() {
 
   const ADMIN_EMAIL = 'chetanmadhav4@gmail.com';
 
-  // FIX: Only initiate query if user is admin to avoid permission errors
+  // FIX: ONLY query if user is actually the admin to prevent permission errors
   const ordersQuery = useMemoFirebase(() => {
     if (!db || !user || user.email !== ADMIN_EMAIL) return null;
     return query(collection(db, 'all_orders'), orderBy('createdAt', 'desc'), limit(100));
-  }, [db, user]);
+  }, [db, user?.email]); // Re-run when email is available
 
   const { data: orders, isLoading } = useCollection(ordersQuery);
 
@@ -74,6 +74,7 @@ export default function SimpleOrdersFeed() {
 
       if (action === 'APPROVE') {
         msg = `✅ *ORDER APPROVED:* Order #${shortId} approve ho gaya hai! Kaam jaldi shuru ho jayega. 🚀`;
+        // Send WhatsApp only on Approval as requested
         if (targetSessionId.length > 10) {
           sendAdminActionNotification(targetSessionId, msg);
         }
@@ -81,6 +82,7 @@ export default function SimpleOrdersFeed() {
         msg = `❌ *ORDER REJECTED:* Order #${shortId} reject kar diya gaya hai. ⚠️ Reason: Invalid Link ya Galat UTR ID.`;
       }
 
+      // Add to user's persistent notifications list
       await updateDoc(sessionRef, { 
         notifications: arrayUnion({
           id: notificationId,
