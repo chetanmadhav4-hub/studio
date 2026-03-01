@@ -1,7 +1,6 @@
 
 import { BotState, UserSession } from './bot-types';
 import { aiGeneratedOrderConfirmation } from '@/ai/flows/ai-generated-order-confirmation';
-import { PlaceHolderImages } from './placeholder-images';
 
 export const SERVICES_CONFIG: Record<string, { name: string; pricePer1000: number; min: number }> = {
   '1': { name: 'Instagram Followers', pricePer1000: 87, min: 100 },
@@ -46,9 +45,6 @@ export async function processBotMessage(
 ): Promise<{ reply: string; nextState: Partial<UserSession> }> {
   const normalizedMsg = messageText.trim().toLowerCase();
   
-  // Using the static PhonePe QR from placeholder
-  const staticQr = PlaceHolderImages.find(img => img.id === 'phonepe-static-qr')?.imageUrl || '';
-
   if (normalizedMsg.startsWith('submit_payment:')) {
     const detailsPart = messageText.substring('submit_payment:'.length).trim();
     const [link, utr] = detailsPart.split('|');
@@ -76,7 +72,6 @@ export async function processBotMessage(
     const whatsappAdminPayload = `Link: ${targetLink}\nService: ${serviceName}\nUTR ID: ${utrId}\nQuantity: ${quantity}`;
     const whatsappTag = `[WHATSAPP_ADMIN:${encodeURIComponent(whatsappAdminPayload)}]`;
 
-    // Strictly formatted multi-line confirmation
     const finalMsg = formatOrderConfirmation({
       orderId,
       quantity,
@@ -152,13 +147,13 @@ export async function processBotMessage(
       }
 
       const price = calculatePrice(quantity, service.pricePer1000);
-      const upiId = 'cc732535@ybl'; 
+      const upiId = 'smmxpressbot@slc'; 
       const accountName = 'CHETAN KUMAR MEGHWAL';
       
       const upiPayload = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(accountName)}&cu=INR`;
 
       return {
-        reply: `✅ Aapne *${quantity} ${service.name}* select kiye hain.\n💰 Total price: *₹${price}*\n\n📲 *Scan This QR to Pay Manual Amount*\n\n👤 *Account:* ${accountName}\n🆔 *UPI ID:* ${upiId}\n💰 *Amount:* ₹${price}\n\n${staticQr}\n\n${upiPayload}\n\n✅ Payment ke baad, apna Instagram Link and UTR ID niche fill karein:\n\n[PAYMENT_FORM]\n\nOPTION: YES, PROCEED\nOPTION: MENU`,
+        reply: `✅ Aapne *${quantity} ${service.name}* select kiye hain.\n💰 Total price: *₹${price}*\n\n📲 *Manual Payment Details*\n\n👤 *Account:* ${accountName}\n🆔 *UPI ID:* ${upiId}\n💰 *Amount:* ₹${price}\n\n${upiPayload}\n\nKripya upar diye gaye UPI ID par payment karein aur niche confirm karein.\n\nOPTION: YES, PROCEED\nOPTION: MENU`,
         nextState: {
           state: 'AWAITING_PAYMENT_DETAILS',
           data: { ...session.data, quantity, price },
@@ -168,7 +163,7 @@ export async function processBotMessage(
 
     case 'AWAITING_PAYMENT_DETAILS': {
       return {
-        reply: "⚠️ Kripya QR code ke niche diye gaye box mein details bhar kar Submit karein.\n\n[PAYMENT_FORM]\n\nOPTION: MENU",
+        reply: "✅ Payment ke baad, apna Instagram Link and UTR ID niche fill karein:\n\n[PAYMENT_FORM]\n\nOPTION: MENU",
         nextState: { state: 'AWAITING_PAYMENT_DETAILS' },
       };
     }

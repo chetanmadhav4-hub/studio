@@ -177,7 +177,7 @@ export function BotPreview({ isAppMode = false }: BotPreviewProps) {
             <div key={idx} className="my-4 flex flex-col gap-3">
               {textBeforeUrl && <div className="leading-relaxed font-black text-slate-900 dark:text-zinc-100 whitespace-pre-wrap">{textBeforeUrl.replace(/\*/g, '')}</div>}
               <div className="bg-white p-3 rounded-[2rem] border-2 border-primary/10 shadow-2xl max-w-[260px] mx-auto text-center transform hover:scale-[1.02] transition-transform overflow-hidden">
-                <img src={imageUrl} alt="Payment QR" className="rounded-[1.5rem] w-full h-auto" />
+                <img src={imageUrl} alt="QR Code" className="rounded-[1.5rem] w-full h-auto" />
                 {upiLink && (
                   <a href={upiLink} className="mt-5 flex items-center justify-center gap-2 bg-[#00A884] text-white py-3.5 rounded-2xl text-[12px] font-black uppercase no-underline shadow-xl active:scale-95 transition-all">
                     <Check className="w-4 h-4" /> Pay via UPI App
@@ -196,6 +196,14 @@ export function BotPreview({ isAppMode = false }: BotPreviewProps) {
       <div className="flex flex-col gap-1.5">
         <div className="text-[13px] flex flex-col">{content}</div>
         
+        {upiLink && !text.includes("picsum.photos") && (
+          <div className="mt-2">
+            <a href={upiLink} className="w-full flex items-center justify-center gap-2 bg-[#00A884] text-white py-4 rounded-2xl text-[13px] font-black uppercase no-underline shadow-xl active:scale-95 transition-all">
+              <Check className="w-5 h-5" /> Pay via UPI App
+            </a>
+          </div>
+        )}
+
         {whatsappMatch && (
           <div className="mt-5 space-y-3">
             <p className="text-[10px] font-black text-primary dark:text-accent uppercase text-center tracking-[0.15em] px-2 opacity-90 leading-snug">
