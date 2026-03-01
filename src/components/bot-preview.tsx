@@ -169,9 +169,9 @@ export function BotPreview({ isAppMode = false }: BotPreviewProps) {
           const textBeforeUrl = line.replace(imageUrl, "").trim();
           return (
             <div key={idx} className="my-2 flex flex-col gap-2">
-              {textBeforeUrl && <div className="leading-relaxed font-black text-slate-800 dark:text-zinc-100 whitespace-pre-wrap">{textBeforeUrl.replace(/\*/g, '')}</div>}
+              {textBeforeUrl && <div className="leading-relaxed font-black text-slate-800 dark:text-zinc-50 whitespace-pre-wrap">{textBeforeUrl.replace(/\*/g, '')}</div>}
               <div className="bg-white p-2 rounded-xl border shadow-md max-w-[180px] mx-auto text-center">
-                <img src={imageUrl} alt="Static QR" className="rounded-lg w-full h-auto" />
+                <img src={imageUrl} alt="PhonePe QR" className="rounded-lg w-full h-auto" />
                 {upiLink && (
                   <a href={upiLink} className="mt-3 flex items-center justify-center gap-2 bg-[#00A884] text-white py-2 rounded-lg text-[10px] font-black uppercase no-underline shadow-sm active:scale-95 transition-transform">
                     <Check className="w-3.5 h-3.5" /> Pay via UPI
@@ -183,7 +183,6 @@ export function BotPreview({ isAppMode = false }: BotPreviewProps) {
         }
       }
       if (line.trim() === "" && idx !== otherLines.length - 1) return <div key={idx} className="h-2" />;
-      // Use whitespace-pre-wrap and silver/white text for dark mode
       return <div key={idx} className="leading-relaxed text-slate-800 dark:text-zinc-50 font-bold whitespace-pre-wrap">{line.replace(/\*/g, '')}</div>;
     });
 

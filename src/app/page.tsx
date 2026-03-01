@@ -71,7 +71,7 @@ export default function Home() {
             </div>
             <div className="flex-1 space-y-1 pr-6">
               <p className="text-[9px] font-black text-white/60 uppercase tracking-[0.2em]">Official Announcement</p>
-              <p className="text-xs sm:text-sm font-bold text-white dark:text-zinc-100 leading-snug">
+              <p className="text-xs sm:text-sm font-bold text-white dark:text-zinc-50 leading-snug">
                 {broadcast.broadcastMessage}
               </p>
             </div>
@@ -85,8 +85,8 @@ export default function Home() {
         </div>
       )}
 
-      {/* APP HEADER - Optimized to prevent clipping on mobile status bars */}
-      <header className="h-24 pt-[env(safe-area-inset-top,20px)] pb-3 border-b dark:border-zinc-800 bg-white dark:bg-zinc-900 flex items-center justify-between px-4 shrink-0 shadow-sm z-[100] relative">
+      {/* APP HEADER - Optimized for Notches */}
+      <header className="h-24 pt-[env(safe-area-inset-top,24px)] pb-3 border-b dark:border-zinc-800 bg-white dark:bg-zinc-900 flex items-center justify-between px-4 shrink-0 shadow-sm z-[100] relative">
         <div className="flex items-center gap-2 mt-auto">
           <div className="w-8 h-8 sm:w-10 sm:h-10 bg-primary rounded-xl flex items-center justify-center shadow-lg shadow-primary/30">
             <Zap className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
@@ -211,7 +211,7 @@ export default function Home() {
                     </DialogTrigger>
                     <DialogContent className="max-w-[95vw] sm:max-w-md max-h-[85vh] overflow-y-auto rounded-[2.5rem] dark:bg-zinc-950 border-none shadow-2xl p-6">
                       <DialogHeader>
-                        <DialogTitle className="flex items-center gap-2 dark:text-zinc-100 text-base font-black uppercase tracking-tighter">
+                        <DialogTitle className="flex items-center gap-2 dark:text-zinc-50 text-base font-black uppercase tracking-tighter">
                           <History className="w-5 h-5 text-primary" />
                           Order History
                         </DialogTitle>
