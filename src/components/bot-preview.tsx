@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useEffect, useRef } from "react";
@@ -183,6 +182,7 @@ export function BotPreview({ isAppMode = false }: BotPreviewProps) {
         }
       }
       if (line.trim() === "" && idx !== otherLines.length - 1) return <div key={idx} className="h-2" />;
+      // White/Silver text for dark mode visibility
       return <div key={idx} className="leading-relaxed text-slate-800 dark:text-zinc-100 font-bold whitespace-pre-wrap">{line.replace(/\*/g, '')}</div>;
     });
 

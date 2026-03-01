@@ -1,4 +1,3 @@
-
 'use server';
 /**
  * @fileOverview This file implements a Genkit flow to generate a friendly and personalized order confirmation message
@@ -48,7 +47,7 @@ const orderConfirmationPrompt = ai.definePrompt({
   output: {schema: AiGeneratedOrderConfirmationOutputSchema},
   prompt: `You are a helpful assistant for the InstaFlow Bot.
 
-Generate a clean and structured order confirmation message.
+Generate a clean and structured order confirmation message. 
 
 CRITICAL: You MUST use multiple lines and bullet points exactly like this (each detail on a NEW line):
 

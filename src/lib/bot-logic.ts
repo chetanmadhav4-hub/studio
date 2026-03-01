@@ -1,4 +1,3 @@
-
 import { BotState, UserSession } from './bot-types';
 import { aiGeneratedOrderConfirmation } from '@/ai/flows/ai-generated-order-confirmation';
 import { generateContextualErrorMessage } from '@/ai/flows/ai-generated-contextual-error-messages';
@@ -57,7 +56,7 @@ export async function processBotMessage(
     const targetLink = link.trim();
     const utrId = utr.trim();
 
-    // WHATSAPP PAYLOAD: Link, Service, UTR ID, Quantity
+    // WHATSAPP PAYLOAD: Link, Service, UTR ID, Quantity (Admin only wants these 4)
     const whatsappAdminPayload = `Link: ${targetLink}\nService: ${serviceName}\nUTR ID: ${utrId}\nQuantity: ${quantity}`;
     const whatsappTag = `[WHATSAPP_ADMIN:${encodeURIComponent(whatsappAdminPayload)}]`;
 
@@ -71,6 +70,7 @@ export async function processBotMessage(
         startTime: '0-30 minutes',
       });
       
+      // Strict newline formatting for the "Woohoo" message
       const finalMsg = confirmation.message.trim() + "\n\n" + 
                        "Send Order Details to Admin and conform your order\n\n" + 
                        whatsappTag + "\n\n" +
@@ -184,7 +184,7 @@ export async function processBotMessage(
         const price = session.data.price || 0;
         const upiId = 'smmxpressbot@slc';
         const accountName = 'CHETAN KUMAR MEGHWAL';
-        // Amount is now included in the payload as requested
+        // PRE-SET AMOUNT included in UPI link as requested
         const upiPayload = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(accountName)}&am=${price}&cu=INR`;
         const qrImageUrl = `https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodeURIComponent(upiPayload)}`;
 
