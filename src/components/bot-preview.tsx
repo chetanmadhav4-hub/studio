@@ -268,8 +268,8 @@ export function BotPreview({ isAppMode = false }: BotPreviewProps) {
 
   return (
     <div className={cn(
-      "relative w-full h-[100dvh] flex flex-col bg-[#E5DDD5] dark:bg-zinc-950 overflow-hidden",
-      !isAppMode && "max-w-[340px] h-full mx-auto rounded-[2.5rem] border-[8px] border-zinc-800 dark:border-zinc-700 p-1 shadow-2xl"
+      "relative w-full flex flex-col bg-[#E5DDD5] dark:bg-zinc-950 overflow-hidden",
+      isAppMode ? "h-full" : "max-w-[340px] h-[100dvh] mx-auto rounded-[2.5rem] border-[8px] border-zinc-800 dark:border-zinc-700 p-1 shadow-2xl"
     )}>
       {/* Header with status bar safety */}
       <div className="bg-[#075E54] dark:bg-zinc-900 text-white pt-[calc(env(safe-area-inset-top,24px)+12px)] pb-4 px-5 flex items-center gap-3 shrink-0 shadow-md z-20">

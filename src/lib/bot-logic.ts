@@ -1,6 +1,5 @@
 
 import { BotState, UserSession } from './bot-types';
-import { aiGeneratedOrderConfirmation } from '@/ai/flows/ai-generated-order-confirmation';
 
 export const SERVICES_CONFIG: Record<string, { name: string; pricePer1000: number; min: number }> = {
   '1': { name: 'Instagram Followers', pricePer1000: 87, min: 100 },
@@ -183,4 +182,3 @@ export async function processBotMessage(
       };
   }
 }
-
