@@ -189,14 +189,9 @@ export function BotPreview({ isAppMode = false }: BotPreviewProps) {
               />
             </div>
             <div className="flex flex-col gap-2 w-full">
-              <Button asChild className="w-full h-12 rounded-2xl font-black uppercase text-[11px] tracking-widest gap-2 bg-primary text-white hover:bg-primary/90 shadow-xl active:scale-95 transition-all">
-                <a href={`upi://pay?pa=smmxpressbot@slc&pn=InstaFlow%20Bot&cu=INR`}>
-                  <Zap className="w-4 h-4" /> Pay via UPI App
-                </a>
-              </Button>
-              <Button asChild variant="secondary" className="w-full h-10 rounded-xl font-black uppercase text-[10px] tracking-widest gap-2 bg-slate-100 hover:bg-slate-200 dark:bg-zinc-800 dark:text-zinc-300">
+              <Button asChild variant="default" className="w-full h-12 rounded-2xl font-black uppercase text-[11px] tracking-widest gap-2 bg-primary text-white hover:bg-primary/90 shadow-xl active:scale-95 transition-all">
                 <a href={qrImage.imageUrl} download="InstaFlow_QR.png">
-                  <Download className="w-4 h-4" /> Save QR Code
+                  <Download className="w-4 h-4" /> Download QR Code
                 </a>
               </Button>
             </div>

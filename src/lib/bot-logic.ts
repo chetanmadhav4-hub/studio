@@ -126,7 +126,7 @@ export async function processBotMessage(
   switch (session.state) {
     case 'AWAITING_SERVICE_SELECTION': {
       return {
-        reply: "⚠️ Kripya niche diye gaye buttons mein se ek select karein.\n\nType 'MENU' to see all services.",
+        reply: "⚠️ Kripya niche diye gaye list mein se ek select karein.\n\nType 'MENU' to see all services.",
         nextState: { state: 'AWAITING_SERVICE_SELECTION' },
       };
     }
