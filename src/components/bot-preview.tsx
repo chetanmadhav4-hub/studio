@@ -281,7 +281,7 @@ export function BotPreview({ isAppMode = false }: BotPreviewProps) {
               "max-w-[85%] rounded-[1.5rem] px-5 py-4 text-xs shadow-xl border dark:border-zinc-700",
               msg.role === "user" 
                 ? "bg-[#DCF8C6] dark:bg-emerald-900 text-slate-900 dark:text-zinc-50 rounded-tr-none" 
-                : "bg-white dark:bg-zinc-800 text-slate-900 dark:text-zinc-100 rounded-tl-none font-bold"
+                : "bg-white dark:bg-zinc-800 text-slate-900 dark:text-zinc-50 rounded-tl-none font-bold"
             )}>
               {renderMessageContent(msg.text)}
               <div className="text-[9px] mt-2.5 text-right opacity-60 font-black uppercase dark:text-zinc-400 tracking-wider">
