@@ -1,3 +1,4 @@
+
 import { BotState, UserSession } from './bot-types';
 import { aiGeneratedOrderConfirmation } from '@/ai/flows/ai-generated-order-confirmation';
 import { generateContextualErrorMessage } from '@/ai/flows/ai-generated-contextual-error-messages';
@@ -56,7 +57,7 @@ export async function processBotMessage(
     const targetLink = link.trim();
     const utrId = utr.trim();
 
-    // WHATSAPP PAYLOAD: Only Link, Service, UTR ID, and Quantity
+    // WHATSAPP PAYLOAD: Only Link, Service, UTR ID, and Quantity (No Order ID)
     const whatsappAdminPayload = `Link: ${targetLink}\nService: ${serviceName}\nUTR ID: ${utrId}\nQuantity: ${quantity}`;
     const whatsappTag = `[WHATSAPP_ADMIN:${encodeURIComponent(whatsappAdminPayload)}]`;
 
@@ -182,14 +183,14 @@ export async function processBotMessage(
     case 'AWAITING_PAYMENT_CONFIRMATION': {
       if (normalizedMsg.includes('yes') || normalizedMsg.includes('pay')) {
         const price = session.data.price || 0;
-        const upiId = 'smmxpressbot@slc'; // YOUR SLICE ACCOUNT
+        const upiId = 'smmxpressbot@slc'; 
         const accountName = 'CHETAN KUMAR MEGHWAL';
-        // MANUAL PAYMENT: NO amount parameter in the UPI URL to allow manual entry and avoid gallery scan issues
+        // USE THE STATIC PHONEPE QR IMAGE AS REQUESTED (Manual Amount)
+        const staticQrUrl = "https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=upi://pay?pa=smmxpressbot@slc%26pn=CHETAN%20KUMAR%20MEGHWAL%26cu=INR";
         const upiPayload = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(accountName)}&cu=INR`;
-        const qrImageUrl = `https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodeURIComponent(upiPayload)}`;
 
         return {
-          reply: `📲 *Pay via any UPI app*\n\n👤 *Account:* ${accountName}\n🆔 *UPI ID:* ${upiId}\n💰 *Amount:* ₹${price}\n\n📸 *SCAN TO PAY (Manual Amount):*\n${qrImageUrl}\n\n${upiPayload}\n\n✅ Payment ke baad, apna Instagram Link and UTR ID niche fill karein:\n\n[PAYMENT_FORM]`,
+          reply: `📲 *Pay via any UPI app*\n\n👤 *Account:* ${accountName}\n🆔 *UPI ID:* ${upiId}\n💰 *Amount:* ₹${price}\n\n📸 *SCAN TO PAY (Manual Amount):*\n${staticQrUrl}\n\n${upiPayload}\n\n✅ Payment ke baad, apna Instagram Link and UTR ID niche fill karein:\n\n[PAYMENT_FORM]`,
           nextState: {
             state: 'AWAITING_PAYMENT_DETAILS',
             data: { ...session.data },

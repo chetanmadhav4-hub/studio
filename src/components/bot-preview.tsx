@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect, useRef } from "react";
@@ -182,7 +183,7 @@ export function BotPreview({ isAppMode = false }: BotPreviewProps) {
         }
       }
       if (line.trim() === "" && idx !== otherLines.length - 1) return <div key={idx} className="h-2" />;
-      // Use whitespace-pre-wrap to respect line breaks for multi-line order confirmations
+      // Use whitespace-pre-wrap and silver/white text for dark mode
       return <div key={idx} className="leading-relaxed text-slate-800 dark:text-zinc-50 font-bold whitespace-pre-wrap">{line.replace(/\*/g, '')}</div>;
     });
 

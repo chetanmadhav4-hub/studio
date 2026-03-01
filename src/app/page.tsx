@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect } from "react";
@@ -84,16 +85,16 @@ export default function Home() {
         </div>
       )}
 
-      {/* APP HEADER - Optimized for mobile status bars and notches */}
-      <header className="h-20 pt-[env(safe-area-inset-top)] pb-2 border-b dark:border-zinc-800 bg-white dark:bg-zinc-900 flex items-center justify-between px-4 shrink-0 shadow-sm z-[100] relative">
-        <div className="flex items-center gap-2 mt-1 sm:mt-2">
+      {/* APP HEADER - Optimized to prevent clipping on mobile status bars */}
+      <header className="h-24 pt-[env(safe-area-inset-top,20px)] pb-3 border-b dark:border-zinc-800 bg-white dark:bg-zinc-900 flex items-center justify-between px-4 shrink-0 shadow-sm z-[100] relative">
+        <div className="flex items-center gap-2 mt-auto">
           <div className="w-8 h-8 sm:w-10 sm:h-10 bg-primary rounded-xl flex items-center justify-center shadow-lg shadow-primary/30">
             <Zap className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
           </div>
           <span className="font-black text-base sm:text-lg tracking-tighter text-primary dark:text-accent uppercase italic">InstaFlow</span>
         </div>
         
-        <div className="flex items-center gap-1.5 mt-1 sm:mt-2">
+        <div className="flex items-center gap-1.5 mt-auto">
           {!isUserLoading ? (
             <>
               {!user ? (
@@ -231,7 +232,7 @@ export default function Home() {
       </main>
 
       {/* COMPACT APP FOOTER */}
-      <footer className="h-10 bg-white dark:bg-zinc-950 border-t dark:border-zinc-900 flex items-center justify-center shrink-0 z-[100] pb-[env(safe-area-inset-bottom)]">
+      <footer className="h-12 bg-white dark:bg-zinc-950 border-t dark:border-zinc-900 flex items-center justify-center shrink-0 z-[100] pb-[env(safe-area-inset-bottom,10px)]">
         <p className="text-[7px] sm:text-[8px] text-muted-foreground dark:text-zinc-600 font-black uppercase tracking-[0.5em] opacity-50">
           InstaFlow Engine v2.0 • Secure SMM
         </p>
