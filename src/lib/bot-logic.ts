@@ -57,7 +57,7 @@ export async function processBotMessage(
     const targetLink = link.trim();
     const utrId = utr.trim();
 
-    // UPDATED WHATSAPP PAYLOAD: Link, Service, UTR ID, Quantity (REMOVED Order ID as requested)
+    // WHATSAPP PAYLOAD: Link, Service, UTR ID, Quantity
     const whatsappAdminPayload = `Link: ${targetLink}\nService: ${serviceName}\nUTR ID: ${utrId}\nQuantity: ${quantity}`;
     const whatsappTag = `[WHATSAPP_ADMIN:${encodeURIComponent(whatsappAdminPayload)}]`;
 
@@ -71,8 +71,14 @@ export async function processBotMessage(
         startTime: '0-30 minutes',
       });
       
+      // Ensure confirmation message is formatted with newlines properly
+      const finalMsg = confirmation.message.trim() + "\n\n" + 
+                       "Naya order lagane ke liye MENU likhein.\n\n" + 
+                       whatsappTag + "\n\n" +
+                       "OPTION: MENU";
+      
       return {
-        reply: confirmation.message + "\n\n" + whatsappTag + "\n\nNaya order lagane ke liye MENU likhein.\n\nOPTION: MENU",
+        reply: finalMsg,
         nextState: { 
           state: 'ORDER_PLACED', 
           data: { ...session.data, orderId, targetLink, utrId } 
@@ -89,7 +95,7 @@ export async function processBotMessage(
                           `- *Target Link:* ${targetLink}`;
 
       return {
-        reply: fallbackMsg + "\n\n" + whatsappTag + "\n\nNaya order lagane ke liye MENU likhein.\n\nOPTION: MENU",
+        reply: fallbackMsg + "\n\n" + "Naya order lagane ke liye MENU likhein.\n\n" + whatsappTag + "\n\n" + "OPTION: MENU",
         nextState: { 
           state: 'ORDER_PLACED', 
           data: { ...session.data, orderId, targetLink, utrId } 

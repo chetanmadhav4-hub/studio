@@ -183,8 +183,8 @@ export function BotPreview({ isAppMode = false }: BotPreviewProps) {
         }
       }
       if (line.trim() === "") return <div key={idx} className="h-1" />;
-      // CLEAN UP: Remove asterisks for display and ensure text contrast in dark mode
-      return <div key={idx} className="leading-relaxed mb-1 text-slate-800 dark:text-zinc-200 font-semibold">{line.replace(/\*/g, '')}</div>;
+      // IMPROVED: Using white/silver text for visibility in dark mode
+      return <div key={idx} className="leading-relaxed mb-1 text-slate-800 dark:text-zinc-100 font-semibold">{line.replace(/\*/g, '')}</div>;
     });
 
     return (
@@ -193,7 +193,7 @@ export function BotPreview({ isAppMode = false }: BotPreviewProps) {
         
         {whatsappMatch && (
           <div className="mt-3 space-y-2">
-            <p className="text-[10px] font-bold text-muted-foreground uppercase text-center">Send Order Details to Admin</p>
+            <p className="text-[10px] font-bold text-muted-foreground uppercase text-center dark:text-zinc-400">Send Order Details to Admin</p>
             <a 
               href={`https://wa.me/919116399517?text=${whatsappMatch[1]}`}
               target="_blank"
@@ -234,7 +234,7 @@ export function BotPreview({ isAppMode = false }: BotPreviewProps) {
         {optionLines.map((optLine, i) => {
           const optionText = optLine.replace("OPTION: ", "").trim();
           return (
-            <button key={i} onClick={() => handleSend(optionText)} className="mt-2 w-full py-2 px-4 font-bold text-[11px] rounded-xl border-2 bg-white dark:bg-zinc-900 text-primary border-primary/10 hover:border-primary/40 hover:bg-primary/5 transition-all flex items-center justify-center gap-2 shadow-sm active:scale-95">
+            <button key={i} onClick={() => handleSend(optionText)} className="mt-2 w-full py-2 px-4 font-bold text-[11px] rounded-xl border-2 bg-white dark:bg-zinc-900 text-primary dark:text-accent border-primary/10 hover:border-primary/40 hover:bg-primary/5 transition-all flex items-center justify-center gap-2 shadow-sm active:scale-95">
               <MousePointer2 className="w-3.5 h-3.5" /> {optionText}
             </button>
           );
