@@ -4,19 +4,19 @@
 
 @layer base {
   :root {
-    --background: 240 25% 93%; /* #E8E8F2 - Subtle off-white with hint of blue */
+    --background: 240 25% 93%; /* #E8E8F2 */
     --foreground: 240 40% 10%;
     --card: 0 0% 100%;
     --card-foreground: 240 40% 10%;
     --popover: 0 0% 100%;
     --popover-foreground: 240 40% 10%;
-    --primary: 240 59% 44%; /* #2E2EB3 - Deep professional indigo blue */
+    --primary: 240 59% 44%; /* #2E2EB3 */
     --primary-foreground: 0 0% 100%;
     --secondary: 240 20% 90%;
     --secondary-foreground: 240 59% 44%;
     --muted: 240 10% 85%;
     --muted-foreground: 240 10% 40%;
-    --accent: 198 96% 63%; /* #45C4FA - Vibrant sky blue */
+    --accent: 198 96% 63%; /* #45C4FA */
     --accent-foreground: 240 40% 10%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
@@ -53,6 +53,21 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground overflow-hidden;
   }
+}
+
+/* Custom scrollbar for chat */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+}
+.dark .custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
 }
