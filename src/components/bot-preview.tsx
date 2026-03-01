@@ -39,7 +39,7 @@ export function BotPreview({ isAppMode = false }: BotPreviewProps) {
   const router = useRouter();
   
   const [messages, setMessages] = useState<ChatMessage[]>([
-    { role: "bot", text: "Send 'Hi' to start the bot! 👋" },
+    { role: "bot", text: "Send 'Hi' to start create order" },
   ]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
@@ -169,7 +169,7 @@ export function BotPreview({ isAppMode = false }: BotPreviewProps) {
       );
     });
 
-    const staticQrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=600x600&data=upi://pay?pa=smmxpressbot@slc%26pn=InstaFlow%20Bot%26cu=INR`;
+    const staticQrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=600x600&data=upi://pay?pa=chetanmrbest-1@okicici%26pn=CHETAN%20KUMAR%20MEGHWAL%26cu=INR`;
 
     return (
       <div className="flex flex-col gap-1.5 w-full overflow-hidden">
