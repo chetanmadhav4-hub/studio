@@ -177,18 +177,19 @@ export function BotPreview({ isAppMode = false }: BotPreviewProps) {
         
         {hasQR && qrImage && (
           <div className="mt-4 flex flex-col items-center gap-3">
-            <div className="relative w-full aspect-[3/4] rounded-[2rem] overflow-hidden border-4 border-white shadow-2xl bg-white">
+            <div className="relative w-64 aspect-square rounded-[2rem] overflow-hidden border-4 border-white shadow-2xl bg-white">
               <Image 
                 src={qrImage.imageUrl} 
                 alt="Payment QR" 
                 fill 
                 className="object-contain p-2"
                 data-ai-hint={qrImage.imageHint}
+                unoptimized
               />
             </div>
             <Button asChild variant="secondary" className="w-full h-11 rounded-xl font-black uppercase text-[10px] tracking-widest gap-2 bg-slate-100 hover:bg-slate-200">
-              <a href={qrImage.imageUrl} download="InstaFlow_QR.png">
-                <Download className="w-4 h-4" /> Download QR Code
+              <a href={qrImage.imageUrl} target="_blank" rel="noopener noreferrer">
+                <Download className="w-4 h-4" /> Save QR Code
               </a>
             </Button>
           </div>
@@ -288,7 +289,7 @@ export function BotPreview({ isAppMode = false }: BotPreviewProps) {
               "max-w-[85%] rounded-[1.5rem] px-5 py-4 text-xs shadow-xl border dark:border-zinc-700",
               msg.role === "user" 
                 ? "bg-[#DCF8C6] dark:bg-emerald-900 text-slate-900 dark:text-zinc-50 rounded-tr-none" 
-                : "bg-white dark:bg-zinc-800 text-slate-900 dark:text-zinc-100 rounded-tl-none font-bold"
+                : "bg-white dark:bg-zinc-800 text-slate-900 dark:text-zinc-50 rounded-tl-none font-bold"
             )}>
               {renderMessageContent(msg.text)}
               <div className="text-[9px] mt-2.5 text-right opacity-60 font-black uppercase dark:text-zinc-400 tracking-wider">

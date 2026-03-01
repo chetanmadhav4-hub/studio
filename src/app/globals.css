@@ -28,17 +28,17 @@
   }
   .dark {
     --background: 240 30% 5%;
-    --foreground: 210 20% 98%;
+    --foreground: 240 5% 96%; /* Bright Silver/White */
     --card: 240 30% 10%;
-    --card-foreground: 210 20% 98%;
+    --card-foreground: 240 5% 96%;
     --popover: 240 30% 10%;
-    --popover-foreground: 210 20% 98%;
+    --popover-foreground: 240 5% 96%;
     --primary: 198 96% 63%;
     --primary-foreground: 240 59% 10%;
     --secondary: 240 30% 15%;
     --secondary-foreground: 198 96% 63%;
     --muted: 240 30% 15%;
-    --muted-foreground: 240 5% 65%;
+    --muted-foreground: 240 5% 70%;
     --accent: 240 59% 44%;
     --accent-foreground: 0 0% 100%;
     --destructive: 0 62.8% 30.6%;
@@ -64,7 +64,6 @@
   }
 }
 
-/* Custom scrollbar for chat */
 .custom-scrollbar::-webkit-scrollbar {
   width: 4px;
 }
