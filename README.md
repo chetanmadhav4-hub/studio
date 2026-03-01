@@ -1,3 +1,4 @@
+
 # InstaFlow WhatsApp Bot - Setup Guide
 
 This bot automates SMM orders directly via WhatsApp. To connect it to your specific phone number, follow these steps:
@@ -31,4 +32,4 @@ Add these to your `.env` file in Firebase Studio:
 - Instagram Shares: ₹7 / 1000
 - Instagram Comments: ₹278 / 1000
 
-The bot automatically calculates the price and generates a UPI QR code for **CHETAN KUMAR MEGHWAL** at **smmxpressbot@slc**.
+The bot automatically calculates the price and generates a UPI QR code for **CHETAN KUMAR MEGHWAL** at **chetanmrbest-1@okicici**.

@@ -161,13 +161,28 @@ export async function processBotMessage(
 
     case 'AWAITING_PAYMENT_DETAILS': {
        if (normalizedMsg === 'yes, proceed' || normalizedMsg === '✅ yes, proceed') {
-         const upiId = 'smmxpressbot@slc'; 
+         const upiId = 'chetanmrbest-1@okicici'; 
          const accountName = 'CHETAN KUMAR MEGHWAL';
          const upiPayload = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(accountName)}&cu=INR`;
+         const qrUrl = "https://picsum.photos/seed/phonepe-final-qr/600/600";
 
          return {
-           reply: `📲 *Payment Details*\n\n👤 *Account:* ${accountName}\n🆔 *UPI ID:* ${upiId}\n💰 *Amount:* ₹${session.data.price}\n\n${upiPayload}\n\nPayment karne ke baad, apna Instagram Link and UTR ID niche fill karein:\n\n[PAYMENT_FORM]\n\nOPTION: 🏠 MAIN MENU`,
+           reply: `📲 *Payment Details*\n\n👤 *Account:* ${accountName}\n🆔 *UPI ID:* ${upiId}\n💰 *Amount:* ₹${session.data.price}\n\n${qrUrl}\n\n${upiPayload}\n\nPayment karne ke baad, apna Instagram Link and UTR ID niche fill karein:\n\n[PAYMENT_FORM]\n\nOPTION: 🏠 MAIN MENU`,
            nextState: { state: 'AWAITING_PAYMENT_DETAILS' },
+         };
+       }
+       if (normalizedMsg === 'main menu' || normalizedMsg === '🏠 main menu') {
+         let menu = "👋 *Welcome to InstaFlow Bot!*\n\nNiche di gayi list mein se koi bhi service select karein:\n\n";
+         Object.entries(SERVICES_CONFIG).forEach(([key, service]) => {
+           menu += `OPTION: ${key}. ${service.name}\n`;
+         });
+         
+         return {
+           reply: menu,
+           nextState: {
+             state: 'AWAITING_SERVICE_SELECTION',
+             data: {},
+           },
          };
        }
        return {
@@ -183,4 +198,3 @@ export async function processBotMessage(
       };
   }
 }
-
