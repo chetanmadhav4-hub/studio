@@ -169,7 +169,7 @@ export function BotPreview({ isAppMode = false }: BotPreviewProps) {
           const textBeforeUrl = line.replace(imageUrl, "").trim();
           return (
             <div key={idx} className="my-2 flex flex-col gap-2">
-              {textBeforeUrl && <div className="leading-relaxed font-bold text-slate-800 dark:text-zinc-100 whitespace-pre-wrap">{textBeforeUrl.replace(/\*/g, '')}</div>}
+              {textBeforeUrl && <div className="leading-relaxed font-black text-slate-800 dark:text-zinc-100 whitespace-pre-wrap">{textBeforeUrl.replace(/\*/g, '')}</div>}
               <div className="bg-white p-2 rounded-xl border shadow-md max-w-[180px] mx-auto text-center">
                 <img src={imageUrl} alt="QR Code" className="rounded-lg w-full h-auto" />
                 {upiLink && (
