@@ -102,9 +102,9 @@ export default function Home() {
         </div>
       </header>
 
-      {/* Main App Surface */}
-      <main className="flex-1 overflow-hidden flex flex-col items-center justify-start">
-        <div className="w-full max-w-md h-full bg-white dark:bg-background relative flex flex-col shadow-2xl border-x dark:border-zinc-800">
+      {/* Main App Surface - Centered Mobile Frame */}
+      <main className="flex-1 overflow-hidden flex flex-col items-center justify-start py-4">
+        <div className="w-full max-w-[420px] h-full bg-white dark:bg-background relative flex flex-col shadow-2xl border dark:border-zinc-800 rounded-[2rem] overflow-hidden">
           
           {isAdmin ? (
             <div className="p-6 space-y-4 overflow-y-auto h-full scrollbar-hide">
@@ -116,11 +116,11 @@ export default function Home() {
               <div className="grid gap-4">
                 <Link href="/orders-feed">
                   <Card className="hover:scale-[1.01] transition-all border-none shadow-lg bg-emerald-600 dark:bg-emerald-700 text-white overflow-hidden group">
-                    <CardHeader className="p-5">
+                    <CardHeader className="p-5 text-left">
                       <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center mb-3 group-hover:rotate-12 transition-transform">
                         <LayoutGrid className="w-5 h-5 text-white" />
                       </div>
-                      <CardTitle className="text-lg font-black uppercase tracking-tight">Live Tracker</CardTitle>
+                      <CardTitle className="text-lg font-black uppercase tracking-tight text-white">Live Tracker</CardTitle>
                       <CardDescription className="text-emerald-50 text-[10px] font-bold opacity-80 uppercase">Manage Incoming Orders</CardDescription>
                     </CardHeader>
                   </Card>
@@ -128,11 +128,11 @@ export default function Home() {
 
                 <Link href="/dashboard/users">
                   <Card className="hover:scale-[1.01] transition-all border-none shadow-lg bg-primary dark:bg-primary/80 text-white overflow-hidden group">
-                    <CardHeader className="p-5">
+                    <CardHeader className="p-5 text-left">
                       <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center mb-3 group-hover:rotate-12 transition-transform">
                         <Users className="w-5 h-5 text-white" />
                       </div>
-                      <CardTitle className="text-lg font-black uppercase tracking-tight">User Database</CardTitle>
+                      <CardTitle className="text-lg font-black uppercase tracking-tight text-white">User Database</CardTitle>
                       <CardDescription className="text-blue-50 text-[10px] font-bold opacity-80 uppercase">Registered User Profiles</CardDescription>
                     </CardHeader>
                   </Card>
@@ -164,8 +164,8 @@ export default function Home() {
                 </div>
               )}
 
-              {/* Bot Interaction Area */}
-              <div className="flex-1 relative">
+              {/* Bot Interaction Area - FULL HEIGHT, INTERNAL SCROLL ONLY */}
+              <div className="flex-1 relative overflow-hidden">
                 <BotPreview isAppMode={true} />
               </div>
             </div>
