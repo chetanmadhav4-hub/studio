@@ -55,6 +55,11 @@ export async function processBotMessage(
     const quantity = session.data.quantity || 0;
     const price = session.data.price || 0;
     const targetLink = link.trim();
+    const utrId = utr.trim();
+
+    // CUSTOM WHATSAPP PAYLOAD AS REQUESTED: Order ID, Service, UTR ID, Quantity
+    const whatsappAdminPayload = `Order ID: ${orderId}\nService: ${serviceName}\nUTR ID: ${utrId}\nQuantity: ${quantity}`;
+    const whatsappTag = `[WHATSAPP_ADMIN:${encodeURIComponent(whatsappAdminPayload)}]`;
 
     try {
       const confirmation = await aiGeneratedOrderConfirmation({
@@ -66,33 +71,28 @@ export async function processBotMessage(
         startTime: '0-30 minutes',
       });
       
-      const cleanMsgForWhatsApp = confirmation.message.replace(/\*/g, '');
-      const whatsappTag = `[WHATSAPP_ADMIN:${encodeURIComponent(cleanMsgForWhatsApp)}]`;
-
       return {
         reply: confirmation.message + "\n\n" + whatsappTag + "\n\nNaya order lagane ke liye MENU likhein.\n\nOPTION: MENU",
         nextState: { 
           state: 'ORDER_PLACED', 
-          data: { ...session.data, orderId, targetLink, utrId: utr.trim() } 
+          data: { ...session.data, orderId, targetLink, utrId } 
         }
       };
     } catch (e) {
-      const fallbackMsg = `🎉 *Woohoo! Your InstaFlow order successfully created!*
-
-- *Order ID:* ${orderId}
-- *Service:* ${serviceName}
-- *Quantity:* ${quantity}
-- *Amount:* ₹${price}
-- *Start Time:* 0-30 minutes
-- *Target Link:* ${targetLink}`;
-
-      const whatsappTag = `[WHATSAPP_ADMIN:${encodeURIComponent(fallbackMsg.replace(/\*/g, ''))}]`;
+      // Fallback with structured breaks
+      const fallbackMsg = `🎉 *Woohoo! Your InstaFlow order successfully created!*\n\n` +
+                          `- *Order ID:* ${orderId}\n` +
+                          `- *Service:* ${serviceName}\n` +
+                          `- *Quantity:* ${quantity}\n` +
+                          `- *Amount:* ₹${price}\n` +
+                          `- *Start Time:* 0-30 minutes\n` +
+                          `- *Target Link:* ${targetLink}`;
 
       return {
         reply: fallbackMsg + "\n\n" + whatsappTag + "\n\nNaya order lagane ke liye MENU likhein.\n\nOPTION: MENU",
         nextState: { 
           state: 'ORDER_PLACED', 
-          data: { ...session.data, orderId, targetLink, utrId: utr.trim() } 
+          data: { ...session.data, orderId, targetLink, utrId } 
         }
       };
     }

@@ -1,3 +1,4 @@
+
 'use server';
 /**
  * @fileOverview This file implements a Genkit flow to generate a friendly and personalized order confirmation message
@@ -52,7 +53,9 @@ Generate a clean and structured order confirmation message.
 CRITICAL: The message MUST start with exactly this header:
 🎉 *Woohoo! Your InstaFlow order successfully created!*
 
-Then, list the following details in this exact format with bullet points:
+Followed by TWO newlines.
+
+Then, list the following details in this exact format with bullet points and newlines:
 - *Order ID:* {{{orderId}}}
 - *Service:* {{{serviceName}}}
 - *Quantity:* {{{quantity}}}
@@ -60,7 +63,7 @@ Then, list the following details in this exact format with bullet points:
 - *Start Time:* {{{startTime}}}
 - *Target Link:* {{{instagramProfileLink}}}
 
-Keep it professional yet friendly. Use Hindi/English mix (Hinglish) if you like, but keep the points in English as shown. Do not write any long paragraphs after the points.`,
+Keep it professional yet friendly. Ensure each point is on its own line. Do not write any long paragraphs after the points.`,
 });
 
 const aiGeneratedOrderConfirmationFlow = ai.defineFlow(
