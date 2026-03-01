@@ -50,7 +50,7 @@ const orderConfirmationPrompt = ai.definePrompt({
 
 Generate a clean and structured order confirmation message.
 
-CRITICAL: You MUST use multiple lines and bullet points exactly like this:
+CRITICAL: You MUST use multiple lines and bullet points exactly like this (each detail on a NEW line):
 
 🎉 *Woohoo! Your InstaFlow order successfully created!*
 
@@ -61,7 +61,7 @@ CRITICAL: You MUST use multiple lines and bullet points exactly like this:
 - *Start Time:* {{{startTime}}}
 - *Target Link:* {{{instagramProfileLink}}}
 
-Keep it professional yet friendly. Ensure each point is on its own line. Do not merge them into a single line. Use double newlines between sections.`,
+Keep it professional yet friendly. Ensure each point is on its own line. Do NOT merge them into a single block of text. Use double newlines between the header and the list.`,
 });
 
 const aiGeneratedOrderConfirmationFlow = ai.defineFlow(

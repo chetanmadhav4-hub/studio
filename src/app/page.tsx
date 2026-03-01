@@ -85,7 +85,7 @@ export default function Home() {
         </div>
       )}
 
-      {/* APP HEADER - Fixed for Mobile Status Bars */}
+      {/* APP HEADER - Optimized for all notches/status bars */}
       <header className="h-20 pt-[env(safe-area-inset-top)] border-b dark:border-zinc-800 bg-white dark:bg-zinc-900 flex items-center justify-between px-4 shrink-0 shadow-sm z-[100]">
         <div className="flex items-center gap-2 mt-2">
           <div className="w-8 h-8 sm:w-10 sm:h-10 bg-primary rounded-xl flex items-center justify-center shadow-lg shadow-primary/30">
