@@ -2,7 +2,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useDoc, useFirestore, useUser } from '@/firebase';
+import { useDoc, useFirestore, useUser, useMemoFirebase } from '@/firebase';
 import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -10,7 +10,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
-import { Megaphone, Save, Loader2, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { Megaphone, Save, Loader2, AlertCircle, CheckCircle2, Zap } from 'lucide-react';
+import Link from 'next/link';
 
 export default function BroadcastAdminPage() {
   const { user } = useUser();
@@ -22,7 +23,7 @@ export default function BroadcastAdminPage() {
 
   const ADMIN_EMAIL = 'chetanmadhav4@gmail.com';
   
-  const broadcastRef = doc(db, 'settings', 'broadcast');
+  const broadcastRef = useMemoFirebase(() => doc(db, 'settings', 'broadcast'), [db]);
   const { data: broadcastData, isLoading } = useDoc(broadcastRef);
 
   useEffect(() => {
@@ -34,6 +35,11 @@ export default function BroadcastAdminPage() {
 
   const handleSave = async () => {
     if (!user || user.email !== ADMIN_EMAIL) return;
+    if (!message.trim() && isActive) {
+      toast({ variant: "destructive", title: "Wait!", description: "Message can't be empty if broadcast is active." });
+      return;
+    }
+
     setIsSaving(true);
     try {
       await setDoc(broadcastRef, {
@@ -44,14 +50,14 @@ export default function BroadcastAdminPage() {
 
       toast({
         title: "Broadcast Updated",
-        description: "Your message is now live for all users.",
+        description: "Your message is now live for all users instantly!",
       });
     } catch (e: any) {
       console.error(e);
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Failed to update broadcast.",
+        description: "Failed to update broadcast settings.",
       });
     } finally {
       setIsSaving(false);
@@ -63,76 +69,83 @@ export default function BroadcastAdminPage() {
       <div className="flex flex-col items-center justify-center py-24 gap-4 text-center">
         <AlertCircle className="w-12 h-12 text-red-500" />
         <h2 className="text-xl font-bold">Access Denied</h2>
-        <p className="text-muted-foreground">This page is for super admin only.</p>
+        <p className="text-muted-foreground">Only super admin can manage broadcasts.</p>
+        <Link href="/"><Button variant="outline">Back Home</Button></Link>
       </div>
     );
   }
 
   return (
-    <div className="max-w-2xl mx-auto space-y-6">
+    <div className="max-w-2xl mx-auto space-y-6 pb-20">
       <div className="flex flex-col gap-1">
-        <h2 className="text-2xl font-bold tracking-tight text-slate-900">Broadcast Manager</h2>
-        <p className="text-sm text-slate-500">Send real-time announcements to all logged-in users.</p>
+        <h2 className="text-3xl font-black tracking-tighter text-slate-900 uppercase">Broadcast Manager</h2>
+        <p className="text-xs font-bold text-slate-500 uppercase tracking-widest opacity-70">Real-time Global Announcements</p>
       </div>
 
-      <Card className="border-none shadow-xl overflow-hidden rounded-2xl bg-white">
-        <CardHeader className="bg-primary text-white p-6">
+      <Card className="border-none shadow-2xl overflow-hidden rounded-[2rem] bg-white">
+        <CardHeader className="bg-primary text-white p-8">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <Megaphone className="w-6 h-6" />
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center border border-white/20">
+                <Megaphone className="w-6 h-6" />
+              </div>
               <div>
-                <CardTitle className="text-lg">Broadcast Settings</CardTitle>
-                <CardDescription className="text-blue-100 text-xs">Real-time update across all user devices</CardDescription>
+                <CardTitle className="text-xl font-black uppercase tracking-tight">Live Broadcast</CardTitle>
+                <CardDescription className="text-blue-100 text-[10px] font-bold uppercase tracking-widest opacity-80">Connected to all user sessions</CardDescription>
               </div>
             </div>
-            <div className="flex items-center gap-2 bg-white/10 px-3 py-1.5 rounded-full border border-white/20">
+            <div className="flex items-center gap-3 bg-white/10 px-4 py-2 rounded-2xl border border-white/20 shadow-inner">
               <Switch 
                 checked={isActive} 
                 onCheckedChange={setIsActive}
                 className="data-[state=checked]:bg-emerald-500"
               />
-              <span className="text-[10px] font-bold uppercase tracking-wider">
-                {isActive ? 'Active' : 'Disabled'}
+              <span className="text-[10px] font-black uppercase tracking-wider">
+                {isActive ? 'Active' : 'Offline'}
               </span>
             </div>
           </div>
         </CardHeader>
-        <CardContent className="p-6 space-y-6">
+        <CardContent className="p-8 space-y-8">
           <div className="space-y-3">
-            <Label className="text-xs font-bold uppercase text-slate-500 tracking-widest">Broadcast Message</Label>
+            <Label className="text-[10px] font-black uppercase text-slate-400 tracking-[0.2em]">Message Content</Label>
             <Textarea 
               placeholder="Ex: 🚀 20% Extra Followers on all orders today! Offer valid till midnight."
-              className="min-h-[150px] text-sm resize-none focus:ring-primary border-slate-200"
+              className="min-h-[180px] text-base resize-none focus:ring-primary border-slate-200 rounded-2xl p-4 font-medium"
               value={message}
               onChange={(e) => setMessage(e.target.value)}
             />
-            <p className="text-[10px] text-muted-foreground italic">
-              * Formatting like *bold* is not supported here, use emojis for emphasis.
-            </p>
+            <div className="flex items-center gap-2 text-[10px] text-muted-foreground italic font-bold">
+              <Zap className="w-3 h-3 text-amber-500" />
+              Real-time update: Users will see this as soon as you save.
+            </div>
           </div>
 
-          <div className="p-4 bg-slate-50 rounded-xl border border-dashed border-slate-200 space-y-2">
-            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Live Preview</p>
+          <div className="p-6 bg-slate-50 rounded-3xl border-2 border-dashed border-slate-200 space-y-3">
+            <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Live Preview</p>
             {isActive ? (
-              <div className="bg-emerald-50 border border-emerald-100 p-3 rounded-lg flex items-start gap-3">
-                <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
-                <p className="text-xs text-emerald-800 font-medium leading-relaxed">
-                  {message || 'No message set...'}
+              <div className="bg-primary/5 border border-primary/10 p-5 rounded-2xl flex items-start gap-4 shadow-sm animate-pulse">
+                <Megaphone className="w-5 h-5 text-primary shrink-0 mt-0.5" />
+                <p className="text-sm text-slate-800 font-bold leading-relaxed">
+                  {message || 'Type something to preview...'}
                 </p>
               </div>
             ) : (
-              <p className="text-xs text-slate-400 italic py-2">Broadcast is currently disabled.</p>
+              <div className="py-6 text-center border rounded-2xl bg-white border-slate-100">
+                <p className="text-xs text-slate-400 font-black uppercase tracking-widest italic">Broadcast is currently disabled.</p>
+              </div>
             )}
           </div>
         </CardContent>
-        <CardFooter className="bg-slate-50 border-t p-4 flex justify-end">
+        <CardFooter className="bg-slate-50 border-t p-6 flex justify-between items-center">
+           <Link href="/"><Button variant="ghost" className="text-xs font-bold uppercase tracking-widest">Cancel</Button></Link>
           <Button 
             onClick={handleSave} 
             disabled={isSaving || isLoading}
-            className="gap-2 px-8 font-bold"
+            className="gap-2 px-10 h-12 font-black uppercase tracking-wider rounded-2xl shadow-xl hover:scale-105 transition-transform"
           >
-            {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-            Publish Broadcast
+            {isSaving ? <Loader2 className="w-5 h-5 animate-spin" /> : <Save className="w-5 h-5" />}
+            Publish Now
           </Button>
         </CardFooter>
       </Card>

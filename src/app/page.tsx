@@ -8,7 +8,7 @@ import { BotPreview } from "@/components/bot-preview";
 import { OrderHistory } from "@/components/order-history";
 import { NotificationBell } from "@/components/notification-bell";
 import { Zap, History, Moon, Sun, LayoutGrid, Users, Loader2, Megaphone, X } from "lucide-react";
-import { useUser, useFirestore, useDoc } from "@/firebase";
+import { useUser, useFirestore, useDoc, useMemoFirebase } from "@/firebase";
 import { doc } from "firebase/firestore";
 import {
   Dialog,
@@ -29,7 +29,7 @@ export default function Home() {
   const ADMIN_EMAIL = 'chetanmadhav4@gmail.com';
   const isAdmin = user && user.email === ADMIN_EMAIL;
 
-  const broadcastRef = doc(db, 'settings', 'broadcast');
+  const broadcastRef = useMemoFirebase(() => doc(db, 'settings', 'broadcast'), [db]);
   const { data: broadcast } = useDoc(broadcastRef);
 
   useEffect(() => {
@@ -52,27 +52,32 @@ export default function Home() {
     }
   };
 
+  // Reset dismissal if message changes
+  useEffect(() => {
+    setIsBroadcastDismissed(false);
+  }, [broadcast?.broadcastMessage]);
+
   return (
-    <div className="h-screen w-full flex flex-col bg-background transition-colors duration-300 overflow-hidden">
+    <div className="h-screen w-full flex flex-col bg-background transition-colors duration-300 overflow-hidden font-body">
       {/* Real-time Broadcast Overlay */}
       {broadcast?.isBroadcastActive && !isBroadcastDismissed && (
-        <div className="absolute top-16 left-1/2 -translate-x-1/2 w-[90%] max-w-[380px] z-[100] animate-in slide-in-from-top-4 duration-500">
-          <div className="bg-primary dark:bg-accent p-4 rounded-2xl shadow-2xl border-2 border-white/20 flex items-start gap-4 relative overflow-hidden group">
-            <div className="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2" />
-            <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center shrink-0">
+        <div className="absolute top-16 left-1/2 -translate-x-1/2 w-[92%] max-w-[400px] z-[100] animate-in slide-in-from-top-10 duration-500">
+          <div className="bg-primary dark:bg-zinc-900 p-4 rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.3)] border-2 border-white/20 flex items-start gap-4 relative overflow-hidden group">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2" />
+            <div className="w-11 h-11 bg-white/10 rounded-2xl flex items-center justify-center shrink-0 border border-white/20">
               <Megaphone className="w-5 h-5 text-white animate-bounce" />
             </div>
-            <div className="flex-1 space-y-1 pr-4">
-              <p className="text-[10px] font-black text-white/70 uppercase tracking-widest">Official Update</p>
-              <p className="text-xs font-bold text-white dark:text-zinc-100 leading-relaxed">
+            <div className="flex-1 space-y-1.5 pr-4">
+              <p className="text-[10px] font-black text-white/50 uppercase tracking-[0.2em]">Official Update</p>
+              <p className="text-sm font-bold text-white dark:text-zinc-100 leading-tight">
                 {broadcast.broadcastMessage}
               </p>
             </div>
             <button 
               onClick={() => setIsBroadcastDismissed(true)}
-              className="absolute top-2 right-2 w-6 h-6 bg-black/10 hover:bg-black/20 rounded-full flex items-center justify-center transition-colors"
+              className="absolute top-3 right-3 w-7 h-7 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center transition-colors border border-white/10"
             >
-              <X className="w-3 h-3 text-white" />
+              <X className="w-4 h-4 text-white" />
             </button>
           </div>
         </div>
@@ -81,10 +86,10 @@ export default function Home() {
       {/* Sleek App Header */}
       <header className="h-14 border-b bg-white dark:bg-zinc-950 flex items-center justify-between px-4 shrink-0 shadow-sm z-50">
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-primary rounded-xl flex items-center justify-center shadow-md shadow-primary/20">
+          <div className="w-8 h-8 bg-primary rounded-xl flex items-center justify-center shadow-lg shadow-primary/20">
             <Zap className="w-5 h-5 text-white" />
           </div>
-          <span className="font-extrabold text-lg tracking-tight text-primary uppercase italic">InstaFlow</span>
+          <span className="font-extrabold text-lg tracking-tighter text-primary dark:text-accent uppercase italic">InstaFlow</span>
         </div>
         
         <div className="flex items-center gap-2">
@@ -93,10 +98,10 @@ export default function Home() {
               {!user ? (
                 <div className="flex items-center gap-2">
                   <Link href="/login">
-                    <Button variant="ghost" size="sm" className="text-xs h-8 font-bold">Login</Button>
+                    <Button variant="ghost" size="sm" className="text-xs h-9 font-bold">Login</Button>
                   </Link>
                   <Link href="/signup">
-                    <Button size="sm" className="bg-primary text-white hover:bg-primary/90 text-xs h-8 font-bold">
+                    <Button size="sm" className="bg-primary text-white hover:bg-primary/90 text-xs h-9 font-bold px-4">
                       Sign Up
                     </Button>
                   </Link>
@@ -106,16 +111,16 @@ export default function Home() {
                   <Button 
                     variant="ghost" 
                     size="sm"
-                    className="h-9 w-9 p-0 rounded-full hover:bg-accent dark:hover:bg-zinc-800 transition-colors"
+                    className="h-10 w-10 p-0 rounded-full hover:bg-accent dark:hover:bg-zinc-800 transition-colors"
                     onClick={toggleTheme}
                   >
-                    {isDark ? <Sun className="w-4 h-4 text-amber-500" /> : <Moon className="w-4 h-4 text-primary" />}
+                    {isDark ? <Sun className="w-5 h-5 text-amber-500" /> : <Moon className="w-5 h-5 text-primary" />}
                   </Button>
 
                   <NotificationBell />
                   
                   <Link href="/profile">
-                    <Button variant="ghost" size="sm" className="p-0.5 rounded-full border-2 border-primary/10 ml-1">
+                    <Button variant="ghost" size="sm" className="p-0.5 rounded-full border-2 border-primary/20 ml-1">
                       <Avatar className="w-8 h-8">
                         <AvatarFallback className="text-[10px] bg-primary text-white font-bold">
                           {user.email?.charAt(0).toUpperCase()}
@@ -127,55 +132,61 @@ export default function Home() {
               )}
             </>
           ) : (
-            <Loader2 className="w-4 h-4 animate-spin text-primary" />
+            <Loader2 className="w-5 h-5 animate-spin text-primary" />
           )}
         </div>
       </header>
 
-      {/* Main App Surface - Centered Mobile Frame */}
+      {/* Main App Surface */}
       <main className="flex-1 overflow-hidden flex flex-col items-center justify-start py-4">
-        <div className="w-full max-w-[420px] h-full bg-white dark:bg-background relative flex flex-col shadow-2xl border dark:border-zinc-800 rounded-[2rem] overflow-hidden">
+        <div className="w-full max-w-[440px] h-full bg-white dark:bg-zinc-950 relative flex flex-col shadow-[0_30px_100px_rgba(0,0,0,0.1)] border dark:border-zinc-800 rounded-[2.5rem] overflow-hidden">
           
           {isAdmin ? (
-            <div className="p-6 space-y-4 overflow-y-auto h-full scrollbar-hide">
+            <div className="p-6 space-y-6 overflow-y-auto h-full scrollbar-hide bg-[#F8F9FC] dark:bg-zinc-950">
               <div className="space-y-1 mb-2">
-                <h1 className="text-xl font-black text-foreground dark:text-white uppercase tracking-tight">Admin Console</h1>
-                <p className="text-[10px] text-muted-foreground font-bold italic uppercase">Manage Orders & Growth</p>
+                <h1 className="text-2xl font-black text-foreground dark:text-white uppercase tracking-tighter">Admin Control</h1>
+                <p className="text-[11px] text-primary dark:text-accent font-black uppercase tracking-widest italic opacity-80">Management Suite v2.0</p>
               </div>
 
               <div className="grid gap-4">
                 <Link href="/orders-feed">
-                  <Card className="hover:scale-[1.01] transition-all border-none shadow-lg bg-emerald-600 dark:bg-emerald-700 text-white overflow-hidden group">
-                    <CardHeader className="p-5 text-left">
-                      <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center mb-3 group-hover:rotate-12 transition-transform">
-                        <LayoutGrid className="w-5 h-5 text-white" />
+                  <Card className="hover:scale-[1.02] active:scale-95 transition-all border-none shadow-xl bg-emerald-600 dark:bg-emerald-800 text-white overflow-hidden group cursor-pointer h-32 flex items-center">
+                    <CardHeader className="p-6 flex flex-row items-center gap-5 w-full space-y-0">
+                      <div className="w-14 h-14 bg-white/20 rounded-2xl flex items-center justify-center shrink-0 group-hover:rotate-12 transition-transform border border-white/20">
+                        <LayoutGrid className="w-7 h-7 text-white" />
                       </div>
-                      <CardTitle className="text-lg font-black uppercase tracking-tight text-white">Live Tracker</CardTitle>
-                      <CardDescription className="text-emerald-50 text-[10px] font-bold opacity-80 uppercase">Manage Incoming Orders</CardDescription>
+                      <div className="text-left">
+                        <CardTitle className="text-xl font-black uppercase tracking-tight text-white">Live Tracker</CardTitle>
+                        <CardDescription className="text-emerald-50 text-[10px] font-bold opacity-80 uppercase tracking-widest mt-1">Manage All Incoming Orders</CardDescription>
+                      </div>
                     </CardHeader>
                   </Card>
                 </Link>
 
                 <Link href="/dashboard/broadcast">
-                  <Card className="hover:scale-[1.01] transition-all border-none shadow-lg bg-primary dark:bg-primary/80 text-white overflow-hidden group">
-                    <CardHeader className="p-5 text-left">
-                      <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center mb-3 group-hover:rotate-12 transition-transform">
-                        <Megaphone className="w-5 h-5 text-white" />
+                  <Card className="hover:scale-[1.02] active:scale-95 transition-all border-none shadow-xl bg-primary dark:bg-primary/80 text-white overflow-hidden group cursor-pointer h-32 flex items-center">
+                    <CardHeader className="p-6 flex flex-row items-center gap-5 w-full space-y-0">
+                      <div className="w-14 h-14 bg-white/20 rounded-2xl flex items-center justify-center shrink-0 group-hover:rotate-12 transition-transform border border-white/20">
+                        <Megaphone className="w-7 h-7 text-white" />
                       </div>
-                      <CardTitle className="text-lg font-black uppercase tracking-tight text-white">Broadcast Msg</CardTitle>
-                      <CardDescription className="text-blue-50 text-[10px] font-bold opacity-80 uppercase">Edit Live Announcements</CardDescription>
+                      <div className="text-left">
+                        <CardTitle className="text-xl font-black uppercase tracking-tight text-white">Broadcast Msg</CardTitle>
+                        <CardDescription className="text-blue-50 text-[10px] font-bold opacity-80 uppercase tracking-widest mt-1">Update Global Announcements</CardDescription>
+                      </div>
                     </CardHeader>
                   </Card>
                 </Link>
 
                 <Link href="/dashboard/users">
-                  <Card className="hover:scale-[1.01] transition-all border-none shadow-lg bg-zinc-800 dark:bg-zinc-900 text-white overflow-hidden group">
-                    <CardHeader className="p-5 text-left">
-                      <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center mb-3 group-hover:rotate-12 transition-transform">
-                        <Users className="w-5 h-5 text-white" />
+                  <Card className="hover:scale-[1.02] active:scale-95 transition-all border-none shadow-xl bg-zinc-800 dark:bg-zinc-900 text-white overflow-hidden group cursor-pointer h-32 flex items-center">
+                    <CardHeader className="p-6 flex flex-row items-center gap-5 w-full space-y-0">
+                      <div className="w-14 h-14 bg-white/20 rounded-2xl flex items-center justify-center shrink-0 group-hover:rotate-12 transition-transform border border-white/20">
+                        <Users className="w-7 h-7 text-white" />
                       </div>
-                      <CardTitle className="text-lg font-black uppercase tracking-tight text-white">User Database</CardTitle>
-                      <CardDescription className="text-zinc-300 text-[10px] font-bold opacity-80 uppercase">Registered User Profiles</CardDescription>
+                      <div className="text-left">
+                        <CardTitle className="text-xl font-black uppercase tracking-tight text-white">All Users</CardTitle>
+                        <CardDescription className="text-zinc-300 text-[10px] font-bold opacity-80 uppercase tracking-widest mt-1">View Registered Database</CardDescription>
+                      </div>
                     </CardHeader>
                   </Card>
                 </Link>
@@ -186,18 +197,18 @@ export default function Home() {
               {/* User Sub-Header */}
               {user && (
                 <div className="h-10 bg-white dark:bg-zinc-900 border-b flex items-center px-4 justify-between shrink-0 shadow-sm z-10">
-                  <span className="text-[10px] font-black text-primary dark:text-accent uppercase tracking-[0.2em]">Automated Bot</span>
+                  <span className="text-[10px] font-black text-primary dark:text-accent uppercase tracking-[0.2em] italic">Automated Bot</span>
                   <Dialog>
                     <DialogTrigger asChild>
                       <Button variant="ghost" size="sm" className="h-7 gap-1.5 text-[10px] font-black hover:bg-primary/5 text-primary dark:text-accent uppercase">
-                        <History className="w-3 h-3" /> History
+                        <History className="w-3.5 h-3.5" /> Recent
                       </Button>
                     </DialogTrigger>
-                    <DialogContent className="max-w-[95vw] sm:max-w-md max-h-[80vh] overflow-y-auto rounded-[2rem] dark:bg-zinc-950 border-none shadow-2xl">
+                    <DialogContent className="max-w-[95vw] sm:max-w-md max-h-[85vh] overflow-y-auto rounded-[2.5rem] dark:bg-zinc-950 border-none shadow-2xl p-6">
                       <DialogHeader>
-                        <DialogTitle className="flex items-center gap-2 dark:text-zinc-100 text-sm font-black uppercase tracking-wider">
-                          <History className="w-4 h-4 text-primary" />
-                          Recent Orders
+                        <DialogTitle className="flex items-center gap-2 dark:text-zinc-100 text-base font-black uppercase tracking-tighter">
+                          <History className="w-5 h-5 text-primary" />
+                          Order History
                         </DialogTitle>
                       </DialogHeader>
                       <OrderHistory />
@@ -206,7 +217,7 @@ export default function Home() {
                 </div>
               )}
 
-              {/* Bot Interaction Area - FULL HEIGHT, INTERNAL SCROLL ONLY */}
+              {/* Bot Interaction Area */}
               <div className="flex-1 relative overflow-hidden">
                 <BotPreview isAppMode={true} />
               </div>
@@ -216,9 +227,9 @@ export default function Home() {
       </main>
 
       {/* Minimal App Footer */}
-      <footer className="h-8 bg-white dark:bg-zinc-950 border-t flex items-center justify-center shrink-0">
-        <p className="text-[8px] text-muted-foreground dark:text-zinc-500 font-black uppercase tracking-[0.4em]">
-          InstaFlow App v2.0
+      <footer className="h-10 bg-white dark:bg-zinc-950 border-t flex items-center justify-center shrink-0">
+        <p className="text-[9px] text-muted-foreground dark:text-zinc-500 font-black uppercase tracking-[0.5em] opacity-60">
+          InstaFlow Engine v2.0
         </p>
       </footer>
     </div>
