@@ -85,7 +85,7 @@ export default function Home() {
         </div>
       )}
 
-      {/* APP HEADER - Corrected for safe areas */}
+      {/* APP HEADER - SAFE AREA FIXED */}
       <header className="h-24 pt-[env(safe-area-inset-top,24px)] pb-3 border-b dark:border-zinc-800 bg-white dark:bg-zinc-900 flex items-center justify-between px-4 shrink-0 shadow-sm z-[100] relative">
         <div className="flex items-center gap-2 mt-auto">
           <div className="w-8 h-8 sm:w-10 sm:h-10 bg-primary rounded-xl flex items-center justify-center shadow-lg shadow-primary/30">

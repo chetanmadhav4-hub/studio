@@ -32,9 +32,9 @@ export async function processBotMessage(
   messageText: string
 ): Promise<{ reply: string; nextState: Partial<UserSession> }> {
   const normalizedMsg = messageText.trim().toLowerCase();
+  // Using the static QR provided by user
   const staticQr = PlaceHolderImages.find(img => img.id === 'phonepe-static-qr')?.imageUrl || '';
 
-  // SPECIAL HANDLER FOR INLINE FORM SUBMISSION
   if (normalizedMsg.startsWith('submit_payment:')) {
     const detailsPart = messageText.substring('submit_payment:'.length).trim();
     const [link, utr] = detailsPart.split('|');
@@ -103,7 +103,6 @@ export async function processBotMessage(
     }
   }
 
-  // GLOBAL SERVICE INTERRUPTION
   let interceptedServiceKey = '';
   Object.entries(SERVICES_CONFIG).forEach(([key, service]) => {
     if (normalizedMsg.includes(service.name.toLowerCase()) || (normalizedMsg.length < 3 && (normalizedMsg === key || normalizedMsg === `${key}.`))) {
@@ -122,7 +121,6 @@ export async function processBotMessage(
     };
   }
 
-  // MENU COMMAND
   if (normalizedMsg === 'hi' || normalizedMsg === 'start' || normalizedMsg === 'menu') {
     let menu = "👋 *Welcome to InstaFlow Bot!*\n\nNiche di gayi list mein se koi bhi service select karein:\n\n";
     Object.entries(SERVICES_CONFIG).forEach(([key, service]) => {
@@ -138,7 +136,6 @@ export async function processBotMessage(
     };
   }
 
-  // STATE-BASED LOGIC
   switch (session.state) {
     case 'AWAITING_SERVICE_SELECTION': {
       return {
@@ -188,7 +185,7 @@ export async function processBotMessage(
         const upiPayload = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(accountName)}&cu=INR`;
 
         return {
-          reply: `📲 *Pay via any UPI app*\n\n👤 *Account:* ${accountName}\n🆔 *UPI ID:* ${upiId}\n💰 *Amount:* ₹${price}\n\n📸 *SCAN TO PAY (Manual Amount):*\n${staticQr}\n\n${upiPayload}\n\n✅ Payment ke baad, apna Instagram Link and UTR ID niche fill karein:\n\n[PAYMENT_FORM]`,
+          reply: `📲 *Scan This QR to Pay Manual Amount*\n\n👤 *Account:* ${accountName}\n🆔 *UPI ID:* ${upiId}\n💰 *Amount:* ₹${price}\n\n${staticQr}\n\n${upiPayload}\n\n✅ Payment ke baad, apna Instagram Link and UTR ID niche fill karein:\n\n[PAYMENT_FORM]`,
           nextState: {
             state: 'AWAITING_PAYMENT_DETAILS',
             data: { ...session.data },

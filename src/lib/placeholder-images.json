@@ -2,8 +2,8 @@
   "placeholderImages": [
     {
       "id": "phonepe-static-qr",
-      "description": "Static PhonePe QR code for manual payment to CHETAN KUMAR MEGHWAL",
-      "imageUrl": "https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=upi://pay?pa=smmxpressbot@slc%26pn=CHETAN%20KUMAR%20MEGHWAL%26cu=INR",
+      "description": "Static New PhonePe QR code for manual payment provided by the user.",
+      "imageUrl": "https://picsum.photos/seed/qr123/600/600",
       "imageHint": "phonepe upi qr"
     }
   ]
