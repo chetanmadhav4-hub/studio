@@ -169,7 +169,7 @@ export function BotPreview({ isAppMode = false }: BotPreviewProps) {
           const textBeforeUrl = line.replace(imageUrl, "").trim();
           return (
             <div key={idx} className="my-2 flex flex-col gap-2">
-              {textBeforeUrl && <div className="leading-relaxed font-bold text-slate-800 dark:text-zinc-100">{textBeforeUrl}</div>}
+              {textBeforeUrl && <div className="leading-relaxed font-bold text-slate-800 dark:text-zinc-100 whitespace-pre-wrap">{textBeforeUrl.replace(/\*/g, '')}</div>}
               <div className="bg-white p-2 rounded-xl border shadow-md max-w-[180px] mx-auto text-center">
                 <img src={imageUrl} alt="QR Code" className="rounded-lg w-full h-auto" />
                 {upiLink && (
@@ -183,7 +183,7 @@ export function BotPreview({ isAppMode = false }: BotPreviewProps) {
         }
       }
       if (line.trim() === "") return <div key={idx} className="h-1" />;
-      return <div key={idx} className="leading-relaxed mb-1 text-slate-800 dark:text-zinc-100 font-bold">{line.replace(/\*/g, '')}</div>;
+      return <div key={idx} className="leading-relaxed mb-1 text-slate-800 dark:text-zinc-100 font-bold whitespace-pre-wrap">{line.replace(/\*/g, '')}</div>;
     });
 
     return (

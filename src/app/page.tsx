@@ -63,7 +63,7 @@ export default function Home() {
       
       {/* REAL-TIME BROADCAST POPUP */}
       {broadcast?.isBroadcastActive && !isBroadcastDismissed && (
-        <div className="fixed top-16 sm:top-20 left-1/2 -translate-x-1/2 w-[92%] max-w-[420px] z-[999] animate-in fade-in slide-in-from-top-10 duration-500">
+        <div className="fixed top-20 sm:top-24 left-1/2 -translate-x-1/2 w-[92%] max-w-[420px] z-[999] animate-in fade-in slide-in-from-top-10 duration-500">
           <div className="bg-primary dark:bg-zinc-900 p-4 sm:p-5 rounded-[2rem] shadow-[0_25px_60px_rgba(0,0,0,0.4)] border-2 border-white/20 flex items-start gap-4 relative overflow-hidden group">
             <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2 blur-2xl" />
             <div className="w-10 h-10 sm:w-12 sm:h-12 bg-white/20 rounded-2xl flex items-center justify-center shrink-0 border border-white/20 shadow-inner">
@@ -85,16 +85,16 @@ export default function Home() {
         </div>
       )}
 
-      {/* APP HEADER - Safe for Notches */}
-      <header className="h-14 sm:h-16 pt-safe border-b dark:border-zinc-800 bg-white dark:bg-zinc-900 flex items-center justify-between px-4 shrink-0 shadow-sm z-[100]">
-        <div className="flex items-center gap-2">
+      {/* APP HEADER - Fixed for Mobile Status Bars */}
+      <header className="h-16 sm:h-20 pt-[env(safe-area-inset-top)] border-b dark:border-zinc-800 bg-white dark:bg-zinc-900 flex items-center justify-between px-4 shrink-0 shadow-sm z-[100]">
+        <div className="flex items-center gap-2 mt-2">
           <div className="w-8 h-8 sm:w-10 sm:h-10 bg-primary rounded-xl flex items-center justify-center shadow-lg shadow-primary/30">
             <Zap className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
           </div>
           <span className="font-black text-base sm:text-lg tracking-tighter text-primary dark:text-accent uppercase italic">InstaFlow</span>
         </div>
         
-        <div className="flex items-center gap-1.5">
+        <div className="flex items-center gap-1.5 mt-2">
           {!isUserLoading ? (
             <>
               {!user ? (
