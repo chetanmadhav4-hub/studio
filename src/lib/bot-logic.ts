@@ -66,15 +66,17 @@ export async function processBotMessage(
         startTime: '0-30 minutes',
       });
       
+      const cleanMsgForWhatsApp = confirmation.message.replace(/\*/g, '');
+      const whatsappTag = `[WHATSAPP_ADMIN:${encodeURIComponent(cleanMsgForWhatsApp)}]`;
+
       return {
-        reply: confirmation.message + "\n\nNaya order lagane ke liye MENU likhein.\n\nOPTION: MENU",
+        reply: confirmation.message + "\n\n" + whatsappTag + "\n\nNaya order lagane ke liye MENU likhein.\n\nOPTION: MENU",
         nextState: { 
           state: 'ORDER_PLACED', 
           data: { ...session.data, orderId, targetLink, utrId: utr.trim() } 
         }
       };
     } catch (e) {
-      // Robust Fallback message
       const fallbackMsg = `🎉 *Woohoo! Your InstaFlow order successfully created!*
 
 - *Order ID:* ${orderId}
@@ -82,14 +84,12 @@ export async function processBotMessage(
 - *Quantity:* ${quantity}
 - *Amount:* ₹${price}
 - *Start Time:* 0-30 minutes
-- *Target Link:* ${targetLink}
+- *Target Link:* ${targetLink}`;
 
-Naya order lagane ke liye MENU likhein.
-
-OPTION: MENU`;
+      const whatsappTag = `[WHATSAPP_ADMIN:${encodeURIComponent(fallbackMsg.replace(/\*/g, ''))}]`;
 
       return {
-        reply: fallbackMsg,
+        reply: fallbackMsg + "\n\n" + whatsappTag + "\n\nNaya order lagane ke liye MENU likhein.\n\nOPTION: MENU",
         nextState: { 
           state: 'ORDER_PLACED', 
           data: { ...session.data, orderId, targetLink, utrId: utr.trim() } 

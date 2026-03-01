@@ -13,7 +13,8 @@ import {
   MousePointer2, 
   LogIn,
   Loader2,
-  Check
+  Check,
+  MessageCircle
 } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
@@ -43,7 +44,6 @@ export function BotPreview({ isAppMode = false }: BotPreviewProps) {
   const [formLink, setFormLink] = useState("");
   const [formUtr, setFormUtr] = useState("");
 
-  // Real-time Session Sync
   const sessionRef = useMemoFirebase(() => {
     if (!db || !user) return null;
     return doc(db, 'botSessions', user.uid);
@@ -82,7 +82,6 @@ export function BotPreview({ isAppMode = false }: BotPreviewProps) {
     const isInternalSubmission = messageToSend.startsWith("SUBMIT_PAYMENT:");
     setInput("");
     
-    // Add user message to UI
     if (!isInternalSubmission) {
       setMessages((prev) => [...prev, { role: "user", text: messageToSend }]);
     }
@@ -90,7 +89,6 @@ export function BotPreview({ isAppMode = false }: BotPreviewProps) {
     setLoading(true);
 
     try {
-      // 1. Get current session
       let currentSession: UserSession = sessionData || {
         phoneNumber: user.uid,
         state: 'START',
@@ -99,13 +97,10 @@ export function BotPreview({ isAppMode = false }: BotPreviewProps) {
         updatedAt: Date.now(),
       };
 
-      // 2. Process logic
       const { reply, nextState } = await processBotMessage(currentSession, messageToSend);
 
-      // 3. Update UI
       setMessages((prev) => [...prev, { role: "bot", text: reply }]);
 
-      // 4. Update Firestore
       const updatedSession = {
         ...currentSession,
         ...nextState,
@@ -117,7 +112,6 @@ export function BotPreview({ isAppMode = false }: BotPreviewProps) {
         await setDoc(sessionRef, updatedSession);
       }
 
-      // 5. Special Case: Order Placed
       if (updatedSession.state === 'ORDER_PLACED' && updatedSession.data?.orderId) {
         const orderId = updatedSession.data.orderId;
         const orderPayload = {
@@ -152,8 +146,12 @@ export function BotPreview({ isAppMode = false }: BotPreviewProps) {
     const urlRegex = /(https?:\/\/[^\s]+)/g;
     const upiRegex = /upi:\/\/pay\S+/;
     const formTag = "[PAYMENT_FORM]";
+    const whatsappTagRegex = /\[WHATSAPP_ADMIN:(.+?)\]/;
+    
     const hasForm = text.includes(formTag);
-    const cleanText = text.replace(formTag, "").trim();
+    const whatsappMatch = text.match(whatsappTagRegex);
+    
+    let cleanText = text.replace(formTag, "").replace(whatsappTagRegex, "").trim();
 
     const upiMatch = cleanText.match(upiRegex);
     const upiLink = upiMatch ? upiMatch[0] : null;
@@ -191,6 +189,21 @@ export function BotPreview({ isAppMode = false }: BotPreviewProps) {
     return (
       <div className="flex flex-col gap-1">
         <div className="text-[13px]">{content}</div>
+        
+        {whatsappMatch && (
+          <div className="mt-3 space-y-2">
+            <p className="text-[10px] font-bold text-muted-foreground uppercase text-center">Send Order Details to Admin</p>
+            <a 
+              href={`https://wa.me/919116399517?text=${whatsappMatch[1]}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full py-2.5 px-4 font-black text-[11px] rounded-xl bg-[#25D366] text-white hover:bg-[#128C7E] transition-all flex items-center justify-center gap-2 shadow-lg active:scale-95 no-underline uppercase"
+            >
+              <MessageCircle className="w-4 h-4" /> Send via WhatsApp
+            </a>
+          </div>
+        )}
+
         {hasForm && (
           <div className="mt-3 p-3 bg-white dark:bg-zinc-900 rounded-xl border-2 border-primary/20 shadow-lg space-y-3">
             <Input 
@@ -216,6 +229,7 @@ export function BotPreview({ isAppMode = false }: BotPreviewProps) {
             </Button>
           </div>
         )}
+
         {optionLines.map((optLine, i) => {
           const optionText = optLine.replace("OPTION: ", "").trim();
           return (
@@ -241,7 +255,6 @@ export function BotPreview({ isAppMode = false }: BotPreviewProps) {
       "relative w-full h-full flex flex-col bg-[#E5DDD5] dark:bg-zinc-950 overflow-hidden",
       !isAppMode && "max-w-[340px] h-full mx-auto rounded-[2.5rem] border-[8px] border-zinc-800 dark:border-zinc-700 p-1 shadow-2xl"
     )}>
-      {/* Bot Header Bar */}
       <div className="bg-[#075E54] dark:bg-zinc-900 text-white py-3 px-4 flex items-center gap-3 shrink-0 shadow-md">
         <div className="w-9 h-9 rounded-full bg-white/20 flex items-center justify-center border-2 border-white/10">
           <Bot className="w-6 h-6" />
@@ -262,7 +275,6 @@ export function BotPreview({ isAppMode = false }: BotPreviewProps) {
         )}
       </div>
       
-      {/* Chat Area - THIS IS THE ONLY SCROLLABLE PART */}
       <div ref={scrollRef} className="flex-1 overflow-y-auto p-4 space-y-4 bg-[url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png')] bg-repeat dark:bg-blend-multiply dark:bg-zinc-950 scroll-smooth custom-scrollbar">
         {messages.map((msg, i) => (
           <div key={i} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
@@ -286,7 +298,6 @@ export function BotPreview({ isAppMode = false }: BotPreviewProps) {
         )}
       </div>
 
-      {/* Input Bar */}
       <div className="p-3 bg-[#F0F2F5] dark:bg-zinc-900 flex gap-2 border-t dark:border-zinc-800 shrink-0 shadow-lg">
         <Input 
           value={input} 
