@@ -105,7 +105,7 @@ export default function ProfilePage() {
 
   return (
     <div className="h-[100dvh] w-full bg-background dark:bg-zinc-950 flex flex-col overflow-hidden font-body">
-      {/* HEADER AREA */}
+      {/* HEADER */}
       <div className="pt-[calc(env(safe-area-inset-top,24px)+24px)] pb-6 px-6 sm:px-8 border-b dark:border-zinc-800 bg-white dark:bg-zinc-900 shrink-0 z-50">
         <div className="max-w-2xl mx-auto flex items-center justify-between">
           <Link href="/">
@@ -122,8 +122,8 @@ export default function ProfilePage() {
       </div>
 
       {/* SCROLLABLE CONTENT */}
-      <div className="flex-1 overflow-y-auto overscroll-contain touch-pan-y custom-scrollbar p-4 sm:p-8">
-        <div className="max-w-2xl mx-auto space-y-6 pb-24">
+      <div className="flex-1 overflow-y-auto overscroll-contain touch-pan-y h-full custom-scrollbar p-4 sm:p-8 pb-32">
+        <div className="max-w-2xl mx-auto space-y-6">
           <Card className="border-none shadow-2xl rounded-[2.5rem] bg-white dark:bg-zinc-900 overflow-hidden transition-all">
             <CardHeader className="bg-primary/5 dark:bg-zinc-800/50 p-6">
               <CardTitle className="font-black uppercase tracking-tight dark:text-zinc-50 text-xl">My Profile</CardTitle>
@@ -257,7 +257,7 @@ export default function ProfilePage() {
             Logout Account
           </Button>
 
-          <p className="text-center text-[9px] text-muted-foreground dark:text-zinc-500 font-black uppercase tracking-[0.4em] pt-4 opacity-50">
+          <p className="text-center text-[9px] text-muted-foreground dark:text-zinc-500 font-black uppercase tracking-[0.4em] pt-4 opacity-50 pb-12">
             instaflow create by chetan nagani
           </p>
         </div>

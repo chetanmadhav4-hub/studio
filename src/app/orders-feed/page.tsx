@@ -109,7 +109,7 @@ export default function SimpleOrdersFeed() {
 
   return (
     <div className="h-[100dvh] bg-[#F0F2F5] dark:bg-zinc-950 flex flex-col overflow-hidden transition-colors font-body">
-      {/* HEADER - SAFE AREA */}
+      {/* HEADER */}
       <div className="pt-[calc(env(safe-area-inset-top,24px)+8px)] pb-4 px-4 bg-white dark:bg-zinc-900 border-b dark:border-zinc-800 shadow-sm z-50">
         <div className="max-w-md mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -129,8 +129,8 @@ export default function SimpleOrdersFeed() {
         </div>
       </div>
 
-      {/* SCROLLABLE FEED CONTAINER */}
-      <div className="flex-1 overflow-y-auto overscroll-contain touch-pan-y custom-scrollbar p-4 pb-24">
+      {/* SCROLLABLE FEED */}
+      <div className="flex-1 overflow-y-auto overscroll-contain touch-pan-y custom-scrollbar p-4 pb-32 h-full">
         <div className="max-w-md mx-auto space-y-6">
           <Tabs defaultValue="pending" className="w-full">
             <TabsList className="grid w-full grid-cols-2 bg-white dark:bg-zinc-900 rounded-3xl p-1.5 border dark:border-zinc-800 h-14 shadow-lg sticky top-0 z-40">

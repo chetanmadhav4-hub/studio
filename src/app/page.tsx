@@ -3,6 +3,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { BotPreview } from "@/components/bot-preview";
 import { OrderHistory } from "@/components/order-history";
@@ -23,6 +24,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 export default function Home() {
   const { user, isUserLoading } = useUser();
   const db = useFirestore();
+  const router = useRouter();
   const [isDark, setIsDark] = useState(false);
   const [isBroadcastDismissed, setIsBroadcastDismissed] = useState(false);
 
@@ -31,6 +33,13 @@ export default function Home() {
 
   const broadcastRef = useMemoFirebase(() => doc(db, 'settings', 'broadcast'), [db]);
   const { data: broadcast } = useDoc(broadcastRef);
+
+  // REDIRECT GUESTS TO LOGIN IMMEDIATELY
+  useEffect(() => {
+    if (!isUserLoading && !user) {
+      router.push('/login');
+    }
+  }, [user, isUserLoading, router]);
 
   useEffect(() => {
     const theme = localStorage.getItem("theme");
@@ -57,6 +66,17 @@ export default function Home() {
       setIsBroadcastDismissed(false);
     }
   }, [broadcast?.broadcastMessage, broadcast?.updatedAt, broadcast?.isBroadcastActive]);
+
+  if (isUserLoading || !user) {
+    return (
+      <div className="h-[100dvh] w-full flex items-center justify-center bg-background dark:bg-zinc-950">
+        <div className="flex flex-col items-center gap-4">
+          <Loader2 className="w-10 h-10 animate-spin text-primary" />
+          <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground animate-pulse">Verifying Session...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="h-[100dvh] w-full flex flex-col bg-background dark:bg-zinc-950 transition-colors duration-300 overflow-hidden font-body relative">
@@ -85,7 +105,7 @@ export default function Home() {
         </div>
       )}
 
-      {/* APP HEADER - FIXED SAFE AREA */}
+      {/* APP HEADER */}
       <header className="h-32 pt-[calc(env(safe-area-inset-top,24px)+8px)] pb-4 border-b dark:border-zinc-800 bg-white dark:bg-zinc-900 flex items-center justify-between px-6 shrink-0 shadow-md z-[100] relative">
         <div className="flex items-center gap-3 mt-auto pb-1">
           <div className="w-11 h-11 sm:w-12 sm:h-12 bg-primary rounded-2xl flex items-center justify-center shadow-xl shadow-primary/30">
@@ -95,47 +115,26 @@ export default function Home() {
         </div>
         
         <div className="flex items-center gap-2 mt-auto pb-1">
-          {!isUserLoading ? (
-            <>
-              {!user ? (
-                <div className="flex items-center gap-2.5">
-                  <Link href="/login">
-                    <Button variant="ghost" size="sm" className="text-[10px] sm:text-xs h-10 font-black uppercase dark:text-zinc-300">Login</Button>
-                  </Link>
-                  <Link href="/signup">
-                    <Button size="sm" className="bg-primary text-white hover:bg-primary/90 text-[10px] sm:text-xs h-10 font-black px-5 rounded-xl shadow-lg uppercase">
-                      Sign Up
-                    </Button>
-                  </Link>
-                </div>
-              ) : (
-                <div className="flex items-center gap-2">
-                  <Button 
-                    variant="ghost" 
-                    size="sm"
-                    className="h-11 w-11 p-0 rounded-full hover:bg-accent/10 dark:hover:bg-zinc-800 transition-colors"
-                    onClick={toggleTheme}
-                  >
-                    {isDark ? <Sun className="w-5 h-5 text-amber-500" /> : <Moon className="w-5 h-5 text-primary" />}
-                  </Button>
+          <Button 
+            variant="ghost" 
+            size="sm"
+            className="h-11 w-11 p-0 rounded-full hover:bg-accent/10 dark:hover:bg-zinc-800 transition-colors"
+            onClick={toggleTheme}
+          >
+            {isDark ? <Sun className="w-5 h-5 text-amber-500" /> : <Moon className="w-5 h-5 text-primary" />}
+          </Button>
 
-                  <NotificationBell />
-                  
-                  <Link href="/profile">
-                    <Button variant="ghost" size="sm" className="p-0.5 rounded-full border-2 border-primary/20 ml-1 shadow-lg">
-                      <Avatar className="w-9 h-9 sm:w-10 sm:h-10">
-                        <AvatarFallback className="text-[11px] sm:text-[12px] bg-primary text-white font-black">
-                          {user.email?.charAt(0).toUpperCase()}
-                        </AvatarFallback>
-                      </Avatar>
-                    </Button>
-                  </Link>
-                </div>
-              )}
-            </>
-          ) : (
-            <Loader2 className="w-7 h-7 animate-spin text-primary" />
-          )}
+          <NotificationBell />
+          
+          <Link href="/profile">
+            <Button variant="ghost" size="sm" className="p-0.5 rounded-full border-2 border-primary/20 ml-1 shadow-lg">
+              <Avatar className="w-9 h-9 sm:w-10 sm:h-10">
+                <AvatarFallback className="text-[11px] sm:text-[12px] bg-primary text-white font-black">
+                  {user.email?.charAt(0).toUpperCase()}
+                </AvatarFallback>
+              </Avatar>
+            </Button>
+          </Link>
         </div>
       </header>
 
@@ -144,8 +143,8 @@ export default function Home() {
         <div className="w-full max-w-[440px] h-full bg-white dark:bg-zinc-900 relative flex flex-col shadow-2xl sm:border dark:border-zinc-800 overflow-hidden">
           
           {isAdmin ? (
-            <div className="flex-1 flex flex-col bg-[#F8F9FC] dark:bg-zinc-950 overflow-hidden">
-              <div className="flex-1 overflow-y-auto overscroll-contain touch-pan-y h-full custom-scrollbar p-6 sm:p-8 pb-24 space-y-6 sm:space-y-8">
+            <div className="flex-1 flex flex-col bg-[#F8F9FC] dark:bg-zinc-950 overflow-hidden h-full">
+              <div className="flex-1 overflow-y-auto overscroll-contain touch-pan-y h-full custom-scrollbar p-6 sm:p-8 pb-32 space-y-6 sm:space-y-8">
                 <div className="space-y-2 mb-3 pt-3">
                   <h1 className="text-3xl sm:text-4xl font-black text-slate-900 dark:text-zinc-50 uppercase tracking-tighter">Admin Panel</h1>
                   <p className="text-[12px] sm:text-[13px] text-primary dark:text-accent font-black uppercase tracking-widest italic opacity-85">Management Hub</p>
@@ -205,27 +204,25 @@ export default function Home() {
           ) : (
             <div className="flex-1 flex flex-col h-full overflow-hidden bg-[#F0F2F5] dark:bg-zinc-950">
               {/* USER ACTION BAR */}
-              {user && (
-                <div className="h-12 sm:h-14 bg-white dark:bg-zinc-900 border-b dark:border-zinc-800 flex items-center px-6 justify-between shrink-0 shadow-md z-10">
-                  <span className="text-[11px] sm:text-[12px] font-black text-primary dark:text-accent uppercase tracking-[0.3em] italic">Automated Assistant</span>
-                  <Dialog>
-                    <DialogTrigger asChild>
-                      <Button variant="ghost" size="sm" className="h-10 gap-2.5 text-[11px] sm:text-[12px] font-black hover:bg-primary/5 text-primary dark:text-accent uppercase tracking-wider">
-                        <History className="w-5 h-5" /> Recent Orders
-                      </Button>
-                    </DialogTrigger>
-                    <DialogContent className="max-w-[95vw] sm:max-w-md max-h-[85vh] overflow-y-auto rounded-[3rem] dark:bg-zinc-950 border-none shadow-2xl p-8">
-                      <DialogHeader>
-                        <DialogTitle className="flex items-center gap-3 dark:text-zinc-50 text-xl font-black uppercase tracking-tighter">
-                          <History className="w-7 h-7 text-primary" />
-                          Order History
-                        </DialogTitle>
-                      </DialogHeader>
-                      <OrderHistory />
-                    </DialogContent>
-                  </Dialog>
-                </div>
-              )}
+              <div className="h-12 sm:h-14 bg-white dark:bg-zinc-900 border-b dark:border-zinc-800 flex items-center px-6 justify-between shrink-0 shadow-md z-10">
+                <span className="text-[11px] sm:text-[12px] font-black text-primary dark:text-accent uppercase tracking-[0.3em] italic">Automated Assistant</span>
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button variant="ghost" size="sm" className="h-10 gap-2.5 text-[11px] sm:text-[12px] font-black hover:bg-primary/5 text-primary dark:text-accent uppercase tracking-wider">
+                      <History className="w-5 h-5" /> Recent Orders
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="max-w-[95vw] sm:max-w-md max-h-[85vh] overflow-y-auto rounded-[3rem] dark:bg-zinc-950 border-none shadow-2xl p-8">
+                    <DialogHeader>
+                      <DialogTitle className="flex items-center gap-3 dark:text-zinc-50 text-xl font-black uppercase tracking-tighter">
+                        <History className="w-7 h-7 text-primary" />
+                        Order History
+                      </DialogTitle>
+                    </DialogHeader>
+                    <OrderHistory />
+                  </DialogContent>
+                </Dialog>
+              </div>
 
               {/* CHAT INTERFACE AREA */}
               <div className="flex-1 relative flex flex-col overflow-hidden">

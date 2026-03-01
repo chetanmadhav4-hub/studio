@@ -61,10 +61,6 @@ export default function LoginPage() {
         loginEmail = data.email;
       }
 
-      if (!loginEmail || !loginEmail.includes('@')) {
-        throw new Error('Please enter a valid email or registered username.');
-      }
-
       await signInWithEmailAndPassword(auth, loginEmail, password);
 
       toast({
@@ -75,15 +71,10 @@ export default function LoginPage() {
       router.push('/');
     } catch (error: any) {
       console.error('Login Error:', error);
-      let message = "Invalid credentials. Please try again.";
-      if (error.code === 'auth/invalid-credential') message = "Wrong email/username or password.";
-      if (error.code === 'auth/user-not-found') message = "Account not found.";
-      if (error.code === 'auth/wrong-password') message = "Incorrect password.";
-      
       toast({
         variant: "destructive",
         title: "Login Failed",
-        description: error.message || message,
+        description: "Invalid credentials. Please try again.",
       });
     } finally {
       setLoading(false);
@@ -92,10 +83,6 @@ export default function LoginPage() {
 
   return (
     <div className="h-[100dvh] w-full flex flex-col items-center justify-center bg-background p-4 sm:p-6 transition-colors duration-300 overflow-hidden relative">
-      <Link href="/" className="absolute top-8 left-6 hidden sm:flex items-center gap-2 text-sm font-black uppercase tracking-widest text-muted-foreground hover:text-primary transition-colors">
-        <ArrowLeft className="w-4 h-4" /> Back Home
-      </Link>
-
       <Card className="w-full max-w-md shadow-2xl border-none ring-1 ring-black/5 rounded-[2.5rem] overflow-hidden bg-white dark:bg-zinc-900">
         <CardHeader className="space-y-2 text-center pt-10 pb-6">
           <div className="flex justify-center mb-4">
