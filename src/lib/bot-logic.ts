@@ -56,7 +56,7 @@ export async function processBotMessage(
     const targetLink = link.trim();
     const utrId = utr.trim();
 
-    // WHATSAPP PAYLOAD: Link, Service, UTR ID, Quantity (Admin only wants these 4)
+    // WHATSAPP PAYLOAD: Link, Service, UTR ID, Quantity (As requested)
     const whatsappAdminPayload = `Link: ${targetLink}\nService: ${serviceName}\nUTR ID: ${utrId}\nQuantity: ${quantity}`;
     const whatsappTag = `[WHATSAPP_ADMIN:${encodeURIComponent(whatsappAdminPayload)}]`;
 
@@ -70,7 +70,7 @@ export async function processBotMessage(
         startTime: '0-30 minutes',
       });
       
-      // Strict newline formatting for the "Woohoo" message
+      // Strict multi-line format ensured by AI + whitespace rendering
       const finalMsg = confirmation.message.trim() + "\n\n" + 
                        "Send Order Details to Admin and conform your order\n\n" + 
                        whatsappTag + "\n\n" +
@@ -105,7 +105,7 @@ export async function processBotMessage(
   // GLOBAL SERVICE INTERRUPTION
   let interceptedServiceKey = '';
   Object.entries(SERVICES_CONFIG).forEach(([key, service]) => {
-    if (normalizedMsg.includes(service.name.toLowerCase()) || (normalizedMsg.length < 3 && normalizedMsg === key)) {
+    if (normalizedMsg.includes(service.name.toLowerCase()) || (normalizedMsg.length < 3 && (normalizedMsg === key || normalizedMsg === `${key}.`))) {
       interceptedServiceKey = key;
     }
   });
@@ -124,8 +124,8 @@ export async function processBotMessage(
   // MENU COMMAND
   if (normalizedMsg === 'hi' || normalizedMsg === 'start' || normalizedMsg === 'menu') {
     let menu = "👋 *Welcome to InstaFlow Bot!*\n\nNiche di gayi list mein se koi bhi service select karein:\n\n";
-    Object.entries(SERVICES_CONFIG).forEach(([_, service]) => {
-      menu += `OPTION: ${service.name}\n`;
+    Object.entries(SERVICES_CONFIG).forEach(([key, service]) => {
+      menu += `OPTION: ${key}. ${service.name}\n`;
     });
     
     return {
@@ -182,9 +182,9 @@ export async function processBotMessage(
     case 'AWAITING_PAYMENT_CONFIRMATION': {
       if (normalizedMsg.includes('yes') || normalizedMsg.includes('pay')) {
         const price = session.data.price || 0;
-        const upiId = 'smmxpressbot@slc';
+        const upiId = 'smmxpressbot@slc'; // YOUR SLICE ACCOUNT
         const accountName = 'CHETAN KUMAR MEGHWAL';
-        // PRE-SET AMOUNT included in UPI link as requested
+        // PRE-SET EXACT AMOUNT for Slice QR
         const upiPayload = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(accountName)}&am=${price}&cu=INR`;
         const qrImageUrl = `https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodeURIComponent(upiPayload)}`;
 
