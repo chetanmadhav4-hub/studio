@@ -28,11 +28,11 @@
   }
   .dark {
     --background: 240 30% 5%;
-    --foreground: 0 0% 100%;
+    --foreground: 210 20% 98%;
     --card: 240 30% 10%;
-    --card-foreground: 0 0% 100%;
+    --card-foreground: 210 20% 98%;
     --popover: 240 30% 10%;
-    --popover-foreground: 0 0% 100%;
+    --popover-foreground: 210 20% 98%;
     --primary: 198 96% 63%;
     --primary-foreground: 240 59% 10%;
     --secondary: 240 30% 15%;
@@ -53,10 +53,14 @@
   * {
     @apply border-border;
   }
+  html, body {
+    @apply h-[100dvh] overflow-hidden;
+  }
   body {
-    @apply bg-background text-foreground overflow-hidden h-[100dvh];
+    @apply bg-background text-foreground antialiased selection:bg-primary/20;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    touch-action: manipulation;
   }
 }
 

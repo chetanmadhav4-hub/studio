@@ -32,7 +32,6 @@ export default function Home() {
   const broadcastRef = useMemoFirebase(() => doc(db, 'settings', 'broadcast'), [db]);
   const { data: broadcast } = useDoc(broadcastRef);
 
-  // Sync theme with local storage
   useEffect(() => {
     const theme = localStorage.getItem("theme");
     if (theme === "dark") {
@@ -53,7 +52,6 @@ export default function Home() {
     }
   };
 
-  // Reset dismissal if message changes or if new message is published
   useEffect(() => {
     if (broadcast?.broadcastMessage) {
       setIsBroadcastDismissed(false);
@@ -61,11 +59,11 @@ export default function Home() {
   }, [broadcast?.broadcastMessage, broadcast?.updatedAt]);
 
   return (
-    <div className="h-[100dvh] w-full flex flex-col bg-background dark:bg-zinc-950 transition-colors duration-300 overflow-hidden font-body">
+    <div className="h-[100dvh] w-full flex flex-col bg-background dark:bg-zinc-950 transition-colors duration-300 overflow-hidden font-body relative">
       
       {/* REAL-TIME BROADCAST POPUP */}
       {broadcast?.isBroadcastActive && !isBroadcastDismissed && (
-        <div className="fixed top-14 sm:top-16 left-1/2 -translate-x-1/2 w-[92%] max-w-[420px] z-[999] animate-in fade-in slide-in-from-top-10 duration-500">
+        <div className="fixed top-16 sm:top-20 left-1/2 -translate-x-1/2 w-[92%] max-w-[420px] z-[999] animate-in fade-in slide-in-from-top-10 duration-500">
           <div className="bg-primary dark:bg-zinc-900 p-4 sm:p-5 rounded-[2rem] shadow-[0_25px_60px_rgba(0,0,0,0.4)] border-2 border-white/20 flex items-start gap-4 relative overflow-hidden group">
             <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2 blur-2xl" />
             <div className="w-10 h-10 sm:w-12 sm:h-12 bg-white/20 rounded-2xl flex items-center justify-center shrink-0 border border-white/20 shadow-inner">
@@ -87,11 +85,11 @@ export default function Home() {
         </div>
       )}
 
-      {/* FIXED APP HEADER */}
-      <header className="h-12 sm:h-14 border-b dark:border-zinc-800 bg-white dark:bg-zinc-900 flex items-center justify-between px-4 shrink-0 shadow-sm z-[100]">
+      {/* APP HEADER - Safe for Notches */}
+      <header className="h-14 sm:h-16 pt-safe border-b dark:border-zinc-800 bg-white dark:bg-zinc-900 flex items-center justify-between px-4 shrink-0 shadow-sm z-[100]">
         <div className="flex items-center gap-2">
-          <div className="w-7 h-7 sm:w-8 sm:h-8 bg-primary rounded-xl flex items-center justify-center shadow-lg shadow-primary/30">
-            <Zap className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
+          <div className="w-8 h-8 sm:w-10 sm:h-10 bg-primary rounded-xl flex items-center justify-center shadow-lg shadow-primary/30">
+            <Zap className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
           </div>
           <span className="font-black text-base sm:text-lg tracking-tighter text-primary dark:text-accent uppercase italic">InstaFlow</span>
         </div>
@@ -102,10 +100,10 @@ export default function Home() {
               {!user ? (
                 <div className="flex items-center gap-1.5">
                   <Link href="/login">
-                    <Button variant="ghost" size="sm" className="text-[10px] sm:text-xs h-8 sm:h-9 font-bold dark:text-zinc-300">Login</Button>
+                    <Button variant="ghost" size="sm" className="text-[10px] sm:text-xs h-9 font-bold dark:text-zinc-300">Login</Button>
                   </Link>
                   <Link href="/signup">
-                    <Button size="sm" className="bg-primary text-white hover:bg-primary/90 text-[10px] sm:text-xs h-8 sm:h-9 font-black px-3 sm:px-4 rounded-xl shadow-md">
+                    <Button size="sm" className="bg-primary text-white hover:bg-primary/90 text-[10px] sm:text-xs h-9 font-black px-3 sm:px-4 rounded-xl shadow-md">
                       Sign Up
                     </Button>
                   </Link>
@@ -115,18 +113,18 @@ export default function Home() {
                   <Button 
                     variant="ghost" 
                     size="sm"
-                    className="h-8 w-8 sm:h-10 sm:w-10 p-0 rounded-full hover:bg-accent/10 dark:hover:bg-zinc-800 transition-colors"
+                    className="h-9 w-9 sm:h-10 sm:w-10 p-0 rounded-full hover:bg-accent/10 dark:hover:bg-zinc-800 transition-colors"
                     onClick={toggleTheme}
                   >
-                    {isDark ? <Sun className="w-4 h-4 sm:w-5 sm:h-5 text-amber-500" /> : <Moon className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />}
+                    {isDark ? <Sun className="w-5 h-5 text-amber-500" /> : <Moon className="w-5 h-5 text-primary" />}
                   </Button>
 
                   <NotificationBell />
                   
                   <Link href="/profile">
                     <Button variant="ghost" size="sm" className="p-0.5 rounded-full border-2 border-primary/20 ml-0.5">
-                      <Avatar className="w-7 h-7 sm:w-8 sm:h-8">
-                        <AvatarFallback className="text-[9px] sm:text-[10px] bg-primary text-white font-black">
+                      <Avatar className="w-8 h-8 sm:w-9 sm:h-9">
+                        <AvatarFallback className="text-[10px] sm:text-[11px] bg-primary text-white font-black">
                           {user.email?.charAt(0).toUpperCase()}
                         </AvatarFallback>
                       </Avatar>
@@ -136,18 +134,18 @@ export default function Home() {
               )}
             </>
           ) : (
-            <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 animate-spin text-primary" />
+            <Loader2 className="w-5 h-5 animate-spin text-primary" />
           )}
         </div>
       </header>
 
       {/* MOBILE APP INTERFACE */}
-      <main className="flex-1 overflow-hidden flex flex-col items-center justify-start p-0 sm:p-4">
-        <div className="w-full max-w-[440px] h-full bg-white dark:bg-zinc-900 relative flex flex-col shadow-2xl sm:border dark:border-zinc-800 sm:rounded-[2.5rem] overflow-hidden">
+      <main className="flex-1 overflow-hidden flex flex-col items-center justify-start p-0">
+        <div className="w-full max-w-[440px] h-full bg-white dark:bg-zinc-900 relative flex flex-col shadow-2xl sm:border dark:border-zinc-800 sm:rounded-t-[2.5rem] overflow-hidden">
           
           {isAdmin ? (
             <div className="p-4 sm:p-6 space-y-4 sm:space-y-6 overflow-y-auto h-full scrollbar-hide bg-[#F8F9FC] dark:bg-zinc-950">
-              <div className="space-y-1 mb-2">
+              <div className="space-y-1 mb-2 pt-2">
                 <h1 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white uppercase tracking-tighter">Admin Panel</h1>
                 <p className="text-[10px] sm:text-[11px] text-primary dark:text-accent font-black uppercase tracking-widest italic opacity-80">Management Hub v2.0</p>
               </div>
@@ -203,12 +201,12 @@ export default function Home() {
             <div className="flex-1 flex flex-col h-full overflow-hidden bg-[#F0F2F5] dark:bg-zinc-950">
               {/* USER ACTION BAR */}
               {user && (
-                <div className="h-9 sm:h-10 bg-white dark:bg-zinc-900 border-b dark:border-zinc-800 flex items-center px-4 justify-between shrink-0 shadow-sm z-10">
+                <div className="h-10 sm:h-12 bg-white dark:bg-zinc-900 border-b dark:border-zinc-800 flex items-center px-4 justify-between shrink-0 shadow-sm z-10">
                   <span className="text-[9px] sm:text-[10px] font-black text-primary dark:text-accent uppercase tracking-[0.2em] italic">Automated Assistant</span>
                   <Dialog>
                     <DialogTrigger asChild>
-                      <Button variant="ghost" size="sm" className="h-7 gap-1.5 text-[9px] sm:text-[10px] font-black hover:bg-primary/5 text-primary dark:text-accent uppercase tracking-wider">
-                        <History className="w-3 h-3 sm:w-3.5 sm:h-3.5" /> Recent Orders
+                      <Button variant="ghost" size="sm" className="h-8 gap-1.5 text-[10px] sm:text-[11px] font-black hover:bg-primary/5 text-primary dark:text-accent uppercase tracking-wider">
+                        <History className="w-3.5 h-3.5" /> Recent Orders
                       </Button>
                     </DialogTrigger>
                     <DialogContent className="max-w-[95vw] sm:max-w-md max-h-[85vh] overflow-y-auto rounded-[2.5rem] dark:bg-zinc-950 border-none shadow-2xl p-6">
@@ -234,7 +232,7 @@ export default function Home() {
       </main>
 
       {/* COMPACT APP FOOTER */}
-      <footer className="h-6 sm:h-8 bg-white dark:bg-zinc-950 border-t dark:border-zinc-900 flex items-center justify-center shrink-0 z-[100]">
+      <footer className="h-6 bg-white dark:bg-zinc-950 border-t dark:border-zinc-900 flex items-center justify-center shrink-0 z-[100] pb-safe">
         <p className="text-[7px] sm:text-[8px] text-muted-foreground dark:text-zinc-600 font-black uppercase tracking-[0.5em] opacity-50">
           InstaFlow Engine v2.0 • Secure SMM
         </p>
