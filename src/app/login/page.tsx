@@ -1,27 +1,34 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { useAuth, useFirestore } from '@/firebase';
+import { useAuth, useFirestore, useUser } from '@/firebase';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
-import { Zap, Loader2, ArrowLeft, Instagram } from 'lucide-react';
+import { Zap, Loader2, Instagram } from 'lucide-react';
 
 export default function LoginPage() {
   const [identifier, setIdentifier] = useState(''); 
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const { user } = useUser();
   const auth = useAuth();
   const db = useFirestore();
   const router = useRouter();
   const { toast } = useToast();
+
+  useEffect(() => {
+    if (user) {
+      router.push('/');
+    }
+  }, [user, router]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -139,12 +146,12 @@ export default function LoginPage() {
         </form>
       </Card>
       
-      <div className="mt-8 flex flex-col items-center gap-2 opacity-50 text-center animate-in fade-in slide-in-from-bottom-4 duration-700">
+      <div className="mt-8 flex flex-col items-center gap-2 opacity-70 text-center animate-in fade-in slide-in-from-bottom-4 duration-700">
         <p className="text-[10px] font-black text-muted-foreground dark:text-zinc-400 uppercase tracking-[0.4em]">
           instaflow create by chetan nagani
         </p>
         <div className="flex items-center gap-1.5 text-[10px] font-black text-primary dark:text-accent uppercase tracking-widest">
-          <Instagram className="w-3.5 h-3.5" />
+          <Instagram className="w-4 h-4" />
           <span>@bindash_boy3</span>
         </div>
       </div>

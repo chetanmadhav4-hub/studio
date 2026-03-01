@@ -85,3 +85,10 @@
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
+.dark .text-slate-900, 
+.dark .text-foreground, 
+.dark .text-slate-800, 
+.dark .text-slate-700 {
+  @apply text-zinc-50 !important;
+}
