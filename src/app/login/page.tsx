@@ -18,17 +18,17 @@ export default function LoginPage() {
   const [identifier, setIdentifier] = useState(''); 
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const { user } = useUser();
+  const { user, isUserLoading } = useUser();
   const auth = useAuth();
   const db = useFirestore();
   const router = useRouter();
   const { toast } = useToast();
 
   useEffect(() => {
-    if (user) {
+    if (!isUserLoading && user) {
       router.push('/');
     }
-  }, [user, router]);
+  }, [user, isUserLoading, router]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -56,14 +56,14 @@ export default function LoginPage() {
           toast({
             variant: "destructive",
             title: "Not Found",
-            description: "Username not registered. Please check or use your email.",
+            description: "Username not registered. Please use your email.",
           });
           return;
         }
         
         const data = usernameSnap.data();
         if (!data || !data.email) {
-          throw new Error('Email mapping missing for this user.');
+          throw new Error('Email mapping missing.');
         }
         loginEmail = data.email;
       }
@@ -72,7 +72,7 @@ export default function LoginPage() {
 
       toast({
         title: "Welcome Back!",
-        description: "Login successful. Redirecting...",
+        description: "Login successful.",
       });
       
       router.push('/');
@@ -81,7 +81,7 @@ export default function LoginPage() {
       toast({
         variant: "destructive",
         title: "Login Failed",
-        description: "Invalid credentials. Please try again.",
+        description: "Invalid credentials.",
       });
     } finally {
       setLoading(false);
@@ -93,12 +93,12 @@ export default function LoginPage() {
       <Card className="w-full max-w-md shadow-2xl border-none ring-1 ring-black/5 rounded-[2.5rem] overflow-hidden bg-white dark:bg-zinc-900">
         <CardHeader className="space-y-2 text-center pt-10 pb-6">
           <div className="flex justify-center mb-4">
-            <div className="w-16 h-16 bg-primary rounded-[1.5rem] flex items-center justify-center shadow-xl shadow-primary/20 animate-in zoom-in duration-500">
+            <div className="w-16 h-16 bg-primary rounded-[1.5rem] flex items-center justify-center shadow-xl shadow-primary/20">
               <Zap className="w-9 h-9 text-white" />
             </div>
           </div>
-          <CardTitle className="text-3xl font-black uppercase tracking-tighter dark:text-zinc-50">InstaFlow Login</CardTitle>
-          <CardDescription className="text-xs font-bold uppercase tracking-widest opacity-70">Enter your credentials to continue</CardDescription>
+          <CardTitle className="text-3xl font-black uppercase tracking-tighter dark:text-zinc-50">InstaFlow Access</CardTitle>
+          <CardDescription className="text-[10px] font-black uppercase tracking-widest opacity-70">Sign in to manage your orders</CardDescription>
         </CardHeader>
         <form onSubmit={handleLogin}>
           <CardContent className="space-y-5 px-8">
@@ -106,9 +106,9 @@ export default function LoginPage() {
               <Label htmlFor="identifier" className="text-[10px] font-black uppercase tracking-widest ml-1">Username or Email</Label>
               <Input 
                 id="identifier" 
-                placeholder="Ex: johndoe" 
+                placeholder="Enter details..." 
                 required 
-                className="h-12 text-sm font-bold bg-slate-50 dark:bg-zinc-800 border-none rounded-2xl focus:ring-2 focus:ring-primary/20 dark:text-zinc-100"
+                className="h-12 text-sm font-black bg-slate-50 dark:bg-zinc-800 border-none rounded-2xl focus:ring-2 focus:ring-primary/20 dark:text-zinc-100"
                 value={identifier}
                 onChange={(e) => setIdentifier(e.target.value)}
               />
@@ -123,7 +123,7 @@ export default function LoginPage() {
                 type="password" 
                 placeholder="••••••••"
                 required 
-                className="h-12 text-sm font-bold bg-slate-50 dark:bg-zinc-800 border-none rounded-2xl focus:ring-2 focus:ring-primary/20 dark:text-zinc-100"
+                className="h-12 text-sm font-black bg-slate-50 dark:bg-zinc-800 border-none rounded-2xl focus:ring-2 focus:ring-primary/20 dark:text-zinc-100"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
@@ -135,7 +135,7 @@ export default function LoginPage() {
               Access Dashboard
             </Button>
             <div className="flex flex-col items-center gap-1 mt-2">
-              <p className="text-[11px] font-bold text-muted-foreground uppercase tracking-tight">
+              <p className="text-[11px] font-black text-muted-foreground uppercase tracking-tight">
                 Don't have an account?
               </p>
               <Link href="/signup" className="text-xs text-primary hover:underline font-black uppercase tracking-widest">
