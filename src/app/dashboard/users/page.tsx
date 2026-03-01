@@ -16,7 +16,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Loader2, User, Mail, Calendar, Hash, AlertCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
-import Link from "next/button";
+import Link from "next/link";
 
 export default function AdminUsersPage() {
   const { user, isUserLoading } = useUser();
@@ -49,15 +49,16 @@ export default function AdminUsersPage() {
     return (
       <div className="flex flex-col items-center justify-center py-24 gap-4 text-center">
         <AlertCircle className="w-12 h-12 text-red-500" />
-        <h2 className="text-xl font-bold">Access Denied</h2>
-        <p className="text-muted-foreground">Only super admin can access this database.</p>
+        <h2 className="text-xl font-bold dark:text-zinc-50">Access Denied</h2>
+        <p className="text-muted-foreground dark:text-zinc-300">Only super admin can access this database.</p>
+        <Link href="/"><button className="bg-primary text-white px-6 py-2 rounded-xl font-bold">Back Home</button></Link>
       </div>
     );
   }
 
   return (
     <div className="h-full overflow-y-auto overscroll-contain touch-pan-y custom-scrollbar pb-32">
-      <div className="space-y-6 max-w-5xl mx-auto pt-4 px-4 sm:px-0">
+      <div className="space-y-6 max-w-7xl mx-auto pt-4 px-4 sm:px-0">
         <div className="flex flex-col gap-1">
           <h2 className="text-3xl font-black tracking-tighter text-slate-900 dark:text-zinc-50 uppercase">Registered Users</h2>
           <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest opacity-80">Complete User Database</p>
@@ -77,14 +78,15 @@ export default function AdminUsersPage() {
                 <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Loading database...</p>
               </div>
             ) : (
-              <div className="overflow-x-auto scrollbar-hide">
-                <div className="min-w-[600px]">
+              <div className="overflow-x-auto touch-pan-x custom-scrollbar">
+                <div className="min-w-[900px] p-2">
                   <Table>
                     <TableHeader className="bg-slate-50 dark:bg-zinc-800/50">
                       <TableRow className="border-b dark:border-zinc-800 hover:bg-transparent">
-                        <TableHead className="font-black text-[10px] text-slate-400 uppercase tracking-wider">USER PROFILE</TableHead>
-                        <TableHead className="font-black text-[10px] text-slate-400 uppercase tracking-wider">CONTACT INFO</TableHead>
-                        <TableHead className="text-right font-black text-[10px] text-slate-400 uppercase tracking-wider">JOINED DATE</TableHead>
+                        <TableHead className="font-black text-[10px] text-slate-400 dark:text-zinc-400 uppercase tracking-wider">USER PROFILE</TableHead>
+                        <TableHead className="font-black text-[10px] text-slate-400 dark:text-zinc-400 uppercase tracking-wider">CONTACT INFO</TableHead>
+                        <TableHead className="font-black text-[10px] text-slate-400 dark:text-zinc-400 uppercase tracking-wider">USER ID</TableHead>
+                        <TableHead className="text-right font-black text-[10px] text-slate-400 dark:text-zinc-400 uppercase tracking-wider">JOINED DATE</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -94,13 +96,13 @@ export default function AdminUsersPage() {
                             <TableCell>
                               <div className="flex items-center gap-3">
                                 <Avatar className="w-10 h-10 border dark:border-zinc-700 shadow-sm">
-                                  <AvatarFallback className="bg-primary/10 text-primary dark:text-accent text-xs font-black">
+                                  <AvatarFallback className="bg-primary/10 text-primary dark:text-accent text-xs font-black uppercase">
                                     {u.username?.charAt(0).toUpperCase() || 'U'}
                                   </AvatarFallback>
                                 </Avatar>
                                 <div className="flex flex-col">
                                   <span className="font-black text-sm text-slate-900 dark:text-zinc-50">@{u.username}</span>
-                                  <span className="text-[9px] text-slate-400 font-black uppercase tracking-tighter opacity-70">UID: {u.id.slice(0, 8)}</span>
+                                  <span className="text-[9px] text-slate-400 dark:text-zinc-400 font-black uppercase tracking-tighter opacity-70">Active User</span>
                                 </div>
                               </div>
                             </TableCell>
@@ -109,6 +111,9 @@ export default function AdminUsersPage() {
                                 <Mail className="w-3 h-3 text-primary/60" />
                                 {u.email}
                               </div>
+                            </TableCell>
+                            <TableCell>
+                                <span className="text-[10px] font-mono font-black text-slate-400 dark:text-zinc-500 uppercase tracking-widest">{u.id}</span>
                             </TableCell>
                             <TableCell className="text-right">
                               <div className="flex items-center justify-end gap-1.5 text-[10px] text-slate-500 dark:text-zinc-400 font-black uppercase tracking-widest">
@@ -126,7 +131,7 @@ export default function AdminUsersPage() {
                         ))
                       ) : (
                         <TableRow>
-                          <TableCell colSpan={3} className="text-center py-24 text-slate-400 font-black uppercase tracking-widest italic">
+                          <TableCell colSpan={4} className="text-center py-24 text-slate-400 font-black uppercase tracking-widest italic">
                             No users registered yet.
                           </TableCell>
                         </TableRow>

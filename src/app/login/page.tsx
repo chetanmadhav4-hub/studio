@@ -135,7 +135,7 @@ export default function LoginPage() {
               Access Dashboard
             </Button>
             <div className="flex flex-col items-center gap-1 mt-2">
-              <p className="text-[11px] font-black text-muted-foreground uppercase tracking-tight">
+              <p className="text-[11px] font-black text-muted-foreground dark:text-zinc-400 uppercase tracking-tight">
                 Don't have an account?
               </p>
               <Link href="/signup" className="text-xs text-primary hover:underline font-black uppercase tracking-widest">
@@ -146,13 +146,15 @@ export default function LoginPage() {
         </form>
       </Card>
       
-      <div className="mt-8 flex flex-col items-center gap-2 opacity-70 text-center animate-in fade-in slide-in-from-bottom-4 duration-700">
-        <p className="text-[10px] font-black text-muted-foreground dark:text-zinc-400 uppercase tracking-[0.4em]">
+      <div className="mt-8 flex flex-col items-center gap-3 opacity-90 text-center animate-in fade-in slide-in-from-bottom-4 duration-700">
+        <p className="text-[10px] font-black text-slate-900 dark:text-zinc-50 uppercase tracking-[0.4em]">
           instaflow create by chetan nagani
         </p>
-        <div className="flex items-center gap-1.5 text-[10px] font-black text-primary dark:text-accent uppercase tracking-widest">
-          <Instagram className="w-4 h-4" />
-          <span>@bindash_boy3</span>
+        <div className="flex flex-col items-center gap-1.5">
+           <Instagram className="w-6 h-6 text-primary dark:text-accent" />
+           <p className="text-xs font-black text-primary dark:text-accent uppercase tracking-[0.2em]">
+             @bindash_boy3
+           </p>
         </div>
       </div>
     </div>

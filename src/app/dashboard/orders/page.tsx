@@ -90,17 +90,17 @@ export default function AdminOrdersPage() {
                 <p className="text-xl font-black uppercase dark:text-zinc-50">Access Denied</p>
               </div>
             ) : (
-              <div className="overflow-x-auto scrollbar-hide">
-                <div className="min-w-[800px]">
+              <div className="overflow-x-auto touch-pan-x custom-scrollbar">
+                <div className="min-w-[1000px] p-2">
                   <Table>
                     <TableHeader className="bg-slate-50 dark:bg-zinc-800/50">
                       <TableRow className="border-b dark:border-zinc-800 hover:bg-transparent">
-                        <TableHead className="w-[120px] font-black text-[10px] text-slate-400 uppercase tracking-wider">ORDER ID</TableHead>
-                        <TableHead className="font-black text-[10px] text-slate-400 uppercase tracking-wider">USER / PHONE</TableHead>
-                        <TableHead className="font-black text-[10px] text-slate-400 uppercase tracking-wider">SERVICE DETAILS</TableHead>
-                        <TableHead className="font-black text-[10px] text-slate-400 uppercase tracking-wider">TARGET LINK</TableHead>
-                        <TableHead className="font-black text-[10px] text-slate-400 uppercase tracking-wider">PAYMENT / UTR</TableHead>
-                        <TableHead className="text-right font-black text-[10px] text-slate-400 uppercase tracking-wider">DATE</TableHead>
+                        <TableHead className="w-[120px] font-black text-[10px] text-slate-400 dark:text-zinc-400 uppercase tracking-wider">ORDER ID</TableHead>
+                        <TableHead className="font-black text-[10px] text-slate-400 dark:text-zinc-400 uppercase tracking-wider">USER / PHONE</TableHead>
+                        <TableHead className="font-black text-[10px] text-slate-400 dark:text-zinc-400 uppercase tracking-wider">SERVICE DETAILS</TableHead>
+                        <TableHead className="font-black text-[10px] text-slate-400 dark:text-zinc-400 uppercase tracking-wider">TARGET LINK</TableHead>
+                        <TableHead className="font-black text-[10px] text-slate-400 dark:text-zinc-400 uppercase tracking-wider">PAYMENT / UTR</TableHead>
+                        <TableHead className="text-right font-black text-[10px] text-slate-400 dark:text-zinc-400 uppercase tracking-wider">DATE</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -134,10 +134,10 @@ export default function AdminOrdersPage() {
                                 href={order.targetLink} 
                                 target="_blank" 
                                 rel="noopener noreferrer"
-                                className="flex items-center gap-1.5 text-[10px] text-blue-600 dark:text-accent hover:underline max-w-[150px] truncate font-black uppercase tracking-tight"
+                                className="flex items-center gap-1.5 text-[10px] text-blue-600 dark:text-accent hover:underline max-w-[200px] truncate font-black uppercase tracking-tight"
                               >
                                 <LinkIcon className="w-3 h-3 shrink-0" />
-                                View Link
+                                {order.targetLink}
                               </a>
                             </TableCell>
                             <TableCell>
@@ -147,7 +147,7 @@ export default function AdminOrdersPage() {
                               </div>
                             </TableCell>
                             <TableCell className="text-right">
-                              <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                              <span className="text-[10px] font-black text-slate-400 dark:text-zinc-500 uppercase tracking-widest">
                                 {order.createdAt?.seconds 
                                   ? new Date(order.createdAt.seconds * 1000).toLocaleDateString()
                                   : 'Recent'}
