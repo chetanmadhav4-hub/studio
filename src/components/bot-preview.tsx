@@ -144,7 +144,7 @@ export function BotPreview({ isAppMode = false }: BotPreviewProps) {
 
   const renderMessageContent = (text: string) => {
     const urlRegex = /(https?:\/\/[^\s]+)/g;
-    const upiRegex = /^upi:\/\/pay\S+$/; // Only match if the whole line is a UPI link
+    const upiRegex = /^upi:\/\/pay\S+$/;
     const formTag = "[PAYMENT_FORM]";
     const whatsappTagRegex = /\[WHATSAPP_ADMIN:(.+?)\]/;
     
@@ -156,14 +156,12 @@ export function BotPreview({ isAppMode = false }: BotPreviewProps) {
     const lines = cleanText.split("\n");
     const optionLines = lines.filter(line => line.startsWith("OPTION: "));
     
-    // Improved filtering: Don't filter out lines that are image URLs, even if they contain UPI strings
     const otherLines = lines.filter(line => {
       const isOption = line.startsWith("OPTION: ");
       const isPureUpi = upiRegex.test(line.trim());
       return !isOption && !isPureUpi;
     });
 
-    // Extract UPI link if it exists as a standalone line or at the end
     const upiLinkLine = lines.find(line => line.trim().startsWith("upi://pay"));
     const upiLink = upiLinkLine ? upiLinkLine.trim() : null;
 
@@ -176,12 +174,12 @@ export function BotPreview({ isAppMode = false }: BotPreviewProps) {
           const textBeforeUrl = line.replace(imageUrl, "").trim();
           return (
             <div key={idx} className="my-2 flex flex-col gap-2">
-              {textBeforeUrl && <div className="leading-relaxed font-black text-slate-800 dark:text-zinc-50 whitespace-pre-wrap">{textBeforeUrl.replace(/\*/g, '')}</div>}
-              <div className="bg-white p-2 rounded-xl border shadow-md max-w-[180px] mx-auto text-center">
+              {textBeforeUrl && <div className="leading-relaxed font-bold text-slate-900 dark:text-zinc-50 whitespace-pre-wrap">{textBeforeUrl.replace(/\*/g, '')}</div>}
+              <div className="bg-white p-2 rounded-xl border shadow-md max-w-[200px] mx-auto text-center">
                 <img src={imageUrl} alt="Payment QR" className="rounded-lg w-full h-auto" />
                 {upiLink && (
-                  <a href={upiLink} className="mt-3 flex items-center justify-center gap-2 bg-[#00A884] text-white py-2 rounded-lg text-[10px] font-black uppercase no-underline shadow-sm active:scale-95 transition-transform">
-                    <Check className="w-3.5 h-3.5" /> Pay via UPI
+                  <a href={upiLink} className="mt-3 flex items-center justify-center gap-2 bg-[#00A884] text-white py-2.5 rounded-xl text-[11px] font-black uppercase no-underline shadow-sm active:scale-95 transition-transform">
+                    <Check className="w-4 h-4" /> Pay via UPI
                   </a>
                 )}
               </div>
@@ -190,7 +188,7 @@ export function BotPreview({ isAppMode = false }: BotPreviewProps) {
         }
       }
       if (line.trim() === "" && idx !== otherLines.length - 1) return <div key={idx} className="h-2" />;
-      return <div key={idx} className="leading-relaxed text-slate-800 dark:text-zinc-50 font-bold whitespace-pre-wrap">{line.replace(/\*/g, '')}</div>;
+      return <div key={idx} className="leading-relaxed text-slate-900 dark:text-zinc-50 font-bold whitespace-pre-wrap">{line.replace(/\*/g, '')}</div>;
     });
 
     return (
@@ -199,14 +197,14 @@ export function BotPreview({ isAppMode = false }: BotPreviewProps) {
         
         {whatsappMatch && (
           <div className="mt-4 space-y-2">
-            <p className="text-[10px] font-black text-primary dark:text-accent uppercase text-center tracking-wider">
+            <p className="text-[10px] font-black text-primary dark:text-accent uppercase text-center tracking-wider px-2">
               Send Order Details to Admin and conform your order
             </p>
             <a 
               href={`https://wa.me/919116399517?text=${whatsappMatch[1]}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="w-full py-3 px-4 font-black text-[12px] rounded-2xl bg-[#25D366] text-white hover:bg-[#128C7E] transition-all flex items-center justify-center gap-2 shadow-xl active:scale-95 no-underline uppercase tracking-tight"
+              className="w-full py-3.5 px-4 font-black text-[12px] rounded-2xl bg-[#25D366] text-white hover:bg-[#128C7E] transition-all flex items-center justify-center gap-2 shadow-xl active:scale-95 no-underline uppercase tracking-tight"
             >
               <MessageCircle className="w-5 h-5" /> Send via WhatsApp
             </a>
@@ -214,16 +212,16 @@ export function BotPreview({ isAppMode = false }: BotPreviewProps) {
         )}
 
         {hasForm && (
-          <div className="mt-3 p-4 bg-slate-50 dark:bg-zinc-900 rounded-[1.5rem] border-2 border-primary/20 shadow-lg space-y-3">
+          <div className="mt-4 p-4 bg-slate-100 dark:bg-zinc-900/80 rounded-[1.8rem] border-2 border-primary/20 shadow-lg space-y-3">
             <Input 
               placeholder="Instagram Profile/Post Link" 
-              className="h-10 text-[11px] font-bold dark:bg-zinc-800 dark:border-zinc-700 dark:text-zinc-100 rounded-xl" 
+              className="h-11 text-[11px] font-bold dark:bg-zinc-800 dark:border-zinc-700 dark:text-zinc-50 rounded-xl focus:ring-primary" 
               value={formLink} 
               onChange={(e) => setFormLink(e.target.value)} 
             />
             <Input 
               placeholder="12-Digit Payment UTR ID" 
-              className="h-10 text-[11px] font-bold dark:bg-zinc-800 dark:border-zinc-700 dark:text-zinc-100 rounded-xl" 
+              className="h-11 text-[11px] font-bold dark:bg-zinc-800 dark:border-zinc-700 dark:text-zinc-50 rounded-xl focus:ring-primary" 
               value={formUtr} 
               onChange={(e) => setFormUtr(e.target.value)} 
               maxLength={12} 
@@ -242,7 +240,7 @@ export function BotPreview({ isAppMode = false }: BotPreviewProps) {
         {optionLines.map((optLine, i) => {
           const optionText = optLine.replace("OPTION: ", "").trim();
           return (
-            <button key={i} onClick={() => handleSend(optionText)} className="mt-2 w-full py-3 px-4 font-black text-[11px] rounded-xl border-2 bg-white dark:bg-zinc-900 text-primary dark:text-accent border-primary/10 hover:border-primary/40 hover:bg-primary/5 transition-all flex items-center justify-center gap-2 shadow-sm active:scale-95 uppercase tracking-tight">
+            <button key={i} onClick={() => handleSend(optionText)} className="mt-2 w-full py-3.5 px-4 font-black text-[11px] rounded-xl border-2 bg-white dark:bg-zinc-900 text-primary dark:text-accent border-primary/10 hover:border-primary/40 hover:bg-primary/5 transition-all flex items-center justify-center gap-2 shadow-sm active:scale-95 uppercase tracking-tight">
               <MousePointer2 className="w-4 h-4" /> {optionText}
             </button>
           );
@@ -315,7 +313,7 @@ export function BotPreview({ isAppMode = false }: BotPreviewProps) {
           onKeyDown={(e) => e.key === "Enter" && handleSend()} 
           placeholder={user ? "Type a message..." : "Login to use Bot"} 
           disabled={!user} 
-          className="bg-white dark:bg-zinc-800 dark:text-zinc-100 dark:border-zinc-700 rounded-2xl h-11 px-4 text-sm font-bold placeholder:text-slate-400 dark:placeholder:text-zinc-500" 
+          className="bg-white dark:bg-zinc-800 dark:text-zinc-50 dark:border-zinc-700 rounded-2xl h-11 px-4 text-sm font-bold placeholder:text-slate-400 dark:placeholder:text-zinc-500" 
         />
         <Button onClick={() => handleSend()} disabled={loading || !user} size="icon" className="rounded-full bg-[#00A884] hover:bg-[#008F6F] h-11 w-11 shrink-0 shadow-lg active:scale-90 transition-all">
           <Send className="w-5 h-5 text-white" />

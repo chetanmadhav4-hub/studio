@@ -1,3 +1,4 @@
+
 'use server';
 /**
  * @fileOverview This file implements a Genkit flow to generate a friendly and personalized order confirmation message
@@ -60,7 +61,7 @@ CRITICAL: You MUST use multiple lines and bullet points exactly like this (each 
 - *Start Time:* {{{startTime}}}
 - *Target Link:* {{{instagramProfileLink}}}
 
-Keep it professional yet friendly. Ensure each bullet point is on its own separate line.`,
+Keep it professional yet friendly. Ensure each bullet point is on its own separate line. Do NOT combine points into paragraphs.`,
 });
 
 const aiGeneratedOrderConfirmationFlow = ai.defineFlow(

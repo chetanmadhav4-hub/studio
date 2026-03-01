@@ -1,10 +1,10 @@
 {
   "placeholderImages": [
     {
-      "id": "static-qr-code",
-      "description": "Slice UPI QR code for CHETAN KUMAR MEGHWAL",
-      "imageUrl": "https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=upi://pay?pa=smmxpressbot@slc%26pn=CHETAN%20KUMAR%20MEGHWAL%26cu=INR",
-      "imageHint": "upi qr code payment"
+      "id": "phonepe-static-qr",
+      "description": "Static PhonePe QR code for manual payment to CHETAN KUMAR MEGHWAL",
+      "imageUrl": "https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=upi://pay?pa=smmxpressbot@slc%26pn=CHETAN%20KUMAR%20MEGHWAL%26cu=INR",
+      "imageHint": "phonepe upi qr"
     }
   ]
 }
