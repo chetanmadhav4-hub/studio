@@ -12,7 +12,7 @@ import { useAuth, useFirestore } from '@/firebase';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
-import { Zap, Loader2, ArrowLeft } from 'lucide-react';
+import { Zap, Loader2, ArrowLeft, Instagram } from 'lucide-react';
 
 export default function LoginPage() {
   const [identifier, setIdentifier] = useState(''); 
@@ -40,7 +40,6 @@ export default function LoginPage() {
     try {
       let loginEmail = id;
 
-      // Check if it's a username (doesn't contain @)
       if (!id.includes('@')) {
         const usernameRef = doc(db, 'usernames', id.toLowerCase());
         const usernameSnap = await getDoc(usernameRef);
@@ -62,12 +61,10 @@ export default function LoginPage() {
         loginEmail = data.email;
       }
 
-      // Final validation
       if (!loginEmail || !loginEmail.includes('@')) {
         throw new Error('Please enter a valid email or registered username.');
       }
 
-      // Sign in with Firebase Auth
       await signInWithEmailAndPassword(auth, loginEmail, password);
 
       toast({
@@ -94,7 +91,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-[100dvh] flex flex-col items-center justify-center bg-background p-4 sm:p-6 transition-colors duration-300">
+    <div className="h-[100dvh] w-full flex flex-col items-center justify-center bg-background p-4 sm:p-6 transition-colors duration-300 overflow-hidden relative">
       <Link href="/" className="absolute top-8 left-6 hidden sm:flex items-center gap-2 text-sm font-black uppercase tracking-widest text-muted-foreground hover:text-primary transition-colors">
         <ArrowLeft className="w-4 h-4" /> Back Home
       </Link>
@@ -115,7 +112,7 @@ export default function LoginPage() {
               <Label htmlFor="identifier" className="text-[10px] font-black uppercase tracking-widest ml-1">Username or Email</Label>
               <Input 
                 id="identifier" 
-                placeholder="Ex: johndoe or name@example.com" 
+                placeholder="Ex: johndoe" 
                 required 
                 className="h-12 text-sm font-bold bg-slate-50 dark:bg-zinc-800 border-none rounded-2xl focus:ring-2 focus:ring-primary/20 dark:text-zinc-100"
                 value={identifier}
@@ -155,9 +152,15 @@ export default function LoginPage() {
         </form>
       </Card>
       
-      <p className="mt-8 text-[10px] font-black text-muted-foreground uppercase tracking-[0.4em] opacity-40">
-        instaflow create by chetan nagani
-      </p>
+      <div className="mt-8 flex flex-col items-center gap-2 opacity-50 text-center animate-in fade-in slide-in-from-bottom-4 duration-700">
+        <p className="text-[10px] font-black text-muted-foreground dark:text-zinc-400 uppercase tracking-[0.4em]">
+          instaflow create by chetan nagani
+        </p>
+        <div className="flex items-center gap-1.5 text-[10px] font-black text-primary dark:text-accent uppercase tracking-widest">
+          <Instagram className="w-3.5 h-3.5" />
+          <span>@bindash_boy3</span>
+        </div>
+      </div>
     </div>
   );
 }
