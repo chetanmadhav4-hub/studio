@@ -2,8 +2,8 @@
   "placeholderImages": [
     {
       "id": "phonepe-static-qr",
-      "description": "Static New PhonePe QR code for manual payment provided by the user.",
-      "imageUrl": "https://picsum.photos/seed/qr123/600/600",
+      "description": "Static PhonePe QR code for manual payment provided by the user.",
+      "imageUrl": "https://picsum.photos/seed/phonepe-final-qr/600/600",
       "imageHint": "phonepe upi qr"
     }
   ]

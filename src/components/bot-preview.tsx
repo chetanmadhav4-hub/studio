@@ -170,7 +170,7 @@ export function BotPreview({ isAppMode = false }: BotPreviewProps) {
       const matches = line.match(urlRegex);
       if (matches) {
         const imageUrl = matches[0];
-        // Detect if it's an image (including placeholder seeds)
+        // Ensure image URL is treated as image, not link
         const isImageUrl = imageUrl.includes("picsum.photos") || imageUrl.includes("api.qrserver.com") || imageUrl.match(/\.(jpeg|jpg|gif|png|webp|svg)/i);
         
         if (isImageUrl) {
@@ -200,7 +200,7 @@ export function BotPreview({ isAppMode = false }: BotPreviewProps) {
         
         {whatsappMatch && (
           <div className="mt-4 space-y-2">
-            <p className="text-[10px] font-black text-primary dark:text-accent uppercase text-center tracking-wider px-2 opacity-80">
+            <p className="text-[10px] font-black text-primary dark:text-accent uppercase text-center tracking-wider px-2 opacity-80 leading-snug">
               Send Order Details to Admin and conform your order
             </p>
             <a 
@@ -265,7 +265,7 @@ export function BotPreview({ isAppMode = false }: BotPreviewProps) {
       "relative w-full h-full flex flex-col bg-[#E5DDD5] dark:bg-zinc-950 overflow-hidden",
       !isAppMode && "max-w-[340px] h-full mx-auto rounded-[2.5rem] border-[8px] border-zinc-800 dark:border-zinc-700 p-1 shadow-2xl"
     )}>
-      {/* Header with safe area padding */}
+      {/* Header with status bar safety */}
       <div className="bg-[#075E54] dark:bg-zinc-900 text-white pt-[calc(env(safe-area-inset-top,24px)+12px)] pb-4 px-5 flex items-center gap-3 shrink-0 shadow-md z-20">
         <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center border-2 border-white/10 shadow-inner">
           <Bot className="w-6 h-6" />

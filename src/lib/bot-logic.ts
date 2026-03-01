@@ -75,7 +75,7 @@ export async function processBotMessage(
     const whatsappAdminPayload = `Link: ${targetLink}\nService: ${serviceName}\nUTR ID: ${utrId}\nQuantity: ${quantity}`;
     const whatsappTag = `[WHATSAPP_ADMIN:${encodeURIComponent(whatsappAdminPayload)}]`;
 
-    // Always use hardcoded formatted message to avoid AI block/clumping issues
+    // Strictly formatted multi-line confirmation
     const finalMsg = formatOrderConfirmation({
       orderId,
       quantity,
@@ -155,7 +155,7 @@ export async function processBotMessage(
       const accountName = 'CHETAN KUMAR MEGHWAL';
       const upiPayload = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(accountName)}&cu=INR`;
 
-      // Jump directly to payment instructions + form for better user flow
+      // Static QR + Manual payment instructions + Payment Form
       return {
         reply: `✅ Aapne *${quantity} ${service.name}* select kiye hain.\n💰 Total price: *₹${price}*\n\n📲 *Scan This QR to Pay Manual Amount*\n\n👤 *Account:* ${accountName}\n🆔 *UPI ID:* ${upiId}\n💰 *Amount:* ₹${price}\n\n${staticQr}\n\n${upiPayload}\n\n✅ Payment ke baad, apna Instagram Link and UTR ID niche fill karein:\n\n[PAYMENT_FORM]`,
         nextState: {
