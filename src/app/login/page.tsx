@@ -9,25 +9,15 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAuth, useFirestore, useUser } from '@/firebase';
-import { signInWithEmailAndPassword, sendPasswordResetEmail } from 'firebase/auth';
+import { signInWithEmailAndPassword } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
-import { Zap, Loader2, Instagram, KeyRound, Mail } from 'lucide-react';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+import { Zap, Loader2, Instagram } from 'lucide-react';
 
 export default function LoginPage() {
   const [identifier, setIdentifier] = useState(''); 
   const [password, setPassword] = useState('');
-  const [resetEmail, setResetEmail] = useState('');
   const [loading, setLoading] = useState(false);
-  const [resetLoading, setResetLoading] = useState(false);
   const { user, isUserLoading } = useUser();
   const auth = useAuth();
   const db = useFirestore();
@@ -98,30 +88,6 @@ export default function LoginPage() {
     }
   };
 
-  const handleForgotPassword = async () => {
-    if (!resetEmail.trim()) {
-      toast({ variant: "destructive", title: "Wait!", description: "Please enter your registered email." });
-      return;
-    }
-    setResetLoading(true);
-    try {
-      await sendPasswordResetEmail(auth, resetEmail);
-      toast({
-        title: "Reset Link Sent!",
-        description: "Check your email inbox/spam to reset your password.",
-      });
-      setResetEmail('');
-    } catch (error: any) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: error.message || "Failed to send reset link.",
-      });
-    } finally {
-      setResetLoading(false);
-    }
-  };
-
   if (isUserLoading) {
     return (
       <div className="h-[100dvh] w-full flex items-center justify-center bg-background dark:bg-zinc-950">
@@ -156,45 +122,7 @@ export default function LoginPage() {
               />
             </div>
             <div className="space-y-2">
-              <div className="flex items-center justify-between ml-1">
-                <Label htmlFor="password" className="text-[10px] font-black uppercase tracking-widest">Password</Label>
-                
-                <Dialog>
-                  <DialogTrigger asChild>
-                    <button type="button" className="text-[10px] font-black uppercase tracking-widest text-primary hover:underline">Forgot?</button>
-                  </DialogTrigger>
-                  <DialogContent className="max-w-[90vw] sm:max-w-md rounded-[2.5rem] p-8 border-none shadow-2xl dark:bg-zinc-950">
-                    <DialogHeader>
-                      <DialogTitle className="text-xl font-black uppercase tracking-tighter dark:text-zinc-50 flex items-center gap-2">
-                        <KeyRound className="w-6 h-6 text-primary" />
-                        Reset Password
-                      </DialogTitle>
-                      <DialogDescription className="text-[10px] font-black uppercase tracking-widest opacity-70">
-                        Enter your email to receive a reset link
-                      </DialogDescription>
-                    </DialogHeader>
-                    <div className="space-y-6 py-4">
-                      <div className="space-y-2">
-                        <Label className="text-[10px] font-black uppercase tracking-widest ml-1">Registered Email</Label>
-                        <Input 
-                          placeholder="example@gmail.com"
-                          className="h-12 bg-slate-100 dark:bg-zinc-800 border-none rounded-2xl font-black"
-                          value={resetEmail}
-                          onChange={(e) => setResetEmail(e.target.value)}
-                        />
-                      </div>
-                      <Button 
-                        onClick={handleForgotPassword} 
-                        disabled={resetLoading}
-                        className="w-full h-12 rounded-2xl font-black uppercase tracking-widest shadow-xl"
-                      >
-                        {resetLoading ? <Loader2 className="w-5 h-5 animate-spin mr-2" /> : <Mail className="w-5 h-5 mr-2" />}
-                        Send Reset Link
-                      </Button>
-                    </div>
-                  </DialogContent>
-                </Dialog>
-              </div>
+              <Label htmlFor="password" className="text-[10px] font-black uppercase tracking-widest ml-1">Password</Label>
               <Input 
                 id="password" 
                 type="password" 
