@@ -80,7 +80,7 @@ export async function processBotMessage(
     }) + "\n\n" + 
     "Send Order Details to Admin and conform your order\n\n" + 
     whatsappTag + "\n\n" +
-    "OPTION: MENU";
+    "OPTION: MAIN MENU";
     
     return {
       reply: finalMsg,
@@ -91,16 +91,27 @@ export async function processBotMessage(
     };
   }
 
-  // Handle service selection from any state
+  // Handle Menu Request
+  if (normalizedMsg === 'hi' || normalizedMsg === 'start' || normalizedMsg === 'menu' || normalizedMsg === 'main menu' || normalizedMsg === '🏠 main menu') {
+    let menu = "👋 *Welcome to InstaFlow Bot!*\n\nNiche di gayi list mein se koi bhi service select karein:\n\n";
+    Object.entries(SERVICES_CONFIG).forEach(([key, service]) => {
+      menu += `OPTION: ${key}. ${service.name}\n`;
+    });
+    
+    return {
+      reply: menu,
+      nextState: {
+        state: 'AWAITING_SERVICE_SELECTION',
+        data: {},
+      },
+    };
+  }
+
+  // Handle service selection from buttons
   let interceptedServiceKey = '';
   Object.entries(SERVICES_CONFIG).forEach(([key, service]) => {
-    const serviceName = service.name.toLowerCase();
-    if (
-      normalizedMsg === key || 
-      normalizedMsg === `${key}.` || 
-      normalizedMsg.startsWith(`${key}.`) ||
-      normalizedMsg.includes(serviceName)
-    ) {
+    const serviceLabel = `${key}. ${service.name}`.toLowerCase();
+    if (normalizedMsg === serviceLabel || normalizedMsg === key || normalizedMsg === service.name.toLowerCase()) {
       interceptedServiceKey = key;
     }
   });
@@ -112,21 +123,6 @@ export async function processBotMessage(
       nextState: { 
         state: 'AWAITING_QUANTITY',
         data: { ...session.data, serviceId: interceptedServiceKey, serviceName: selectedService.name }
-      },
-    };
-  }
-
-  if (normalizedMsg === 'hi' || normalizedMsg === 'start' || normalizedMsg === 'menu') {
-    let menu = "👋 *Welcome to InstaFlow Bot!*\n\nNiche di gayi list mein se koi bhi service select karein:\n\n";
-    Object.entries(SERVICES_CONFIG).forEach(([key, service]) => {
-      menu += `OPTION: ${key}. ${service.name}\n`;
-    });
-    
-    return {
-      reply: menu,
-      nextState: {
-        state: 'AWAITING_SERVICE_SELECTION',
-        data: {},
       },
     };
   }
@@ -153,13 +149,9 @@ export async function processBotMessage(
       }
 
       const price = calculatePrice(quantity, service.pricePer1000);
-      const upiId = 'smmxpressbot@slc'; 
-      const accountName = 'CHETAN KUMAR MEGHWAL';
-      
-      const upiPayload = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(accountName)}&cu=INR`;
 
       return {
-        reply: `✅ Aapne *${quantity} ${service.name}* select kiye hain.\n💰 Total price: *₹${price}*\n\n📲 *Payment Details*\n\n👤 *Account:* ${accountName}\n🆔 *UPI ID:* ${upiId}\n💰 *Amount:* ₹${price}\n\n${upiPayload}\n\nKripya niche 'YES, PROCEED' button par click karein payment ke liye.\n\nOPTION: YES, PROCEED\nOPTION: MENU`,
+        reply: `✅ Aapne *${quantity} ${service.name}* select kiye hain.\n💰 Total price: *₹${price}*\n\nKya aap aage badhna chahte hain?\n\nOPTION: ✅ YES, PROCEED\nOPTION: 🏠 MAIN MENU`,
         nextState: {
           state: 'AWAITING_PAYMENT_DETAILS',
           data: { ...session.data, quantity, price },
@@ -168,22 +160,27 @@ export async function processBotMessage(
     }
 
     case 'AWAITING_PAYMENT_DETAILS': {
-       if (normalizedMsg === 'yes, proceed') {
+       if (normalizedMsg === 'yes, proceed' || normalizedMsg === '✅ yes, proceed') {
+         const upiId = 'smmxpressbot@slc'; 
+         const accountName = 'CHETAN KUMAR MEGHWAL';
+         const upiPayload = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(accountName)}&cu=INR`;
+
          return {
-           reply: "✅ Payment ke baad, apna Instagram Link and UTR ID niche fill karein:\n\n[PAYMENT_FORM]\n\nOPTION: MENU",
+           reply: `📲 *Payment Details*\n\n👤 *Account:* ${accountName}\n🆔 *UPI ID:* ${upiId}\n💰 *Amount:* ₹${session.data.price}\n\n${upiPayload}\n\nPayment karne ke baad, apna Instagram Link and UTR ID niche fill karein:\n\n[PAYMENT_FORM]\n\nOPTION: 🏠 MAIN MENU`,
            nextState: { state: 'AWAITING_PAYMENT_DETAILS' },
          };
        }
        return {
-         reply: "⚠️ Kripya 'YES, PROCEED' button par click karein payment ke baad.",
+         reply: "⚠️ Kripya 'YES, PROCEED' button par click karein ya 'MAIN MENU' par wapas jayein.",
          nextState: { state: 'AWAITING_PAYMENT_DETAILS' }
        };
     }
 
     default:
       return {
-        reply: "👋 Welcome back! Menu dekhne ke liye *HI* bhejein.\n\nOPTION: MENU",
+        reply: "👋 Welcome back! Menu dekhne ke liye *HI* bhejein.\n\nOPTION: MAIN MENU",
         nextState: { state: 'START', data: {} },
       };
   }
 }
+
