@@ -172,12 +172,12 @@ export function BotPreview({ isAppMode = false }: BotPreviewProps) {
     const staticQrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=600x600&data=upi://pay?pa=smmxpressbot@slc%26pn=InstaFlow%20Bot%26cu=INR`;
 
     return (
-      <div className="flex flex-col gap-1.5">
+      <div className="flex flex-col gap-1.5 w-full overflow-hidden">
         <div className="text-[13px] flex flex-col">{content}</div>
         
         {hasQR && (
           <div className="mt-4 flex flex-col items-center gap-3 w-full animate-in fade-in slide-in-from-bottom-2">
-            <div className="relative w-64 aspect-square rounded-[2rem] overflow-hidden border-4 border-white shadow-2xl bg-white">
+            <div className="relative w-full max-w-[240px] aspect-square rounded-[2rem] overflow-hidden border-4 border-white shadow-2xl bg-white">
               <Image 
                 src={staticQrUrl} 
                 alt="Payment QR" 
@@ -203,7 +203,7 @@ export function BotPreview({ isAppMode = false }: BotPreviewProps) {
               Send Order Details to Admin and confirm your order
             </p>
             <a 
-              href={`https://wa.me/918239914751?text=${whatsappMatch[1]}`}
+              href={`https://wa.me/919116399517?text=${whatsappMatch[1]}`}
               target="_blank"
               rel="noopener noreferrer"
               className="w-full py-4 px-5 font-black text-[13px] rounded-2xl bg-[#25D366] text-white hover:bg-[#128C7E] transition-all flex items-center justify-center gap-2 shadow-2xl active:scale-95 no-underline uppercase tracking-tight"
@@ -264,7 +264,8 @@ export function BotPreview({ isAppMode = false }: BotPreviewProps) {
       "relative w-full flex flex-col bg-[#E5DDD5] dark:bg-zinc-950 overflow-hidden",
       isAppMode ? "h-full" : "max-w-[440px] h-[600px] mx-auto rounded-[2.5rem] border-[8px] border-zinc-800 dark:border-zinc-700 p-1 shadow-2xl"
     )}>
-      <div className="bg-[#075E54] dark:bg-zinc-900 text-white pt-[calc(env(safe-area-inset-top,24px)+12px)] pb-4 px-5 flex items-center gap-3 shrink-0 shadow-md z-30">
+      {/* BOT HEADER - Fixed with safe area */}
+      <div className="bg-[#075E54] dark:bg-zinc-900 text-white pt-3 pb-4 px-5 flex items-center gap-3 shrink-0 shadow-md z-30">
         <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center border-2 border-white/10 shadow-inner">
           <Bot className="w-6 h-6" />
         </div>
@@ -284,6 +285,7 @@ export function BotPreview({ isAppMode = false }: BotPreviewProps) {
         )}
       </div>
       
+      {/* CHAT AREA */}
       <div ref={scrollRef} className="flex-1 overflow-y-auto p-4 pb-12 space-y-4 bg-[url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png')] bg-repeat dark:bg-blend-multiply dark:bg-zinc-950 scroll-smooth custom-scrollbar z-10">
         {messages.map((msg, i) => (
           <div key={i} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
@@ -307,7 +309,8 @@ export function BotPreview({ isAppMode = false }: BotPreviewProps) {
         )}
       </div>
 
-      <div className="p-3 bg-[#F0F2F5] dark:bg-zinc-900 flex gap-2 border-t dark:border-zinc-800 shrink-0 shadow-2xl z-30 pb-[calc(env(safe-area-inset-bottom,12px)+16px)]">
+      {/* INPUT BAR - STICKY TO BOTTOM */}
+      <div className="p-3 bg-[#F0F2F5] dark:bg-zinc-900 flex gap-2 border-t dark:border-zinc-800 shrink-0 shadow-2xl z-30 pb-4">
         <Input 
           value={input} 
           onChange={(e) => setInput(e.target.value)} 

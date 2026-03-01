@@ -21,7 +21,7 @@ export async function POST(req: Request) {
 
     const phoneNumber = message.from;
     const messageText = message.text?.body || '';
-    const adminNumber = '919116053238'; 
+    const adminNumber = '919116399517'; 
 
     // Retrieve session
     const sessionRef = doc(firestore, 'botSessions', phoneNumber);
