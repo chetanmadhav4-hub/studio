@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useEffect, useRef } from "react";
@@ -6,26 +5,16 @@ import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { useUser, useFirestore, useDoc, useMemoFirebase } from "@/firebase";
+import { useUser, useFirestore } from "@/firebase";
 import { 
   Send, 
   Bot, 
   MousePointer2, 
   ExternalLink, 
   LogIn,
-  Bell,
-  CheckCircle2,
-  AlertCircle,
-  Trash2
+  Loader2
 } from "lucide-react";
 import Link from "next/link";
-import { doc, updateDoc, deleteField } from "firebase/firestore";
-import { UserNotification } from "@/lib/bot-types";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
 
 interface ChatMessage {
   role: "user" | "bot";
@@ -33,8 +22,7 @@ interface ChatMessage {
 }
 
 export function BotPreview() {
-  const { user } = useUser();
-  const db = useFirestore();
+  const { user, isUserLoading } = useUser();
   const router = useRouter();
   const [messages, setMessages] = useState<ChatMessage[]>([
     { role: "bot", text: "Send 'Hi' to start the bot! 👋" },
@@ -169,6 +157,14 @@ export function BotPreview() {
       </div>
     );
   };
+
+  if (isUserLoading) {
+    return (
+      <div className="h-[600px] flex items-center justify-center bg-white dark:bg-zinc-950 rounded-2xl shadow-xl">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   return (
     <Card className="w-full h-[600px] flex flex-col bg-[#E5DDD5] dark:bg-zinc-950 shadow-xl rounded-2xl overflow-hidden border-none transition-all">

@@ -1,5 +1,4 @@
-
-'use client';
+"use client";
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
@@ -8,7 +7,7 @@ import { BotPreview } from "@/components/bot-preview";
 import { OrderHistory } from "@/components/order-history";
 import { NotificationBell } from "@/components/notification-bell";
 import { AdminNotificationBell } from "@/components/admin-notification-bell";
-import { CheckCircle2, Zap, History, Moon, Sun, LayoutGrid, Users, ArrowRight } from "lucide-react";
+import { CheckCircle2, Zap, History, Moon, Sun, LayoutGrid, Users, ArrowRight, Loader2 } from "lucide-react";
 import { useUser } from "@/firebase";
 import {
   Dialog,
@@ -59,7 +58,7 @@ export default function Home() {
           </div>
           
           <div className="flex items-center gap-1 sm:gap-2">
-            {!isUserLoading && (
+            {!isUserLoading ? (
               <>
                 {!user ? (
                   <>
@@ -99,6 +98,8 @@ export default function Home() {
                   </div>
                 )}
               </>
+            ) : (
+              <Loader2 className="w-5 h-5 animate-spin text-primary" />
             )}
           </div>
         </div>

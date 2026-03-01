@@ -1,4 +1,3 @@
-
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
@@ -6,10 +5,9 @@ service cloud.firestore {
     // Master collection of orders for the admin tracker
     match /all_orders/{orderId} {
       // Allow admin (Chetan) to read and manage everything
-      // Using a slightly more explicit rule for list/get
       allow list, get, update, delete: if request.auth != null && request.auth.token.email == 'chetanmadhav4@gmail.com';
-      // Allow creation for anyone during the order flow (bot/preview)
-      allow create: if true;
+      // Allow creation for any authenticated user (the bot/user flow)
+      allow create: if request.auth != null;
     }
 
     // User profile and sub-collections
@@ -32,7 +30,8 @@ service cloud.firestore {
 
     // Bot sessions - needed for notifications and flow
     match /botSessions/{sessionId} {
-      allow read, write: if true;
+      // Allow user to read/write their own session, admin can read/write all
+      allow read, write: if request.auth != null && (request.auth.uid == sessionId || request.auth.token.email == 'chetanmadhav4@gmail.com');
     }
   }
 }

@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useEffect } from "react";
@@ -19,20 +18,20 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
 export function AdminNotificationBell() {
-  const { user } = useUser();
+  const { user, isUserLoading } = useUser();
   const db = useFirestore();
   const ADMIN_EMAIL = 'chetanmadhav4@gmail.com';
 
-  // FIX: ONLY query if user is actually the admin to prevent permission errors
+  // STRICT GATING: Only query if user is logged in AND is the admin
   const ordersQuery = useMemoFirebase(() => {
-    if (!db || !user || user.email !== ADMIN_EMAIL) return null;
+    if (!db || isUserLoading || !user || user.email !== ADMIN_EMAIL) return null;
     return query(
       collection(db, 'all_orders'), 
       where('status', '==', 'PROCESSING'),
       orderBy('createdAt', 'desc'),
       limit(10)
     );
-  }, [db, user?.email]);
+  }, [db, user?.email, isUserLoading]);
 
   const { data: newOrders, isLoading } = useCollection(ordersQuery);
   const [prevCount, setPrevCount] = useState(0);
@@ -48,7 +47,7 @@ export function AdminNotificationBell() {
     }
   }, [newOrders, prevCount]);
 
-  if (!user || user.email !== ADMIN_EMAIL) return null;
+  if (isUserLoading || !user || user.email !== ADMIN_EMAIL) return null;
 
   return (
     <Popover>

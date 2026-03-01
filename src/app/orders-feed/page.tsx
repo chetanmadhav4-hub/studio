@@ -1,5 +1,4 @@
-
-'use client';
+"use client";
 
 import { useCollection, useFirestore, useMemoFirebase, useUser } from "@/firebase";
 import { collection, query, orderBy, limit, doc, updateDoc, serverTimestamp, arrayUnion } from "firebase/firestore";
@@ -34,11 +33,11 @@ export default function SimpleOrdersFeed() {
 
   const ADMIN_EMAIL = 'chetanmadhav4@gmail.com';
 
-  // FIX: ONLY query if user is actually the admin to prevent permission errors
+  // STRICT GATING: Only query if user is logged in AND is the admin
   const ordersQuery = useMemoFirebase(() => {
-    if (!db || !user || user.email !== ADMIN_EMAIL) return null;
+    if (!db || isUserLoading || !user || user.email !== ADMIN_EMAIL) return null;
     return query(collection(db, 'all_orders'), orderBy('createdAt', 'desc'), limit(100));
-  }, [db, user?.email]);
+  }, [db, user?.email, isUserLoading]);
 
   const { data: orders, isLoading } = useCollection(ordersQuery);
 
@@ -74,7 +73,6 @@ export default function SimpleOrdersFeed() {
 
       if (action === 'APPROVE') {
         msg = `✅ *ORDER APPROVED:* Order #${shortId} approve ho gaya hai! Kaam jaldi shuru ho jayega. 🚀`;
-        // Send WhatsApp only on Approval as requested
         if (targetSessionId.length > 10) {
           sendAdminActionNotification(targetSessionId, msg);
         }
@@ -82,7 +80,6 @@ export default function SimpleOrdersFeed() {
         msg = `❌ *ORDER REJECTED:* Order #${shortId} reject kar diya gaya hai. ⚠️ Reason: Invalid Link ya Galat UTR ID.`;
       }
 
-      // Add to user's persistent notifications list
       await updateDoc(sessionRef, { 
         notifications: arrayUnion({
           id: notificationId,
@@ -147,7 +144,7 @@ export default function SimpleOrdersFeed() {
             </div>
             <div>
               <h1 className="text-lg font-bold text-slate-900 dark:text-zinc-100">Admin Control</h1>
-              <p className="text-[10px] text-emerald-500 font-bold uppercase tracking-widest">Order Management</p>
+              <p className="text-[10px] text-emerald-500 font-bold uppercase tracking-widest text-left">Order Management</p>
             </div>
           </div>
           <Button variant="ghost" size="icon" onClick={() => window.location.reload()} className="rounded-full dark:text-zinc-400">
