@@ -71,7 +71,8 @@ export default function Home() {
             </div>
             <div className="flex-1 space-y-1.5 pr-7">
               <p className="text-[9px] font-black text-white/70 uppercase tracking-[0.25em]">Official Announcement</p>
-              <p className="text-sm font-black text-white dark:text-zinc-50 leading-snug">
+              {/* FIXED: added whitespace-pre-wrap to preserve line breaks and dark:text-zinc-50 for silver/white words */}
+              <p className="text-sm font-black text-white dark:text-zinc-50 leading-snug whitespace-pre-wrap">
                 {broadcast.broadcastMessage}
               </p>
             </div>

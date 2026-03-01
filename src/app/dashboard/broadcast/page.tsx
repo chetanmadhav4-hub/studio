@@ -126,7 +126,8 @@ export default function BroadcastAdminPage() {
             {isActive ? (
               <div className="bg-primary/5 border border-primary/10 p-5 rounded-2xl flex items-start gap-4 shadow-sm animate-pulse">
                 <Megaphone className="w-5 h-5 text-primary shrink-0 mt-0.5" />
-                <p className="text-sm text-slate-800 font-bold leading-relaxed">
+                {/* FIXED: added whitespace-pre-wrap to preserve line-by-line formatting in preview */}
+                <p className="text-sm text-slate-800 font-bold leading-relaxed whitespace-pre-wrap">
                   {message || 'Type something to preview...'}
                 </p>
               </div>
