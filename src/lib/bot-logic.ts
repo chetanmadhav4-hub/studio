@@ -166,11 +166,9 @@ export async function processBotMessage(
        if (normalizedMsg === 'yes, proceed' || normalizedMsg === '✅ yes, proceed') {
          const upiId = '8239914751@ybl'; 
          const accountName = 'CHETAN KUMAR MEGHWAL';
-         // CRITICAL: Removed &am= to avoid "2000 limit" error on personal IDs
-         const upiLink = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(accountName)}&cu=INR`;
 
          return {
-           reply: `📲 *Payment Details*\n\n👤 *Account:* ${accountName}\n🆔 *UPI ID:* ${upiId}\n💰 *Amount:* ₹${session.data.price}\n\n${upiLink}\n\nKripya is UPI ID par manual payment karein aur UTR ID niche form mein bharein:\n\n[PAYMENT_FORM]\n\nOPTION: 🏠 MAIN MENU`,
+           reply: `📲 *Payment Details*\n\nKripya niche di gayi UPI ID par manual payment karein:\n\n👤 *Account:* ${accountName}\n🆔 *UPI ID:* ${upiId}\n💰 *Amount:* ₹${session.data.price}\n\nPayment ke baad 12-digit UTR ID niche form mein bharein:\n\n[PAYMENT_FORM]\n\nOPTION: 🏠 MAIN MENU`,
            nextState: { state: 'AWAITING_PAYMENT_DETAILS' },
          };
        }

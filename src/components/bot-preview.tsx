@@ -143,7 +143,6 @@ export function BotPreview({ isAppMode = false }: BotPreviewProps) {
   };
 
   const renderMessageContent = (text: string) => {
-    const upiRegex = /^upi:\/\/pay\S+$/;
     const formTag = "[PAYMENT_FORM]";
     const whatsappTagRegex = /\[WHATSAPP_ADMIN:(.+?)\]/;
     
@@ -154,14 +153,8 @@ export function BotPreview({ isAppMode = false }: BotPreviewProps) {
 
     const lines = cleanText.split("\n");
     const optionLines = lines.filter(line => line.startsWith("OPTION: "));
-    const upiLinkLine = lines.find(line => line.trim().startsWith("upi://pay"));
-    const upiLink = upiLinkLine ? upiLinkLine.trim() : null;
 
-    const otherLines = lines.filter(line => {
-      const isOption = line.startsWith("OPTION: ");
-      const isPureUpi = upiRegex.test(line.trim());
-      return !isOption && !isPureUpi;
-    });
+    const otherLines = lines.filter(line => !line.startsWith("OPTION: "));
 
     const content = otherLines.map((line, idx) => {
       if (line.trim() === "" && idx !== otherLines.length - 1) return <div key={idx} className="h-2" />;
@@ -176,17 +169,6 @@ export function BotPreview({ isAppMode = false }: BotPreviewProps) {
       <div className="flex flex-col gap-1.5">
         <div className="text-[13px] flex flex-col">{content}</div>
         
-        {upiLink && (
-          <div className="mt-2">
-            <a 
-              href={upiLink} 
-              className="w-full flex items-center justify-center gap-2 bg-[#00A884] text-white py-4 rounded-2xl text-[13px] font-black uppercase no-underline shadow-xl active:scale-95 transition-all"
-            >
-              <Check className="w-5 h-5" /> Pay via UPI App
-            </a>
-          </div>
-        )}
-
         {whatsappMatch && (
           <div className="mt-5 space-y-3">
             <p className="text-[10px] font-black text-primary dark:text-accent uppercase text-center tracking-[0.15em] px-2 opacity-90 leading-snug">
