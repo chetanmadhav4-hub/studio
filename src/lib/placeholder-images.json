@@ -1,10 +1,10 @@
 {
   "placeholderImages": [
     {
-      "id": "phonepe-static-qr",
-      "description": "Static PhonePe QR code for manual payment provided by the user.",
-      "imageUrl": "https://picsum.photos/seed/phonepe-final-qr/600/600",
-      "imageHint": "phonepe upi qr"
+      "id": "slice-payment-qr",
+      "description": "Slice QR code for smmxpressbot@slc provided by the user.",
+      "imageUrl": "https://picsum.photos/seed/slice-qr-final/600/800",
+      "imageHint": "upi qr payment slice"
     }
   ]
 }

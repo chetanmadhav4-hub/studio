@@ -14,12 +14,15 @@ import {
   LogIn,
   Loader2,
   Check,
-  MessageCircle
+  MessageCircle,
+  Download
 } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { processBotMessage } from "@/lib/bot-logic";
 import { UserSession } from "@/lib/bot-types";
+import { PlaceHolderImages } from "@/lib/placeholder-images";
+import Image from "next/image";
 
 interface ChatMessage {
   role: "user" | "bot";
@@ -43,6 +46,8 @@ export function BotPreview({ isAppMode = false }: BotPreviewProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [formLink, setFormLink] = useState("");
   const [formUtr, setFormUtr] = useState("");
+
+  const qrImage = PlaceHolderImages.find(img => img.id === 'slice-payment-qr');
 
   const sessionRef = useMemoFirebase(() => {
     if (!db || !user) return null;
@@ -144,22 +149,23 @@ export function BotPreview({ isAppMode = false }: BotPreviewProps) {
 
   const renderMessageContent = (text: string) => {
     const formTag = "[PAYMENT_FORM]";
+    const qrTag = "[PAYMENT_QR]";
     const whatsappTagRegex = /\[WHATSAPP_ADMIN:(.+?)\]/;
     
     const hasForm = text.includes(formTag);
+    const hasQR = text.includes(qrTag);
     const whatsappMatch = text.match(whatsappTagRegex);
     
-    let cleanText = text.replace(formTag, "").replace(whatsappTagRegex, "").trim();
+    let cleanText = text.replace(formTag, "").replace(qrTag, "").replace(whatsappTagRegex, "").trim();
 
     const lines = cleanText.split("\n");
     const optionLines = lines.filter(line => line.startsWith("OPTION: "));
-
     const otherLines = lines.filter(line => !line.startsWith("OPTION: "));
 
     const content = otherLines.map((line, idx) => {
       if (line.trim() === "" && idx !== otherLines.length - 1) return <div key={idx} className="h-2" />;
       return (
-        <div key={idx} className="leading-relaxed text-slate-900 dark:text-zinc-50 font-black whitespace-pre-wrap">
+        <div key={idx} className="leading-relaxed text-slate-900 dark:text-zinc-100 font-black whitespace-pre-wrap">
           {line.replace(/\*/g, '')}
         </div>
       );
@@ -169,6 +175,25 @@ export function BotPreview({ isAppMode = false }: BotPreviewProps) {
       <div className="flex flex-col gap-1.5">
         <div className="text-[13px] flex flex-col">{content}</div>
         
+        {hasQR && qrImage && (
+          <div className="mt-4 flex flex-col items-center gap-3">
+            <div className="relative w-full aspect-[3/4] rounded-[2rem] overflow-hidden border-4 border-white shadow-2xl bg-white">
+              <Image 
+                src={qrImage.imageUrl} 
+                alt="Payment QR" 
+                fill 
+                className="object-contain p-2"
+                data-ai-hint={qrImage.imageHint}
+              />
+            </div>
+            <Button asChild variant="secondary" className="w-full h-11 rounded-xl font-black uppercase text-[10px] tracking-widest gap-2 bg-slate-100 hover:bg-slate-200">
+              <a href={qrImage.imageUrl} download="InstaFlow_QR.png">
+                <Download className="w-4 h-4" /> Download QR Code
+              </a>
+            </Button>
+          </div>
+        )}
+
         {whatsappMatch && (
           <div className="mt-5 space-y-3">
             <p className="text-[10px] font-black text-primary dark:text-accent uppercase text-center tracking-[0.15em] px-2 opacity-90 leading-snug">
@@ -263,7 +288,7 @@ export function BotPreview({ isAppMode = false }: BotPreviewProps) {
               "max-w-[85%] rounded-[1.5rem] px-5 py-4 text-xs shadow-xl border dark:border-zinc-700",
               msg.role === "user" 
                 ? "bg-[#DCF8C6] dark:bg-emerald-900 text-slate-900 dark:text-zinc-50 rounded-tr-none" 
-                : "bg-white dark:bg-zinc-800 text-slate-900 dark:text-zinc-50 rounded-tl-none font-bold"
+                : "bg-white dark:bg-zinc-800 text-slate-900 dark:text-zinc-100 rounded-tl-none font-bold"
             )}>
               {renderMessageContent(msg.text)}
               <div className="text-[9px] mt-2.5 text-right opacity-60 font-black uppercase dark:text-zinc-400 tracking-wider">

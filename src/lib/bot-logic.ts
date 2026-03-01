@@ -24,9 +24,6 @@ export function isValidUtr(utr: string): boolean {
   return regex.test(utr.trim());
 }
 
-/**
- * Formats the order confirmation message with strict multi-line spacing.
- */
 function formatOrderConfirmation(details: any): string {
   return `🎉 *Woohoo! Your InstaFlow order successfully created!*
 
@@ -44,7 +41,6 @@ export async function processBotMessage(
 ): Promise<{ reply: string; nextState: Partial<UserSession> }> {
   const normalizedMsg = messageText.trim().toLowerCase();
   
-  // 1. Handle Payment Submission
   if (normalizedMsg.startsWith('submit_payment:')) {
     const detailsPart = messageText.substring('submit_payment:'.length).trim();
     const [link, utr] = detailsPart.split('|');
@@ -92,7 +88,6 @@ export async function processBotMessage(
     };
   }
 
-  // 2. Handle Menu / Start Commands
   if (normalizedMsg === 'hi' || normalizedMsg === 'start' || normalizedMsg === 'menu' || normalizedMsg === 'main menu' || normalizedMsg === '🏠 main menu') {
     let menu = "👋 *Welcome to InstaFlow Bot!*\n\nNiche di gayi list mein se koi bhi service select karein:\n\n";
     Object.entries(SERVICES_CONFIG).forEach(([key, service]) => {
@@ -108,7 +103,6 @@ export async function processBotMessage(
     };
   }
 
-  // 3. Handle Service Selection
   let interceptedServiceKey = '';
   Object.entries(SERVICES_CONFIG).forEach(([key, service]) => {
     const serviceLabel = `${key}. ${service.name}`.toLowerCase();
@@ -129,7 +123,6 @@ export async function processBotMessage(
     };
   }
 
-  // 4. State Machine
   switch (session.state) {
     case 'AWAITING_SERVICE_SELECTION': {
       return {
@@ -164,11 +157,8 @@ export async function processBotMessage(
 
     case 'AWAITING_PAYMENT_DETAILS': {
        if (normalizedMsg === 'yes, proceed' || normalizedMsg === '✅ yes, proceed') {
-         const upiId = '8239914751@ybl'; 
-         const accountName = 'CHETAN KUMAR MEGHWAL';
-
          return {
-           reply: `📲 *Payment Details*\n\nKripya niche di gayi UPI ID par manual payment karein:\n\n👤 *Account:* ${accountName}\n🆔 *UPI ID:* ${upiId}\n💰 *Amount:* ₹${session.data.price}\n\nPayment ke baad 12-digit UTR ID niche form mein bharein:\n\n[PAYMENT_FORM]\n\nOPTION: 🏠 MAIN MENU`,
+           reply: `📸 *Payment QR Code*\n\nKripya niche diye gaye QR code ko scan ya download karke ₹${session.data.price} ka payment karein.\n\n[PAYMENT_QR]\n\nPayment ke baad 12-digit UTR ID niche form mein bharein:\n\n[PAYMENT_FORM]\n\nOPTION: 🏠 MAIN MENU`,
            nextState: { state: 'AWAITING_PAYMENT_DETAILS' },
          };
        }
