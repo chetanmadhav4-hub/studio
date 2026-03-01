@@ -45,7 +45,8 @@ export async function processBotMessage(
   messageText: string
 ): Promise<{ reply: string; nextState: Partial<UserSession> }> {
   const normalizedMsg = messageText.trim().toLowerCase();
-  // Using the static PhonePe QR from placeholder
+  
+  // Using the static PhonePe QR from placeholder (Your provided image)
   const staticQr = PlaceHolderImages.find(img => img.id === 'phonepe-static-qr')?.imageUrl || '';
 
   if (normalizedMsg.startsWith('submit_payment:')) {
@@ -151,11 +152,12 @@ export async function processBotMessage(
       }
 
       const price = calculatePrice(quantity, service.pricePer1000);
-      const upiId = 'cc732535@ybl'; 
+      const upiId = 'cc732535@ybl'; // UPDATED UPI ID
       const accountName = 'CHETAN KUMAR MEGHWAL';
+      
+      // UPI Link with NO pre-filled amount for Manual Payment
       const upiPayload = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(accountName)}&cu=INR`;
 
-      // Manual payment instructions + Static New QR + Payment Form
       return {
         reply: `✅ Aapne *${quantity} ${service.name}* select kiye hain.\n💰 Total price: *₹${price}*\n\n📲 *Scan This QR to Pay Manual Amount*\n\n👤 *Account:* ${accountName}\n🆔 *UPI ID:* ${upiId}\n💰 *Amount:* ₹${price}\n\n${staticQr}\n\n${upiPayload}\n\n✅ Payment ke baad, apna Instagram Link and UTR ID niche fill karein:\n\n[PAYMENT_FORM]`,
         nextState: {

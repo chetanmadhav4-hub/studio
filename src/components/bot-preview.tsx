@@ -169,18 +169,18 @@ export function BotPreview({ isAppMode = false }: BotPreviewProps) {
       const matches = line.match(urlRegex);
       if (matches) {
         const imageUrl = matches[0];
-        // Strictly identify image placeholders and render them
+        // Identify image URLs (placeholders or actual images)
         const isImageUrl = imageUrl.includes("picsum.photos") || imageUrl.match(/\.(jpeg|jpg|gif|png|webp|svg)/i);
         
         if (isImageUrl) {
           const textBeforeUrl = line.replace(imageUrl, "").trim();
           return (
-            <div key={idx} className="my-3 flex flex-col gap-2">
+            <div key={idx} className="my-4 flex flex-col gap-3">
               {textBeforeUrl && <div className="leading-relaxed font-black text-slate-900 dark:text-zinc-100 whitespace-pre-wrap">{textBeforeUrl.replace(/\*/g, '')}</div>}
-              <div className="bg-white p-2.5 rounded-2xl border shadow-xl max-w-[240px] mx-auto text-center transform hover:scale-[1.02] transition-transform overflow-hidden">
-                <img src={imageUrl} alt="Payment QR" className="rounded-xl w-full h-auto" />
+              <div className="bg-white p-3 rounded-[2rem] border-2 border-primary/10 shadow-2xl max-w-[260px] mx-auto text-center transform hover:scale-[1.02] transition-transform overflow-hidden">
+                <img src={imageUrl} alt="Payment QR" className="rounded-[1.5rem] w-full h-auto" />
                 {upiLink && (
-                  <a href={upiLink} className="mt-4 flex items-center justify-center gap-2 bg-[#00A884] text-white py-3 rounded-xl text-[12px] font-black uppercase no-underline shadow-md active:scale-95 transition-all">
+                  <a href={upiLink} className="mt-5 flex items-center justify-center gap-2 bg-[#00A884] text-white py-3.5 rounded-2xl text-[12px] font-black uppercase no-underline shadow-xl active:scale-95 transition-all">
                     <Check className="w-4 h-4" /> Pay via UPI App
                   </a>
                 )}
@@ -194,19 +194,19 @@ export function BotPreview({ isAppMode = false }: BotPreviewProps) {
     });
 
     return (
-      <div className="flex flex-col gap-1">
+      <div className="flex flex-col gap-1.5">
         <div className="text-[13px] flex flex-col">{content}</div>
         
         {whatsappMatch && (
-          <div className="mt-4 space-y-2">
-            <p className="text-[10px] font-black text-primary dark:text-accent uppercase text-center tracking-wider px-2 opacity-80 leading-snug">
+          <div className="mt-5 space-y-3">
+            <p className="text-[10px] font-black text-primary dark:text-accent uppercase text-center tracking-[0.15em] px-2 opacity-90 leading-snug">
               Send Order Details to Admin and conform your order
             </p>
             <a 
               href={`https://wa.me/919116399517?text=${whatsappMatch[1]}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="w-full py-3.5 px-4 font-black text-[12px] rounded-2xl bg-[#25D366] text-white hover:bg-[#128C7E] transition-all flex items-center justify-center gap-2 shadow-xl active:scale-95 no-underline uppercase tracking-tight"
+              className="w-full py-4 px-5 font-black text-[13px] rounded-2xl bg-[#25D366] text-white hover:bg-[#128C7E] transition-all flex items-center justify-center gap-2 shadow-2xl active:scale-95 no-underline uppercase tracking-tight"
             >
               <MessageCircle className="w-5 h-5" /> Send via WhatsApp
             </a>
@@ -214,23 +214,23 @@ export function BotPreview({ isAppMode = false }: BotPreviewProps) {
         )}
 
         {hasForm && (
-          <div className="mt-4 p-4 bg-slate-100 dark:bg-zinc-800 rounded-[1.8rem] border-2 border-primary/20 shadow-lg space-y-3">
+          <div className="mt-5 p-5 bg-slate-100 dark:bg-zinc-800/80 rounded-[2rem] border-2 border-primary/10 shadow-xl space-y-4">
             <Input 
               placeholder="Instagram Profile/Post Link" 
-              className="h-11 text-[11px] font-black dark:bg-zinc-900 dark:border-zinc-700 dark:text-zinc-50 rounded-xl focus:ring-primary placeholder:text-zinc-400" 
+              className="h-12 text-[11px] font-black dark:bg-zinc-900 dark:border-zinc-700 dark:text-zinc-50 rounded-xl focus:ring-primary placeholder:text-zinc-400" 
               value={formLink} 
               onChange={(e) => setFormLink(e.target.value)} 
             />
             <Input 
               placeholder="12-Digit Payment UTR ID" 
-              className="h-11 text-[11px] font-black dark:bg-zinc-900 dark:border-zinc-700 dark:text-zinc-50 rounded-xl focus:ring-primary placeholder:text-zinc-400" 
+              className="h-12 text-[11px] font-black dark:bg-zinc-900 dark:border-zinc-700 dark:text-zinc-50 rounded-xl focus:ring-primary placeholder:text-zinc-400" 
               value={formUtr} 
               onChange={(e) => setFormUtr(e.target.value)} 
               maxLength={12} 
             />
             <Button 
               size="sm" 
-              className="w-full bg-[#00A884] hover:bg-[#008F6F] h-11 text-[11px] font-black uppercase tracking-wider rounded-xl shadow-lg" 
+              className="w-full bg-[#00A884] hover:bg-[#008F6F] h-12 text-[12px] font-black uppercase tracking-wider rounded-xl shadow-xl" 
               onClick={() => handleSend(`SUBMIT_PAYMENT:${formLink}|${formUtr}`)} 
               disabled={!formLink || formUtr.length < 12}
             >
@@ -242,7 +242,7 @@ export function BotPreview({ isAppMode = false }: BotPreviewProps) {
         {optionLines.map((optLine, i) => {
           const optionText = optLine.replace("OPTION: ", "").trim();
           return (
-            <button key={i} onClick={() => handleSend(optionText)} className="mt-2 w-full py-3.5 px-4 font-black text-[11px] rounded-xl border-2 bg-white dark:bg-zinc-800 text-primary dark:text-accent border-primary/10 hover:border-primary/40 hover:bg-primary/5 transition-all flex items-center justify-center gap-2 shadow-sm active:scale-95 uppercase tracking-tight">
+            <button key={i} onClick={() => handleSend(optionText)} className="mt-2.5 w-full py-4 px-5 font-black text-[12px] rounded-2xl border-2 bg-white dark:bg-zinc-800 text-primary dark:text-accent border-primary/5 hover:border-primary/30 hover:bg-primary/5 transition-all flex items-center justify-center gap-2 shadow-sm active:scale-95 uppercase tracking-tight">
               <MousePointer2 className="w-4 h-4" /> {optionText}
             </button>
           );
@@ -289,35 +289,35 @@ export function BotPreview({ isAppMode = false }: BotPreviewProps) {
         {messages.map((msg, i) => (
           <div key={i} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
             <div className={cn(
-              "max-w-[85%] rounded-2xl px-4 py-3 text-xs shadow-md border dark:border-zinc-700",
+              "max-w-[85%] rounded-[1.5rem] px-5 py-4 text-xs shadow-xl border dark:border-zinc-700",
               msg.role === "user" 
                 ? "bg-[#DCF8C6] dark:bg-emerald-900 text-slate-900 dark:text-zinc-50 rounded-tr-none" 
                 : "bg-white dark:bg-zinc-800 text-slate-900 dark:text-zinc-100 rounded-tl-none font-bold"
             )}>
               {renderMessageContent(msg.text)}
-              <div className="text-[9px] mt-2 text-right opacity-50 font-black uppercase dark:text-zinc-400">
+              <div className="text-[9px] mt-2.5 text-right opacity-60 font-black uppercase dark:text-zinc-400 tracking-wider">
                 {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
               </div>
             </div>
           </div>
         ))}
         {loading && (
-          <div className="flex items-center gap-2 text-[10px] font-black italic opacity-60 dark:text-zinc-200 animate-pulse bg-white/50 dark:bg-zinc-800/50 w-fit px-4 py-2 rounded-full shadow-sm">
+          <div className="flex items-center gap-2 text-[10px] font-black italic opacity-70 dark:text-zinc-200 animate-pulse bg-white/60 dark:bg-zinc-800/60 w-fit px-5 py-3 rounded-full shadow-lg border dark:border-zinc-700">
             <Bot className="w-4 h-4" /> Bot is thinking...
           </div>
         )}
       </div>
 
-      <div className="p-3 bg-[#F0F2F5] dark:bg-zinc-900 flex gap-2 border-t dark:border-zinc-800 shrink-0 shadow-lg z-20 pb-[calc(env(safe-area-inset-bottom,12px)+12px)]">
+      <div className="p-3 bg-[#F0F2F5] dark:bg-zinc-900 flex gap-2 border-t dark:border-zinc-800 shrink-0 shadow-2xl z-20 pb-[calc(env(safe-area-inset-bottom,12px)+16px)]">
         <Input 
           value={input} 
           onChange={(e) => setInput(e.target.value)} 
           onKeyDown={(e) => e.key === "Enter" && handleSend()} 
           placeholder={user ? "Type a message..." : "Login to use Bot"} 
           disabled={!user} 
-          className="bg-white dark:bg-zinc-800 dark:text-zinc-50 dark:border-zinc-700 rounded-2xl h-11 px-4 text-sm font-black placeholder:text-slate-400 dark:placeholder:text-zinc-500 shadow-inner" 
+          className="bg-white dark:bg-zinc-800 dark:text-zinc-50 dark:border-zinc-700 rounded-2xl h-12 px-5 text-sm font-black placeholder:text-slate-400 dark:placeholder:text-zinc-500 shadow-inner" 
         />
-        <Button onClick={() => handleSend()} disabled={loading || !user} size="icon" className="rounded-full bg-[#00A884] hover:bg-[#008F6F] h-11 w-11 shrink-0 shadow-xl active:scale-90 transition-all">
+        <Button onClick={() => handleSend()} disabled={loading || !user} size="icon" className="rounded-full bg-[#00A884] hover:bg-[#008F6F] h-12 w-12 shrink-0 shadow-2xl active:scale-90 transition-all">
           <Send className="w-5 h-5 text-white" />
         </Button>
       </div>
