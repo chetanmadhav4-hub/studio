@@ -8,7 +8,7 @@ import { BotPreview } from "@/components/bot-preview";
 import { OrderHistory } from "@/components/order-history";
 import { NotificationBell } from "@/components/notification-bell";
 import { AdminNotificationBell } from "@/components/admin-notification-bell";
-import { CheckCircle2, Zap, History, Moon, Sun, LayoutGrid } from "lucide-react";
+import { CheckCircle2, Zap, History, Moon, Sun, LayoutGrid, Users, ArrowRight } from "lucide-react";
 import { useUser } from "@/firebase";
 import {
   Dialog,
@@ -18,12 +18,14 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 
 export default function Home() {
   const { user, isUserLoading } = useUser();
   const [isDark, setIsDark] = useState(false);
 
   const ADMIN_EMAIL = 'chetanmadhav4@gmail.com';
+  const isAdmin = user?.email === ADMIN_EMAIL;
 
   useEffect(() => {
     const theme = localStorage.getItem("theme");
@@ -83,18 +85,7 @@ export default function Home() {
 
                     <NotificationBell />
                     
-                    {/* ONLY SHOW ADMIN BELL TO ADMIN */}
-                    {user.email === ADMIN_EMAIL && <AdminNotificationBell />}
-
-                    {/* ONLY SHOW TRACKER BUTTON TO ADMIN */}
-                    {user.email === ADMIN_EMAIL && (
-                      <Link href="/orders-feed" className="hidden sm:block">
-                        <Button className="bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-bold px-3 h-8 gap-1.5 shadow-sm rounded-lg transition-all active:scale-95 ml-1">
-                          <LayoutGrid className="w-3.5 h-3.5" />
-                          LIVE TRACKER
-                        </Button>
-                      </Link>
-                    )}
+                    {isAdmin && <AdminNotificationBell />}
 
                     <Link href="/profile">
                       <Button variant="ghost" size="sm" className="gap-2 text-sm p-1 ml-1">
@@ -113,54 +104,102 @@ export default function Home() {
         </div>
       </header>
 
-      <section className="bg-gradient-to-b from-white to-background dark:from-zinc-950 dark:to-background pt-8 pb-12 md:pt-16 md:pb-20 transition-colors">
+      <section className="bg-gradient-to-b from-white to-background dark:from-zinc-950 dark:to-background pt-8 pb-12 md:pt-16 md:pb-20 transition-colors flex-1">
         <div className="container mx-auto px-4">
-          <div className="max-w-2xl mx-auto text-center space-y-6">
+          <div className="max-w-4xl mx-auto text-center space-y-8">
             <div className="space-y-4">
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-foreground dark:text-zinc-100 leading-tight">
-                Welcome to <span className="text-primary">InstaFlow</span>
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-foreground dark:text-white leading-tight">
+                {isAdmin ? "Admin Control Center" : "Welcome to InstaFlow"}
               </h1>
               <p className="text-base md:text-lg text-muted-foreground dark:text-zinc-400 max-w-xl mx-auto">
-                Join thousands of users who grow their social media presence automatically.
+                {isAdmin 
+                  ? "Manage orders and monitor user growth in real-time." 
+                  : "Join thousands of users who grow their social media presence automatically."}
               </p>
             </div>
 
-            {user ? (
-              <div className="flex justify-center flex-col items-center gap-4">
-                <Dialog>
-                  <DialogTrigger asChild>
-                    <Button variant="outline" size="sm" className="gap-2 shadow-sm border-primary/20 text-primary hover:text-primary hover:bg-primary/5 dark:bg-zinc-900 dark:text-zinc-100 dark:border-zinc-800 text-xs h-9">
-                      <History className="w-4 h-4" />
-                      View Order History
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent className="max-w-[95vw] md:max-w-md max-h-[85vh] overflow-y-auto rounded-2xl dark:bg-zinc-950 dark:border-zinc-800">
-                    <DialogHeader>
-                      <DialogTitle className="flex items-center gap-2 dark:text-zinc-100">
-                        <History className="w-5 h-5 text-primary" />
-                        My Orders
-                      </DialogTitle>
-                    </DialogHeader>
-                    <OrderHistory />
-                  </DialogContent>
-                </Dialog>
-              </div>
-            ) : null}
+            {isAdmin ? (
+              <div className="grid md:grid-cols-2 gap-6 mt-12">
+                <Link href="/orders-feed">
+                  <Card className="hover:shadow-2xl transition-all cursor-pointer group border-primary/20 bg-white dark:bg-zinc-900 overflow-hidden relative">
+                    <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:scale-110 transition-transform">
+                      <LayoutGrid className="w-24 h-24" />
+                    </div>
+                    <CardHeader className="text-left">
+                      <div className="w-12 h-12 bg-emerald-600 rounded-xl flex items-center justify-center mb-4 shadow-lg shadow-emerald-200 dark:shadow-none">
+                        <LayoutGrid className="w-6 h-6 text-white" />
+                      </div>
+                      <CardTitle className="text-2xl font-bold dark:text-white">LIVE TRACKER (ऑर्डर)</CardTitle>
+                      <CardDescription className="dark:text-zinc-400">Manage pending orders, approve or reject payments instantly.</CardDescription>
+                    </CardHeader>
+                    <CardContent className="text-left">
+                      <Button className="bg-emerald-600 hover:bg-emerald-700 w-full group-hover:gap-4 transition-all">
+                        Open Tracker <ArrowRight className="w-4 h-4" />
+                      </Button>
+                    </CardContent>
+                  </Card>
+                </Link>
 
-            <div className="w-full max-w-[420px] mx-auto mt-2 transition-all">
-              <BotPreview />
-            </div>
+                <Link href="/dashboard/users">
+                  <Card className="hover:shadow-2xl transition-all cursor-pointer group border-primary/20 bg-white dark:bg-zinc-900 overflow-hidden relative">
+                    <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:scale-110 transition-transform">
+                      <Users className="w-24 h-24" />
+                    </div>
+                    <CardHeader className="text-left">
+                      <div className="w-12 h-12 bg-primary rounded-xl flex items-center justify-center mb-4 shadow-lg shadow-primary/20 dark:shadow-none">
+                        <Users className="w-6 h-6 text-white" />
+                      </div>
+                      <CardTitle className="text-2xl font-bold dark:text-white">REGISTERED USERS</CardTitle>
+                      <CardDescription className="dark:text-zinc-400">View your growing community and manage user profiles.</CardDescription>
+                    </CardHeader>
+                    <CardContent className="text-left">
+                      <Button className="w-full group-hover:gap-4 transition-all">
+                        View All Users <ArrowRight className="w-4 h-4" />
+                      </Button>
+                    </CardContent>
+                  </Card>
+                </Link>
+              </div>
+            ) : (
+              <>
+                {user ? (
+                  <div className="flex justify-center flex-col items-center gap-4">
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <Button variant="outline" size="sm" className="gap-2 shadow-sm border-primary/20 text-primary hover:text-primary hover:bg-primary/5 dark:bg-zinc-900 dark:text-zinc-100 dark:border-zinc-800 text-xs h-9">
+                          <History className="w-4 h-4" />
+                          View Order History
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent className="max-w-[95vw] md:max-w-md max-h-[85vh] overflow-y-auto rounded-2xl dark:bg-zinc-950 dark:border-zinc-800">
+                        <DialogHeader>
+                          <DialogTitle className="flex items-center gap-2 dark:text-zinc-100">
+                            <History className="w-5 h-5 text-primary" />
+                            My Orders
+                          </DialogTitle>
+                        </DialogHeader>
+                        <OrderHistory />
+                      </DialogContent>
+                    </Dialog>
+                  </div>
+                ) : null}
 
-            <div className="hidden sm:flex items-center justify-center gap-8 pt-8 opacity-60">
-              <div className="flex items-center gap-2 text-sm text-muted-foreground dark:text-zinc-400">
-                <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-                Instant Delivery
-              </div>
-              <div className="flex items-center gap-2 text-sm text-muted-foreground dark:text-zinc-400">
-                <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-                24/7 Automation
-              </div>
-            </div>
+                <div className="w-full max-w-[420px] mx-auto mt-2 transition-all">
+                  <BotPreview />
+                </div>
+
+                <div className="hidden sm:flex items-center justify-center gap-8 pt-8 opacity-60">
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground dark:text-zinc-400">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+                    Instant Delivery
+                  </div>
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground dark:text-zinc-400">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+                    24/7 Automation
+                  </div>
+                </div>
+              </>
+            )}
           </div>
         </div>
       </section>
