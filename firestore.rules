@@ -10,7 +10,9 @@ service cloud.firestore {
 
     // Master collection of orders for the admin tracker
     match /all_orders/{orderId} {
-      allow read, write: if isAdmin();
+      // Explicitly allow list/read for admin to prevent query errors
+      allow read: if isAdmin();
+      allow write: if isAdmin();
       allow create: if request.auth != null;
     }
 
