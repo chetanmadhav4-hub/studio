@@ -25,7 +25,7 @@ export default function Home() {
   const [isDark, setIsDark] = useState(false);
 
   const ADMIN_EMAIL = 'chetanmadhav4@gmail.com';
-  const isAdmin = user?.email === ADMIN_EMAIL;
+  const isAdmin = user && user.email === ADMIN_EMAIL;
 
   useEffect(() => {
     const theme = localStorage.getItem("theme");

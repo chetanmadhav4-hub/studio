@@ -6,7 +6,8 @@ service cloud.firestore {
     // Master collection of orders for the admin tracker
     match /all_orders/{orderId} {
       // Allow admin (Chetan) to read and manage everything
-      allow read, update, delete: if request.auth != null && request.auth.token.email == 'chetanmadhav4@gmail.com';
+      // Using a slightly more explicit rule for list/get
+      allow list, get, update, delete: if request.auth != null && request.auth.token.email == 'chetanmadhav4@gmail.com';
       // Allow creation for anyone during the order flow (bot/preview)
       allow create: if true;
     }

@@ -6,15 +6,26 @@ import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { useUser } from "@/firebase";
+import { useUser, useFirestore, useDoc, useMemoFirebase } from "@/firebase";
 import { 
   Send, 
   Bot, 
   MousePointer2, 
   ExternalLink, 
-  LogIn
+  LogIn,
+  Bell,
+  CheckCircle2,
+  AlertCircle,
+  Trash2
 } from "lucide-react";
 import Link from "next/link";
+import { doc, updateDoc, deleteField } from "firebase/firestore";
+import { UserNotification } from "@/lib/bot-types";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
 interface ChatMessage {
   role: "user" | "bot";
@@ -23,6 +34,7 @@ interface ChatMessage {
 
 export function BotPreview() {
   const { user } = useUser();
+  const db = useFirestore();
   const router = useRouter();
   const [messages, setMessages] = useState<ChatMessage[]>([
     { role: "bot", text: "Send 'Hi' to start the bot! 👋" },
@@ -106,7 +118,7 @@ export function BotPreview() {
 
     const lines = cleanText.split("\n");
     const optionLines = lines.filter(line => line.startsWith("OPTION: "));
-    const otherLines = lines.filter(line => !line.startsWith("OPTION: ") && !line.match(upiRegex));
+    const otherLines = lines.filter(line => !line.startsWith("OPTION: ") && !line.startsWith("ADMIN_UPDATE: ") && !line.match(upiRegex));
 
     const content = otherLines.map((line, idx) => {
       const matches = line.match(urlRegex);
