@@ -44,6 +44,7 @@ export async function processBotMessage(
 ): Promise<{ reply: string; nextState: Partial<UserSession> }> {
   const normalizedMsg = messageText.trim().toLowerCase();
   
+  // 1. Handle Payment Submission
   if (normalizedMsg.startsWith('submit_payment:')) {
     const detailsPart = messageText.substring('submit_payment:'.length).trim();
     const [link, utr] = detailsPart.split('|');
@@ -80,7 +81,7 @@ export async function processBotMessage(
     }) + "\n\n" + 
     "Send Order Details to Admin and conform your order\n\n" + 
     whatsappTag + "\n\n" +
-    "OPTION: MAIN MENU";
+    "OPTION: 🏠 MAIN MENU";
     
     return {
       reply: finalMsg,
@@ -91,7 +92,7 @@ export async function processBotMessage(
     };
   }
 
-  // Handle Menu Request
+  // 2. Handle Menu / Start Commands
   if (normalizedMsg === 'hi' || normalizedMsg === 'start' || normalizedMsg === 'menu' || normalizedMsg === 'main menu' || normalizedMsg === '🏠 main menu') {
     let menu = "👋 *Welcome to InstaFlow Bot!*\n\nNiche di gayi list mein se koi bhi service select karein:\n\n";
     Object.entries(SERVICES_CONFIG).forEach(([key, service]) => {
@@ -107,11 +108,13 @@ export async function processBotMessage(
     };
   }
 
-  // Handle service selection from buttons
+  // 3. Handle Service Selection (Check buttons)
   let interceptedServiceKey = '';
   Object.entries(SERVICES_CONFIG).forEach(([key, service]) => {
     const serviceLabel = `${key}. ${service.name}`.toLowerCase();
-    if (normalizedMsg === serviceLabel || normalizedMsg === key || normalizedMsg === service.name.toLowerCase()) {
+    const pureName = service.name.toLowerCase();
+    // Match against full label or just the key or just the name
+    if (normalizedMsg === serviceLabel || normalizedMsg === key || normalizedMsg === pureName) {
       interceptedServiceKey = key;
     }
   });
@@ -127,6 +130,7 @@ export async function processBotMessage(
     };
   }
 
+  // 4. State Machine
   switch (session.state) {
     case 'AWAITING_SERVICE_SELECTION': {
       return {
@@ -163,20 +167,20 @@ export async function processBotMessage(
        if (normalizedMsg === 'yes, proceed' || normalizedMsg === '✅ yes, proceed') {
          const upiId = 'chetanmrbest-1@okicici'; 
          const accountName = 'CHETAN KUMAR MEGHWAL';
-         const upiPayload = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(accountName)}&cu=INR`;
+         // Using manual UPI ID text as requested
          const qrUrl = "https://picsum.photos/seed/phonepe-final-qr/600/600";
 
          return {
-           reply: `📲 *Payment Details*\n\n👤 *Account:* ${accountName}\n🆔 *UPI ID:* ${upiId}\n💰 *Amount:* ₹${session.data.price}\n\n${qrUrl}\n\n${upiPayload}\n\nPayment karne ke baad, apna Instagram Link and UTR ID niche fill karein:\n\n[PAYMENT_FORM]\n\nOPTION: 🏠 MAIN MENU`,
+           reply: `📲 *Payment Details*\n\n👤 *Account:* ${accountName}\n🆔 *UPI ID:* ${upiId}\n💰 *Amount:* ₹${session.data.price}\n\n${qrUrl}\n\nKripya is UPI ID par payment karein aur screenshot ya UTR ID niche form mein bharein:\n\n[PAYMENT_FORM]\n\nOPTION: 🏠 MAIN MENU`,
            nextState: { state: 'AWAITING_PAYMENT_DETAILS' },
          };
        }
+       
        if (normalizedMsg === 'main menu' || normalizedMsg === '🏠 main menu') {
          let menu = "👋 *Welcome to InstaFlow Bot!*\n\nNiche di gayi list mein se koi bhi service select karein:\n\n";
          Object.entries(SERVICES_CONFIG).forEach(([key, service]) => {
            menu += `OPTION: ${key}. ${service.name}\n`;
          });
-         
          return {
            reply: menu,
            nextState: {
@@ -185,15 +189,16 @@ export async function processBotMessage(
            },
          };
        }
+
        return {
-         reply: "⚠️ Kripya 'YES, PROCEED' button par click karein ya 'MAIN MENU' par wapas jayein.",
+         reply: "⚠️ Kripya '✅ YES, PROCEED' button par click karein ya '🏠 MAIN MENU' par wapas jayein.",
          nextState: { state: 'AWAITING_PAYMENT_DETAILS' }
        };
     }
 
     default:
       return {
-        reply: "👋 Welcome back! Menu dekhne ke liye *HI* bhejein.\n\nOPTION: MAIN MENU",
+        reply: "👋 Welcome back! Menu dekhne ke liye *HI* bhejein.\n\nOPTION: 🏠 MAIN MENU",
         nextState: { state: 'START', data: {} },
       };
   }
