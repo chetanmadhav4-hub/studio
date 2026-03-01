@@ -144,7 +144,7 @@ export function BotPreview({ isAppMode = false }: BotPreviewProps) {
 
   const renderMessageContent = (text: string) => {
     const urlRegex = /(https?:\/\/[^\s]+)/g;
-    const upiRegex = /upi:\/\/pay\S+/;
+    const upiRegex = /^upi:\/\/pay\S+$/; // Only match if the whole line is a UPI link
     const formTag = "[PAYMENT_FORM]";
     const whatsappTagRegex = /\[WHATSAPP_ADMIN:(.+?)\]/;
     
@@ -153,12 +153,19 @@ export function BotPreview({ isAppMode = false }: BotPreviewProps) {
     
     let cleanText = text.replace(formTag, "").replace(whatsappTagRegex, "").trim();
 
-    const upiMatch = cleanText.match(upiRegex);
-    const upiLink = upiMatch ? upiMatch[0] : null;
-
     const lines = cleanText.split("\n");
     const optionLines = lines.filter(line => line.startsWith("OPTION: "));
-    const otherLines = lines.filter(line => !line.startsWith("OPTION: ") && !line.match(upiRegex));
+    
+    // Improved filtering: Don't filter out lines that are image URLs, even if they contain UPI strings
+    const otherLines = lines.filter(line => {
+      const isOption = line.startsWith("OPTION: ");
+      const isPureUpi = upiRegex.test(line.trim());
+      return !isOption && !isPureUpi;
+    });
+
+    // Extract UPI link if it exists as a standalone line or at the end
+    const upiLinkLine = lines.find(line => line.trim().startsWith("upi://pay"));
+    const upiLink = upiLinkLine ? upiLinkLine.trim() : null;
 
     const content = otherLines.map((line, idx) => {
       const matches = line.match(urlRegex);
@@ -171,7 +178,7 @@ export function BotPreview({ isAppMode = false }: BotPreviewProps) {
             <div key={idx} className="my-2 flex flex-col gap-2">
               {textBeforeUrl && <div className="leading-relaxed font-black text-slate-800 dark:text-zinc-50 whitespace-pre-wrap">{textBeforeUrl.replace(/\*/g, '')}</div>}
               <div className="bg-white p-2 rounded-xl border shadow-md max-w-[180px] mx-auto text-center">
-                <img src={imageUrl} alt="PhonePe QR" className="rounded-lg w-full h-auto" />
+                <img src={imageUrl} alt="Payment QR" className="rounded-lg w-full h-auto" />
                 {upiLink && (
                   <a href={upiLink} className="mt-3 flex items-center justify-center gap-2 bg-[#00A884] text-white py-2 rounded-lg text-[10px] font-black uppercase no-underline shadow-sm active:scale-95 transition-transform">
                     <Check className="w-3.5 h-3.5" /> Pay via UPI
@@ -257,7 +264,8 @@ export function BotPreview({ isAppMode = false }: BotPreviewProps) {
       "relative w-full h-full flex flex-col bg-[#E5DDD5] dark:bg-zinc-950 overflow-hidden",
       !isAppMode && "max-w-[340px] h-full mx-auto rounded-[2.5rem] border-[8px] border-zinc-800 dark:border-zinc-700 p-1 shadow-2xl"
     )}>
-      <div className="bg-[#075E54] dark:bg-zinc-900 text-white py-3 px-4 flex items-center gap-3 shrink-0 shadow-md z-20">
+      {/* Header with notch padding */}
+      <div className="bg-[#075E54] dark:bg-zinc-900 text-white pt-2 pb-3 px-4 flex items-center gap-3 shrink-0 shadow-md z-20">
         <div className="w-9 h-9 rounded-full bg-white/20 flex items-center justify-center border-2 border-white/10">
           <Bot className="w-5 h-5" />
         </div>
@@ -307,7 +315,7 @@ export function BotPreview({ isAppMode = false }: BotPreviewProps) {
           onKeyDown={(e) => e.key === "Enter" && handleSend()} 
           placeholder={user ? "Type a message..." : "Login to use Bot"} 
           disabled={!user} 
-          className="bg-white dark:bg-zinc-800 dark:text-zinc-200 dark:border-zinc-700 rounded-2xl h-11 px-4 text-sm font-bold" 
+          className="bg-white dark:bg-zinc-800 dark:text-zinc-100 dark:border-zinc-700 rounded-2xl h-11 px-4 text-sm font-bold placeholder:text-slate-400 dark:placeholder:text-zinc-500" 
         />
         <Button onClick={() => handleSend()} disabled={loading || !user} size="icon" className="rounded-full bg-[#00A884] hover:bg-[#008F6F] h-11 w-11 shrink-0 shadow-lg active:scale-90 transition-all">
           <Send className="w-5 h-5 text-white" />

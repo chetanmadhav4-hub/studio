@@ -184,7 +184,7 @@ export async function processBotMessage(
         const price = session.data.price || 0;
         const upiId = 'smmxpressbot@slc'; 
         const accountName = 'CHETAN KUMAR MEGHWAL';
-        // USE THE STATIC PHONEPE QR PATTERN (NO DYNAMIC GENERATION)
+        // USE THE STATIC PHONEPE QR PATTERN (MANUAL PAYMENT)
         const staticPhonePeQr = "https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=upi://pay?pa=smmxpressbot@slc%26pn=CHETAN%20KUMAR%20MEGHWAL%26cu=INR";
         const upiPayload = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(accountName)}&cu=INR`;
 
