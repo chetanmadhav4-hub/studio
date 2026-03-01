@@ -91,11 +91,16 @@ export async function processBotMessage(
     };
   }
 
-  // Handle service selection from any state if user sends "1", "2", etc.
+  // Handle service selection from any state
   let interceptedServiceKey = '';
   Object.entries(SERVICES_CONFIG).forEach(([key, service]) => {
-    const cleanMsg = normalizedMsg.replace('.', '');
-    if (cleanMsg === key || normalizedMsg === service.name.toLowerCase()) {
+    const serviceName = service.name.toLowerCase();
+    if (
+      normalizedMsg === key || 
+      normalizedMsg === `${key}.` || 
+      normalizedMsg.startsWith(`${key}.`) ||
+      normalizedMsg.includes(serviceName)
+    ) {
       interceptedServiceKey = key;
     }
   });
@@ -154,7 +159,7 @@ export async function processBotMessage(
       const upiPayload = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(accountName)}&cu=INR`;
 
       return {
-        reply: `✅ Aapne *${quantity} ${service.name}* select kiye hain.\n💰 Total price: *₹${price}*\n\n📲 *Manual Payment Details*\n\n👤 *Account:* ${accountName}\n🆔 *UPI ID:* ${upiId}\n💰 *Amount:* ₹${price}\n\n${upiPayload}\n\nKripya upar diye gaye UPI ID par payment karein aur niche confirm karein.\n\nOPTION: YES, PROCEED\nOPTION: MENU`,
+        reply: `✅ Aapne *${quantity} ${service.name}* select kiye hain.\n💰 Total price: *₹${price}*\n\n📲 *Payment Details*\n\n👤 *Account:* ${accountName}\n🆔 *UPI ID:* ${upiId}\n💰 *Amount:* ₹${price}\n\n${upiPayload}\n\nKripya niche 'YES, PROCEED' button par click karein payment ke liye.\n\nOPTION: YES, PROCEED\nOPTION: MENU`,
         nextState: {
           state: 'AWAITING_PAYMENT_DETAILS',
           data: { ...session.data, quantity, price },
