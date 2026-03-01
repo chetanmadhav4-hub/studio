@@ -15,7 +15,8 @@ import {
   Loader2,
   Check,
   MessageCircle,
-  Download
+  Download,
+  Zap
 } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
@@ -165,7 +166,7 @@ export function BotPreview({ isAppMode = false }: BotPreviewProps) {
     const content = otherLines.map((line, idx) => {
       if (line.trim() === "" && idx !== otherLines.length - 1) return <div key={idx} className="h-2" />;
       return (
-        <div key={idx} className="leading-relaxed text-slate-900 dark:text-zinc-100 font-black whitespace-pre-wrap">
+        <div key={idx} className="leading-relaxed text-slate-900 dark:text-zinc-50 font-black whitespace-pre-wrap">
           {line.replace(/\*/g, '')}
         </div>
       );
@@ -176,7 +177,7 @@ export function BotPreview({ isAppMode = false }: BotPreviewProps) {
         <div className="text-[13px] flex flex-col">{content}</div>
         
         {hasQR && qrImage && (
-          <div className="mt-4 flex flex-col items-center gap-3">
+          <div className="mt-4 flex flex-col items-center gap-3 w-full">
             <div className="relative w-64 aspect-square rounded-[2rem] overflow-hidden border-4 border-white shadow-2xl bg-white">
               <Image 
                 src={qrImage.imageUrl} 
@@ -187,11 +188,18 @@ export function BotPreview({ isAppMode = false }: BotPreviewProps) {
                 unoptimized
               />
             </div>
-            <Button asChild variant="secondary" className="w-full h-11 rounded-xl font-black uppercase text-[10px] tracking-widest gap-2 bg-slate-100 hover:bg-slate-200">
-              <a href={qrImage.imageUrl} download="InstaFlow_QR.png">
-                <Download className="w-4 h-4" /> Save QR Code
-              </a>
-            </Button>
+            <div className="flex flex-col gap-2 w-full">
+              <Button asChild className="w-full h-12 rounded-2xl font-black uppercase text-[11px] tracking-widest gap-2 bg-primary text-white hover:bg-primary/90 shadow-xl active:scale-95 transition-all">
+                <a href={`upi://pay?pa=smmxpressbot@slc&pn=InstaFlow%20Bot&cu=INR`}>
+                  <Zap className="w-4 h-4" /> Pay via UPI App
+                </a>
+              </Button>
+              <Button asChild variant="secondary" className="w-full h-10 rounded-xl font-black uppercase text-[10px] tracking-widest gap-2 bg-slate-100 hover:bg-slate-200 dark:bg-zinc-800 dark:text-zinc-300">
+                <a href={qrImage.imageUrl} download="InstaFlow_QR.png">
+                  <Download className="w-4 h-4" /> Save QR Code
+                </a>
+              </Button>
+            </div>
           </div>
         )}
 
