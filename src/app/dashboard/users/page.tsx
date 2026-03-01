@@ -51,7 +51,7 @@ export default function AdminUsersPage() {
       await sendPasswordResetEmail(auth, email);
       toast({
         title: "Reset Link Sent!",
-        description: `Password reset email sent to ${email}.`,
+        description: `Password reset link has been sent to ${email}.`,
       });
     } catch (e: any) {
       toast({
@@ -105,8 +105,8 @@ export default function AdminUsersPage() {
                 <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Loading database...</p>
               </div>
             ) : (
-              <div className="overflow-x-auto touch-pan-x custom-scrollbar">
-                <div className="min-w-[1000px] p-2">
+              <div className="w-full overflow-x-auto overscroll-x-contain touch-pan-x custom-scrollbar">
+                <div className="min-w-[1100px] p-4">
                   <Table>
                     <TableHeader className="bg-slate-50 dark:bg-zinc-800/50">
                       <TableRow className="border-b dark:border-zinc-800 hover:bg-transparent">
@@ -144,12 +144,12 @@ export default function AdminUsersPage() {
                               <Button 
                                 variant="outline" 
                                 size="sm" 
-                                className="h-8 text-[9px] font-black uppercase tracking-widest gap-2 rounded-xl dark:border-zinc-700 dark:text-zinc-50"
+                                className="h-8 text-[9px] font-black uppercase tracking-widest gap-2 rounded-xl dark:border-zinc-700 dark:text-zinc-50 hover:bg-primary/10 transition-colors"
                                 onClick={() => handleSendResetLink(u.email, u.id)}
                                 disabled={resettingId === u.id}
                               >
                                 {resettingId === u.id ? <Check className="w-3 h-3 text-emerald-500" /> : <KeyRound className="w-3 h-3" />}
-                                Send Reset Email
+                                Reset User Password
                               </Button>
                             </TableCell>
                             <TableCell>

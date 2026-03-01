@@ -90,8 +90,8 @@ export default function AdminOrdersPage() {
                 <p className="text-xl font-black uppercase dark:text-zinc-50">Access Denied</p>
               </div>
             ) : (
-              <div className="overflow-x-auto touch-pan-x custom-scrollbar">
-                <div className="min-w-[1000px] p-2">
+              <div className="w-full overflow-x-auto overscroll-x-contain touch-pan-x custom-scrollbar">
+                <div className="min-w-[1100px] p-4">
                   <Table>
                     <TableHeader className="bg-slate-50 dark:bg-zinc-800/50">
                       <TableRow className="border-b dark:border-zinc-800 hover:bg-transparent">
