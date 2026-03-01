@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useEffect, useRef } from "react";
@@ -183,7 +182,6 @@ export function BotPreview({ isAppMode = false }: BotPreviewProps) {
         }
       }
       if (line.trim() === "") return <div key={idx} className="h-1" />;
-      // IMPROVED: Using white/silver text for visibility in dark mode
       return <div key={idx} className="leading-relaxed mb-1 text-slate-800 dark:text-zinc-100 font-semibold">{line.replace(/\*/g, '')}</div>;
     });
 
@@ -193,7 +191,9 @@ export function BotPreview({ isAppMode = false }: BotPreviewProps) {
         
         {whatsappMatch && (
           <div className="mt-3 space-y-2">
-            <p className="text-[10px] font-bold text-muted-foreground uppercase text-center dark:text-zinc-400">Send Order Details to Admin</p>
+            <p className="text-[10px] font-bold text-muted-foreground uppercase text-center dark:text-zinc-400">
+              Send Order Details to Admin and conform your order
+            </p>
             <a 
               href={`https://wa.me/919116399517?text=${whatsappMatch[1]}`}
               target="_blank"

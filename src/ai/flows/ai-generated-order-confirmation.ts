@@ -1,4 +1,3 @@
-
 'use server';
 /**
  * @fileOverview This file implements a Genkit flow to generate a friendly and personalized order confirmation message
@@ -19,7 +18,7 @@ const AiGeneratedOrderConfirmationInputSchema = z.object({
   instagramProfileLink: z
     .string()
     .url()
-    .describe('The user\u2019s Instagram profile URL for the order.'),
+    .describe('The user’s Instagram profile URL for the order.'),
   price: z.number().describe('The total price of the order.'),
   startTime: z
     .string()

@@ -1,4 +1,3 @@
-
 import { BotState, UserSession } from './bot-types';
 import { aiGeneratedOrderConfirmation } from '@/ai/flows/ai-generated-order-confirmation';
 import { generateContextualErrorMessage } from '@/ai/flows/ai-generated-contextual-error-messages';
@@ -71,7 +70,6 @@ export async function processBotMessage(
         startTime: '0-30 minutes',
       });
       
-      // Ensure confirmation message is formatted with newlines properly
       const finalMsg = confirmation.message.trim() + "\n\n" + 
                        "Naya order lagane ke liye MENU likhein.\n\n" + 
                        whatsappTag + "\n\n" +
@@ -85,7 +83,6 @@ export async function processBotMessage(
         }
       };
     } catch (e) {
-      // Fallback with structured breaks
       const fallbackMsg = `🎉 *Woohoo! Your InstaFlow order successfully created!*\n\n` +
                           `- *Order ID:* ${orderId}\n` +
                           `- *Service:* ${serviceName}\n` +
