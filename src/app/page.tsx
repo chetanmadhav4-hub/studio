@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect } from "react";
@@ -102,37 +103,37 @@ export default function Home() {
       </header>
 
       {/* Main App Surface */}
-      <main className="flex-1 overflow-hidden flex flex-col items-center">
-        <div className="w-full max-w-lg h-full bg-white dark:bg-background relative flex flex-col shadow-2xl">
+      <main className="flex-1 overflow-hidden flex flex-col items-center justify-start">
+        <div className="w-full max-w-md h-full bg-white dark:bg-background relative flex flex-col shadow-2xl border-x dark:border-zinc-800">
           
           {isAdmin ? (
-            <div className="p-6 space-y-6 overflow-y-auto h-full scrollbar-hide">
+            <div className="p-6 space-y-4 overflow-y-auto h-full scrollbar-hide">
               <div className="space-y-1 mb-2">
-                <h1 className="text-2xl font-black text-foreground dark:text-white uppercase">Control Center</h1>
-                <p className="text-xs text-muted-foreground font-medium italic">Manage orders and user data instantly.</p>
+                <h1 className="text-xl font-black text-foreground dark:text-white uppercase tracking-tight">Admin Console</h1>
+                <p className="text-[10px] text-muted-foreground font-bold italic uppercase">Manage Orders & Growth</p>
               </div>
 
               <div className="grid gap-4">
                 <Link href="/orders-feed">
-                  <Card className="hover:scale-[1.02] transition-all border-none shadow-lg bg-emerald-600 dark:bg-emerald-700 text-white overflow-hidden group">
+                  <Card className="hover:scale-[1.01] transition-all border-none shadow-lg bg-emerald-600 dark:bg-emerald-700 text-white overflow-hidden group">
                     <CardHeader className="p-5">
-                      <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center mb-4 group-hover:rotate-12 transition-transform">
-                        <LayoutGrid className="w-6 h-6 text-white" />
+                      <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center mb-3 group-hover:rotate-12 transition-transform">
+                        <LayoutGrid className="w-5 h-5 text-white" />
                       </div>
-                      <CardTitle className="text-xl font-black uppercase tracking-tight">Live Tracker</CardTitle>
-                      <CardDescription className="text-emerald-50 text-xs font-medium opacity-80">Approve or reject payments in real-time.</CardDescription>
+                      <CardTitle className="text-lg font-black uppercase tracking-tight">Live Tracker</CardTitle>
+                      <CardDescription className="text-emerald-50 text-[10px] font-bold opacity-80 uppercase">Manage Incoming Orders</CardDescription>
                     </CardHeader>
                   </Card>
                 </Link>
 
                 <Link href="/dashboard/users">
-                  <Card className="hover:scale-[1.02] transition-all border-none shadow-lg bg-primary dark:bg-primary/80 text-white overflow-hidden group">
+                  <Card className="hover:scale-[1.01] transition-all border-none shadow-lg bg-primary dark:bg-primary/80 text-white overflow-hidden group">
                     <CardHeader className="p-5">
-                      <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center mb-4 group-hover:rotate-12 transition-transform">
-                        <Users className="w-6 h-6 text-white" />
+                      <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center mb-3 group-hover:rotate-12 transition-transform">
+                        <Users className="w-5 h-5 text-white" />
                       </div>
-                      <CardTitle className="text-xl font-black uppercase tracking-tight">Registered Users</CardTitle>
-                      <CardDescription className="text-blue-50 text-xs font-medium opacity-80">Monitor growth and view all registration data.</CardDescription>
+                      <CardTitle className="text-lg font-black uppercase tracking-tight">User Database</CardTitle>
+                      <CardDescription className="text-blue-50 text-[10px] font-bold opacity-80 uppercase">Registered User Profiles</CardDescription>
                     </CardHeader>
                   </Card>
                 </Link>
@@ -142,19 +143,19 @@ export default function Home() {
             <div className="flex-1 flex flex-col h-full overflow-hidden bg-[#F0F2F5] dark:bg-zinc-950">
               {/* User Sub-Header */}
               {user && (
-                <div className="h-10 bg-white dark:bg-zinc-900 border-b flex items-center px-4 justify-between shrink-0">
-                  <span className="text-[10px] font-bold text-muted-foreground dark:text-zinc-400 uppercase tracking-widest">Bot Interface</span>
+                <div className="h-10 bg-white dark:bg-zinc-900 border-b flex items-center px-4 justify-between shrink-0 shadow-sm z-10">
+                  <span className="text-[10px] font-black text-primary dark:text-accent uppercase tracking-[0.2em]">Automated Bot</span>
                   <Dialog>
                     <DialogTrigger asChild>
-                      <Button variant="ghost" size="sm" className="h-7 gap-1.5 text-[10px] font-bold hover:bg-primary/5 text-primary dark:text-accent">
-                        <History className="w-3 h-3" /> My History
+                      <Button variant="ghost" size="sm" className="h-7 gap-1.5 text-[10px] font-black hover:bg-primary/5 text-primary dark:text-accent uppercase">
+                        <History className="w-3 h-3" /> History
                       </Button>
                     </DialogTrigger>
-                    <DialogContent className="max-w-[95vw] sm:max-w-md max-h-[85vh] overflow-y-auto rounded-3xl dark:bg-zinc-950">
+                    <DialogContent className="max-w-[95vw] sm:max-w-md max-h-[80vh] overflow-y-auto rounded-[2rem] dark:bg-zinc-950 border-none shadow-2xl">
                       <DialogHeader>
-                        <DialogTitle className="flex items-center gap-2 dark:text-zinc-100 text-sm">
+                        <DialogTitle className="flex items-center gap-2 dark:text-zinc-100 text-sm font-black uppercase tracking-wider">
                           <History className="w-4 h-4 text-primary" />
-                          Order History
+                          Recent Orders
                         </DialogTitle>
                       </DialogHeader>
                       <OrderHistory />
@@ -163,7 +164,7 @@ export default function Home() {
                 </div>
               )}
 
-              {/* Pure Bot Experience */}
+              {/* Bot Interaction Area */}
               <div className="flex-1 relative">
                 <BotPreview isAppMode={true} />
               </div>
@@ -172,10 +173,10 @@ export default function Home() {
         </div>
       </main>
 
-      {/* Persistent Bottom Bar */}
-      <footer className="h-10 bg-white dark:bg-zinc-950 border-t flex items-center justify-center shrink-0">
-        <p className="text-[9px] text-muted-foreground dark:text-zinc-500 font-bold uppercase tracking-[0.2em]">
-          Powered by InstaFlow Automation
+      {/* Minimal App Footer */}
+      <footer className="h-8 bg-white dark:bg-zinc-950 border-t flex items-center justify-center shrink-0">
+        <p className="text-[8px] text-muted-foreground dark:text-zinc-500 font-black uppercase tracking-[0.4em]">
+          InstaFlow App v2.0
         </p>
       </footer>
     </div>

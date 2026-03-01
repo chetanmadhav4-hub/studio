@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -27,11 +28,11 @@
   }
   .dark {
     --background: 240 30% 5%;
-    --foreground: 0 0% 98%;
+    --foreground: 0 0% 100%;
     --card: 240 30% 10%;
-    --card-foreground: 0 0% 98%;
+    --card-foreground: 0 0% 100%;
     --popover: 240 30% 10%;
-    --popover-foreground: 0 0% 98%;
+    --popover-foreground: 0 0% 100%;
     --primary: 198 96% 63%;
     --primary-foreground: 240 59% 10%;
     --secondary: 240 30% 15%;
@@ -39,7 +40,7 @@
     --muted: 240 30% 15%;
     --muted-foreground: 240 5% 65%;
     --accent: 240 59% 44%;
-    --accent-foreground: 0 0% 98%;
+    --accent-foreground: 0 0% 100%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
     --border: 240 30% 20%;
@@ -53,7 +54,9 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground overflow-hidden;
+    @apply bg-background text-foreground overflow-hidden h-screen;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 }
 
@@ -70,4 +73,12 @@
 }
 .dark .custom-scrollbar::-webkit-scrollbar-thumb {
   background: rgba(255, 255, 255, 0.1);
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
