@@ -155,15 +155,14 @@ export function BotPreview({ isAppMode = false }: BotPreviewProps) {
 
     const lines = cleanText.split("\n");
     const optionLines = lines.filter(line => line.startsWith("OPTION: "));
-    
+    const upiLinkLine = lines.find(line => line.trim().startsWith("upi://pay"));
+    const upiLink = upiLinkLine ? upiLinkLine.trim() : null;
+
     const otherLines = lines.filter(line => {
       const isOption = line.startsWith("OPTION: ");
       const isPureUpi = upiRegex.test(line.trim());
       return !isOption && !isPureUpi;
     });
-
-    const upiLinkLine = lines.find(line => line.trim().startsWith("upi://pay"));
-    const upiLink = upiLinkLine ? upiLinkLine.trim() : null;
 
     const content = otherLines.map((line, idx) => {
       const matches = line.match(urlRegex);
@@ -266,7 +265,6 @@ export function BotPreview({ isAppMode = false }: BotPreviewProps) {
       "relative w-full flex flex-col bg-[#E5DDD5] dark:bg-zinc-950 overflow-hidden",
       isAppMode ? "h-full" : "max-w-[340px] h-[100dvh] mx-auto rounded-[2.5rem] border-[8px] border-zinc-800 dark:border-zinc-700 p-1 shadow-2xl"
     )}>
-      {/* Header with status bar safety */}
       <div className="bg-[#075E54] dark:bg-zinc-900 text-white pt-[calc(env(safe-area-inset-top,24px)+12px)] pb-4 px-5 flex items-center gap-3 shrink-0 shadow-md z-20">
         <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center border-2 border-white/10 shadow-inner">
           <Bot className="w-6 h-6" />

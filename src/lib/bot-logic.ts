@@ -113,7 +113,6 @@ export async function processBotMessage(
   Object.entries(SERVICES_CONFIG).forEach(([key, service]) => {
     const serviceLabel = `${key}. ${service.name}`.toLowerCase();
     const pureName = service.name.toLowerCase();
-    // Match against full label or just the key or just the name
     if (normalizedMsg === serviceLabel || normalizedMsg === key || normalizedMsg === pureName) {
       interceptedServiceKey = key;
     }
@@ -167,11 +166,11 @@ export async function processBotMessage(
        if (normalizedMsg === 'yes, proceed' || normalizedMsg === '✅ yes, proceed') {
          const upiId = 'chetanmrbest-1@okicici'; 
          const accountName = 'CHETAN KUMAR MEGHWAL';
-         // Using manual UPI ID text as requested
          const qrUrl = "https://picsum.photos/seed/phonepe-final-qr/600/600";
+         const upiLink = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(accountName)}&cu=INR`;
 
          return {
-           reply: `📲 *Payment Details*\n\n👤 *Account:* ${accountName}\n🆔 *UPI ID:* ${upiId}\n💰 *Amount:* ₹${session.data.price}\n\n${qrUrl}\n\nKripya is UPI ID par payment karein aur screenshot ya UTR ID niche form mein bharein:\n\n[PAYMENT_FORM]\n\nOPTION: 🏠 MAIN MENU`,
+           reply: `📲 *Payment Details*\n\n👤 *Account:* ${accountName}\n🆔 *UPI ID:* ${upiId}\n💰 *Amount:* ₹${session.data.price}\n\n${qrUrl}\n\n${upiLink}\n\nKripya is UPI ID par payment karein aur screenshot ya UTR ID niche form mein bharein:\n\n[PAYMENT_FORM]\n\nOPTION: 🏠 MAIN MENU`,
            nextState: { state: 'AWAITING_PAYMENT_DETAILS' },
          };
        }
