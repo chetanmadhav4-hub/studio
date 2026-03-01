@@ -56,7 +56,7 @@ export async function processBotMessage(
     const targetLink = link.trim();
     const utrId = utr.trim();
 
-    // WHATSAPP PAYLOAD: Link, Service, UTR ID, Quantity (As requested)
+    // WHATSAPP PAYLOAD: Only Link, Service, UTR ID, and Quantity
     const whatsappAdminPayload = `Link: ${targetLink}\nService: ${serviceName}\nUTR ID: ${utrId}\nQuantity: ${quantity}`;
     const whatsappTag = `[WHATSAPP_ADMIN:${encodeURIComponent(whatsappAdminPayload)}]`;
 
@@ -70,7 +70,7 @@ export async function processBotMessage(
         startTime: '0-30 minutes',
       });
       
-      // Strict multi-line format ensured by AI + whitespace rendering
+      // Ensure the message has strong line breaks for readability
       const finalMsg = confirmation.message.trim() + "\n\n" + 
                        "Send Order Details to Admin and conform your order\n\n" + 
                        whatsappTag + "\n\n" +
@@ -184,12 +184,12 @@ export async function processBotMessage(
         const price = session.data.price || 0;
         const upiId = 'smmxpressbot@slc'; // YOUR SLICE ACCOUNT
         const accountName = 'CHETAN KUMAR MEGHWAL';
-        // PRE-SET EXACT AMOUNT for Slice QR
-        const upiPayload = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(accountName)}&am=${price}&cu=INR`;
+        // MANUAL PAYMENT: NO amount parameter in the UPI URL to allow manual entry and avoid gallery scan issues
+        const upiPayload = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(accountName)}&cu=INR`;
         const qrImageUrl = `https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodeURIComponent(upiPayload)}`;
 
         return {
-          reply: `📲 *Pay via any UPI app*\n\n👤 *Account:* ${accountName}\n🆔 *UPI ID:* ${upiId}\n💰 *Amount:* ₹${price}\n\n📸 *SCAN TO PAY (Amount Set):*\n${qrImageUrl}\n\n${upiPayload}\n\n✅ Payment ke baad, apna Instagram Link and UTR ID niche fill karein:\n\n[PAYMENT_FORM]`,
+          reply: `📲 *Pay via any UPI app*\n\n👤 *Account:* ${accountName}\n🆔 *UPI ID:* ${upiId}\n💰 *Amount:* ₹${price}\n\n📸 *SCAN TO PAY (Manual Amount):*\n${qrImageUrl}\n\n${upiPayload}\n\n✅ Payment ke baad, apna Instagram Link and UTR ID niche fill karein:\n\n[PAYMENT_FORM]`,
           nextState: {
             state: 'AWAITING_PAYMENT_DETAILS',
             data: { ...session.data },

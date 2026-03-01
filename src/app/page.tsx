@@ -84,16 +84,16 @@ export default function Home() {
         </div>
       )}
 
-      {/* APP HEADER - Fixed for mobile status bars */}
-      <header className="h-20 pt-[env(safe-area-inset-top)] border-b dark:border-zinc-800 bg-white dark:bg-zinc-900 flex items-center justify-between px-4 shrink-0 shadow-sm z-[100] relative">
-        <div className="flex items-center gap-2 mt-2">
+      {/* APP HEADER - Optimized for mobile status bars and notches */}
+      <header className="h-20 pt-[env(safe-area-inset-top)] pb-2 border-b dark:border-zinc-800 bg-white dark:bg-zinc-900 flex items-center justify-between px-4 shrink-0 shadow-sm z-[100] relative">
+        <div className="flex items-center gap-2 mt-1 sm:mt-2">
           <div className="w-8 h-8 sm:w-10 sm:h-10 bg-primary rounded-xl flex items-center justify-center shadow-lg shadow-primary/30">
             <Zap className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
           </div>
           <span className="font-black text-base sm:text-lg tracking-tighter text-primary dark:text-accent uppercase italic">InstaFlow</span>
         </div>
         
-        <div className="flex items-center gap-1.5 mt-2">
+        <div className="flex items-center gap-1.5 mt-1 sm:mt-2">
           {!isUserLoading ? (
             <>
               {!user ? (
