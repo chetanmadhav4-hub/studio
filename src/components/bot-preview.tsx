@@ -143,6 +143,7 @@ export function BotPreview({ isAppMode = false }: BotPreviewProps) {
   };
 
   const renderMessageContent = (text: string) => {
+    // Improved regex to pick up image URLs correctly
     const urlRegex = /(https?:\/\/[^\s]+)/g;
     const upiRegex = /^upi:\/\/pay\S+$/;
     const formTag = "[PAYMENT_FORM]";
@@ -169,17 +170,19 @@ export function BotPreview({ isAppMode = false }: BotPreviewProps) {
       const matches = line.match(urlRegex);
       if (matches) {
         const imageUrl = matches[0];
-        const isImageUrl = imageUrl.includes("api.qrserver.com") || imageUrl.match(/\.(jpeg|jpg|gif|png|webp|svg)/i);
+        // Ensure it's treated as an image
+        const isImageUrl = imageUrl.includes("picsum.photos") || imageUrl.includes("api.qrserver.com") || imageUrl.match(/\.(jpeg|jpg|gif|png|webp|svg)/i);
+        
         if (isImageUrl) {
           const textBeforeUrl = line.replace(imageUrl, "").trim();
           return (
-            <div key={idx} className="my-2 flex flex-col gap-2">
+            <div key={idx} className="my-3 flex flex-col gap-2">
               {textBeforeUrl && <div className="leading-relaxed font-bold text-slate-900 dark:text-zinc-50 whitespace-pre-wrap">{textBeforeUrl.replace(/\*/g, '')}</div>}
-              <div className="bg-white p-2 rounded-xl border shadow-md max-w-[200px] mx-auto text-center">
-                <img src={imageUrl} alt="Payment QR" className="rounded-lg w-full h-auto" />
+              <div className="bg-white p-2.5 rounded-2xl border shadow-xl max-w-[240px] mx-auto text-center transform hover:scale-[1.02] transition-transform">
+                <img src={imageUrl} alt="Payment QR" className="rounded-xl w-full h-auto" />
                 {upiLink && (
-                  <a href={upiLink} className="mt-3 flex items-center justify-center gap-2 bg-[#00A884] text-white py-2.5 rounded-xl text-[11px] font-black uppercase no-underline shadow-sm active:scale-95 transition-transform">
-                    <Check className="w-4 h-4" /> Pay via UPI
+                  <a href={upiLink} className="mt-4 flex items-center justify-center gap-2 bg-[#00A884] text-white py-3 rounded-xl text-[12px] font-black uppercase no-underline shadow-md active:scale-95 transition-all">
+                    <Check className="w-4 h-4" /> Pay via UPI App
                   </a>
                 )}
               </div>
@@ -188,7 +191,7 @@ export function BotPreview({ isAppMode = false }: BotPreviewProps) {
         }
       }
       if (line.trim() === "" && idx !== otherLines.length - 1) return <div key={idx} className="h-2" />;
-      return <div key={idx} className="leading-relaxed text-slate-900 dark:text-zinc-50 font-bold whitespace-pre-wrap">{line.replace(/\*/g, '')}</div>;
+      return <div key={idx} className="leading-relaxed text-slate-900 dark:text-zinc-100 font-bold whitespace-pre-wrap">{line.replace(/\*/g, '')}</div>;
     });
 
     return (
@@ -197,7 +200,7 @@ export function BotPreview({ isAppMode = false }: BotPreviewProps) {
         
         {whatsappMatch && (
           <div className="mt-4 space-y-2">
-            <p className="text-[10px] font-black text-primary dark:text-accent uppercase text-center tracking-wider px-2">
+            <p className="text-[10px] font-black text-primary dark:text-accent uppercase text-center tracking-wider px-2 opacity-80">
               Send Order Details to Admin and conform your order
             </p>
             <a 
@@ -262,8 +265,8 @@ export function BotPreview({ isAppMode = false }: BotPreviewProps) {
       "relative w-full h-full flex flex-col bg-[#E5DDD5] dark:bg-zinc-950 overflow-hidden",
       !isAppMode && "max-w-[340px] h-full mx-auto rounded-[2.5rem] border-[8px] border-zinc-800 dark:border-zinc-700 p-1 shadow-2xl"
     )}>
-      {/* Header with notch padding */}
-      <div className="bg-[#075E54] dark:bg-zinc-900 text-white pt-2 pb-3 px-4 flex items-center gap-3 shrink-0 shadow-md z-20">
+      {/* Header with notch padding - SAFE AREA FIX */}
+      <div className="bg-[#075E54] dark:bg-zinc-900 text-white pt-[calc(env(safe-area-inset-top,24px)+8px)] pb-3 px-4 flex items-center gap-3 shrink-0 shadow-md z-20">
         <div className="w-9 h-9 rounded-full bg-white/20 flex items-center justify-center border-2 border-white/10">
           <Bot className="w-5 h-5" />
         </div>
@@ -290,7 +293,7 @@ export function BotPreview({ isAppMode = false }: BotPreviewProps) {
               "max-w-[85%] rounded-2xl px-4 py-3 text-xs shadow-md border dark:border-zinc-700",
               msg.role === "user" 
                 ? "bg-[#DCF8C6] dark:bg-emerald-900 text-slate-900 dark:text-zinc-50 rounded-tr-none" 
-                : "bg-white dark:bg-zinc-800 text-slate-900 dark:text-zinc-50 rounded-tl-none"
+                : "bg-white dark:bg-zinc-800 text-slate-900 dark:text-zinc-100 rounded-tl-none font-medium"
             )}>
               {renderMessageContent(msg.text)}
               <div className="text-[9px] mt-1 text-right opacity-40 font-bold uppercase dark:text-zinc-400">
@@ -306,7 +309,7 @@ export function BotPreview({ isAppMode = false }: BotPreviewProps) {
         )}
       </div>
 
-      <div className="p-3 bg-[#F0F2F5] dark:bg-zinc-900 flex gap-2 border-t dark:border-zinc-800 shrink-0 shadow-lg z-20">
+      <div className="p-3 bg-[#F0F2F5] dark:bg-zinc-900 flex gap-2 border-t dark:border-zinc-800 shrink-0 shadow-lg z-20 pb-[calc(env(safe-area-inset-bottom,12px)+8px)]">
         <Input 
           value={input} 
           onChange={(e) => setInput(e.target.value)} 
