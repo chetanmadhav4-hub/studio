@@ -212,14 +212,16 @@ export default function Home() {
                       <History className="w-5 h-5" /> Recent Orders
                     </Button>
                   </DialogTrigger>
-                  <DialogContent className="w-[90vw] max-w-[380px] max-h-[80vh] overflow-y-auto rounded-[2.5rem] dark:bg-zinc-950 border-none shadow-2xl p-6 sm:p-8">
-                    <DialogHeader>
+                  <DialogContent className="w-[92%] max-w-[400px] max-h-[70vh] overflow-hidden rounded-[2.5rem] dark:bg-zinc-950 border-none shadow-2xl p-6 sm:p-8 flex flex-col">
+                    <DialogHeader className="shrink-0 mb-4">
                       <DialogTitle className="flex items-center gap-3 dark:text-zinc-50 text-xl font-black uppercase tracking-tighter">
                         <History className="w-6 h-6 text-primary" />
                         Order History
                       </DialogTitle>
                     </DialogHeader>
-                    <OrderHistory />
+                    <div className="flex-1 overflow-y-auto custom-scrollbar">
+                      <OrderHistory />
+                    </div>
                   </DialogContent>
                 </Dialog>
               </div>
